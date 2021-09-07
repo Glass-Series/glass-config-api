@@ -1,18 +1,18 @@
 buildscript {
 	repositories {
-		mavenCentral()
-		jcenter()
 		maven {
 			name = "Fabric"
 			url = "https://maven.fabricmc.net/"
 		}
+		mavenCentral()
+		jcenter()
 		maven {
 			name = "Jitpack"
 			url 'https://jitpack.io/'
 		}
 	}
 	dependencies {
-		classpath 'com.github.Chocohead:Fabric-Loom:e3d1762'
+		classpath 'com.github.Chocohead:Fabric-Loom:66ed9fe'
 	}
 }
 
@@ -88,7 +88,17 @@ dependencies {
 
 	modImplementation "com.github.minecraft-cursed-legacy:cursed-fabric-loader:${project.loader_version}"
 
-	modImplementation "net.modificationstation:StationAPI:${project.stapi_version}"
+	modImplementation "com.github.modificationstation:StationAPI:${project.stapi_version}"
+
+	implementation "com.github.jhalterman:typetools:87240d6"
+
+	implementation "com.github.mineLdiver:expressions:2fa66db"
+
+	implementation "com.github.mineLdiver:UnsafeEvents:7efec57"
+
+	modImplementation "com.github.calmilamsy:ModMenu:af21851"
+
+	compile "blue.endless:jankson:1.2.1"
 }
 
 processResources {

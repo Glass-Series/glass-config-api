@@ -1,41 +1,41 @@
 {
   "schemaVersion": 1,
-  "id": "examplemod",
+  "id": "gcapi",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Glass Config API",
+  "description": "A shitty config GUI with an API to match.",
   "authors": [
-    "Me!"
+    "calmilamsy"
   ],
   "contact": {
     "homepage": "https://glass-launcher.net/",
-    "sources": "https://github.com/calmilamsy/BIN-fabric-example-mod"
+    "sources": "https://github.com/calmilamsy/Glass-Config-API"
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/examplemod/icon.png",
+  "icon": "assets/gcapi/icon.png",
 
   "environment": "*",
   "entrypoints": {
+    "gcapi" : [
+      "net.glasslauncher.mods.api.gcapi.api.ConfigClass"
+    ],
+    "modmenu" : [
+    ],
     "stationapi:event_bus": [
-      "net.glasslauncher.example.events.init.AchievementListener",
-      "net.glasslauncher.example.events.init.BlockListener",
-      "net.glasslauncher.example.events.init.ItemListener",
-      "net.glasslauncher.example.events.init.PlayerHandlerListener",
-      "net.glasslauncher.example.events.init.RecipeListener"
+      "net.glasslauncher.mods.api.gcapi.GlassConfigAPI"
     ],
     "stationapi:event_bus_client": [
-      "net.glasslauncher.example.events.init.ModelListener",
-      "net.glasslauncher.example.events.init.KeyBindingListener",
-      "net.glasslauncher.example.events.init.TextureListener"
     ],
     "stationapi:event_bus_server": [
-      "net.glasslauncher.example.events.init.ServerInitListener"
     ]
   },
+  "custom": {
+    "modmenu:api": true
+  },
   "mixins": [
-    "examplemod.mixins.json"
+    "gcapi.mixins.json"
   ],
 
   "depends": {
