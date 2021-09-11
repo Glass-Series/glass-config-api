@@ -73,10 +73,10 @@ public class ScreenBuilder extends ScreenBase {
     @Override
     public void onMouseEvent() {
         super.onMouseEvent();
-        if (Mouse.isButtonDown(0) || Mouse.isButtonDown(1)) {
+        if (Mouse.isButtonDown(0)) {
             for (ConfigBase configBase : entryList) {
                 if (configBase instanceof ConfigEntry) {
-                    ((ConfigEntry<?>) configBase).getDrawable().mouseClicked(mouseX, mouseY);
+                    ((ConfigEntry<?>) configBase).getDrawable().mouseClicked(mouseX, mouseY, 0);
                 }
             }
         }

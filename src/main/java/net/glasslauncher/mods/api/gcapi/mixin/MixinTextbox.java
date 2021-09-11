@@ -4,9 +4,11 @@ import net.glasslauncher.mods.api.gcapi.screen.HasDrawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widgets.Textbox;
 import net.minecraft.client.render.TextRenderer;
+import net.minecraft.util.CharacterUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Textbox.class)
@@ -22,13 +24,6 @@ public abstract class MixinTextbox extends DrawableHelper implements HasDrawable
 
     @Mutable
     @Shadow @Final private int height;
-
-    @Shadow public abstract void mouseClicked(int i, int j, int k);
-
-    @Override
-    public void mouseClicked(int mouseX, int mouseY) {
-        mouseClicked(mouseX, mouseY, 0);
-    }
 
     @Override
     public void setXYWH(int x, int y, int width, int height) {
