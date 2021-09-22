@@ -12,7 +12,6 @@ public class StringConfigEntry extends ConfigEntry<String> {
 
     public StringConfigEntry(String name, String description, String value) {
         super(name, description, value);
-        System.out.println(value);
     }
 
     @Override

@@ -3,12 +3,9 @@ package net.glasslauncher.mods.api.gcapi.mixin;
 import net.glasslauncher.mods.api.gcapi.screen.HasDrawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widgets.Textbox;
-import net.minecraft.client.render.TextRenderer;
-import net.minecraft.util.CharacterUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(Textbox.class)

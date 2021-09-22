@@ -46,15 +46,15 @@ public class CharacterUtils {
         return "";
     }
 
-    public static String method_2752(String string, int i, boolean flag, TextRenderer textRenderer) {
+    public static String getRenderableString(String string, int maxPixelWidth, boolean flag, TextRenderer textRenderer) {
         StringBuilder var4 = new StringBuilder();
-        int var5 = 0;
+        int currentPixelWidth = 0;
         int var6 = flag ? string.length() - 1 : 0;
         int var7 = flag ? -1 : 1;
         boolean var8 = false;
         boolean var9 = false;
 
-        for(int var10 = var6; var10 >= 0 && var10 < string.length() && var5 < i; var10 += var7) {
+        for(int var10 = var6; var10 >= 0 && var10 < string.length() && currentPixelWidth < maxPixelWidth; var10 += var7) {
             char var11 = string.charAt(var10);
             int var12 = textRenderer.getTextWidth(Character.toString(var11));
             if (var8) {
@@ -69,13 +69,13 @@ public class CharacterUtils {
             } else if (var12 < 0) {
                 var8 = true;
             } else {
-                var5 += var12;
+                currentPixelWidth += var12;
                 if (var9) {
-                    ++var5;
+                    ++currentPixelWidth;
                 }
             }
 
-            if (var5 > i) {
+            if (currentPixelWidth > maxPixelWidth) {
                 break;
             }
 

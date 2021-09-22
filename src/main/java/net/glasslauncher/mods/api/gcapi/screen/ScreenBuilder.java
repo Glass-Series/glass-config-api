@@ -2,12 +2,12 @@ package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.ModContainer;
 import net.glasslauncher.mods.api.gcapi.GlassConfigAPI;
+import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.gui.widgets.ScrollableBase;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
-import net.modificationstation.stationapi.api.registry.ModID;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
@@ -16,14 +16,14 @@ import java.util.List;
 public class ScreenBuilder extends ScreenBase {
 
     private ScreenScrollList scrollList;
-    private final List<ConfigEntry<?>> entryList = new ArrayList<>();
+    private final List<ConfigBase> entryList = new ArrayList<>();
     private int selectedIndex = -1;
     private final ScreenBase parent;
-    private final ModID mod;
+    private final ModContainerEntrypoint mod;
     private int mouseX = -1;
     private int mouseY = -1;
 
-    public ScreenBuilder(ScreenBase parent, ModID mod) {
+    public ScreenBuilder(ScreenBase parent, ModContainerEntrypoint mod) {
         this.parent = parent;
         this.mod = mod;
     }
@@ -33,7 +33,7 @@ public class ScreenBuilder extends ScreenBase {
         buttons.clear();
         entryList.clear();
         this.scrollList = new ScreenScrollList();
-        buttons.add(new Button(0,0, 0, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
+        buttons.add(new Button(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
         GlassConfigAPI.MOD_CONFIGS.get(mod).forEach(property -> {
             property.keySet().forEach((key) -> {
                 entryList.addAll(property.get(key));
@@ -47,7 +47,7 @@ public class ScreenBuilder extends ScreenBase {
         super.tick();
         for (ConfigBase configBase : entryList) {
             if (configBase instanceof ConfigEntry) {
-                ((ConfigEntry<?>) configBase).getDrawable().tick();
+                configBase.getDrawable().tick();
             }
         }
     }
@@ -57,7 +57,7 @@ public class ScreenBuilder extends ScreenBase {
         super.keyPressed(character, key);
         for (ConfigBase configBase : entryList) {
             if (configBase instanceof ConfigEntry) {
-                ((ConfigEntry<?>) configBase).getDrawable().keyPressed(character, key);
+                configBase.getDrawable().keyPressed(character, key);
             }
         }
     }
@@ -76,7 +76,7 @@ public class ScreenBuilder extends ScreenBase {
         if (Mouse.isButtonDown(0)) {
             for (ConfigBase configBase : entryList) {
                 if (configBase instanceof ConfigEntry) {
-                    ((ConfigEntry<?>) configBase).getDrawable().mouseClicked(mouseX, mouseY, 0);
+                    configBase.getDrawable().mouseClicked(mouseX, mouseY, 0);
                 }
             }
         }
@@ -106,7 +106,7 @@ public class ScreenBuilder extends ScreenBase {
         }
 
         @Override
-        protected boolean isWorldSelected(int i) {
+        protected boolean isEntrySelected(int i) {
             return i == selectedIndex;
         }
 
@@ -116,14 +116,11 @@ public class ScreenBuilder extends ScreenBase {
         }
 
         @Override
-        protected void renderStatEntry(int itemId, int x, int y, int i1, Tessellator arg) {
+        protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
             ConfigBase configBase = ScreenBuilder.this.entryList.get(itemId);
-
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.name, x + 2, y + 1, 16777215);
-            if (configBase instanceof ConfigEntry) {
-                ((ConfigEntry) configBase).getDrawable().setXYWH(x + 2, y + 12, 50, 20);
-                ((ConfigEntry) configBase).getDrawable().draw();
-            }
+            configBase.getDrawable().setXYWH(x + 2, y + 12, 50, 20);
+            configBase.getDrawable().draw();
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.description, x + 2, y + 34, 8421504);
         }
     }

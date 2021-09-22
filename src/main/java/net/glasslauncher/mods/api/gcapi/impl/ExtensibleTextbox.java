@@ -27,6 +27,8 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
     private int selectedBorderColour = 14737632;
     private int deselectedBorderColour = 7368816;
 
+    private boolean doRenderUpdate = true;
+
     public ExtensibleTextbox(TextRenderer textRenderer, int xPos, int yPos, int width, int height) {
         this.textRenderer = textRenderer;
         this.x = xPos;
@@ -85,7 +87,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
         }
 
         this.text = var2;
-        this.method_743(var4 - this.cursorMin + var8);
+        this.updateOffsetCursorMax(var4 - this.cursorMin + var8);
     }
 
     public void method_729(int i) {
@@ -117,7 +119,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
 
                 this.text = var5;
                 if (var2) {
-                    this.method_743(i);
+                    this.updateOffsetCursorMax(i);
                 }
 
             }
@@ -158,12 +160,12 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
         return var3;
     }
 
-    public void method_743(int i) {
-        this.method_745(this.cursorMin + i);
+    public void updateOffsetCursorMax(int cursorMax) {
+        this.updateCursorMax(this.cursorMin + cursorMax);
     }
 
-    public void method_745(int i) {
-        this.cursorMax = i;
+    public void updateCursorMax(int cursorMax) {
+        this.cursorMax = cursorMax;
         int var2 = this.text.length();
         if (this.cursorMax < 0) {
             this.cursorMax = 0;
@@ -173,15 +175,15 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
             this.cursorMax = var2;
         }
 
-        this.method_749(this.cursorMax);
+        this.updateCursorPosition(this.cursorMax);
     }
 
-    public void method_742() {
-        this.method_745(0);
+    public void updateCursorMax() {
+        this.updateCursorMax(0);
     }
 
     public void onTextChanged() {
-        this.method_745(this.text.length());
+        this.updateCursorMax(this.text.length());
     }
 
     @Override
@@ -190,7 +192,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
             switch(c) {
                 case '\u0001':
                     this.onTextChanged();
-                    this.method_749(0);
+                    this.updateCursorPosition(0);
                     return;
                 case '\u0003':
                     CharacterUtils.setClipboardText(this.getSelectedText());
@@ -214,43 +216,43 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
                             return;
                         case 199:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                                this.method_749(0);
+                                this.updateCursorPosition(0);
                             } else {
-                                this.method_742();
+                                this.updateCursorMax();
                             }
 
                             return;
                         case 203:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                                 if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                    this.method_749(this.method_730(-1, this.getCursorMin()));
+                                    this.updateCursorPosition(this.method_730(-1, this.getCursorMin()));
                                 } else {
-                                    this.method_749(this.getCursorMin() - 1);
+                                    this.updateCursorPosition(this.getCursorMin() - 1);
                                 }
                             } else if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                this.method_745(this.method_739(-1));
+                                this.updateCursorMax(this.method_739(-1));
                             } else {
-                                this.method_743(-1);
+                                this.updateOffsetCursorMax(-1);
                             }
 
                             return;
                         case 205:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                                 if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                    this.method_749(this.method_730(1, this.getCursorMin()));
+                                    this.updateCursorPosition(this.method_730(1, this.getCursorMin()));
                                 } else {
-                                    this.method_749(this.getCursorMin() + 1);
+                                    this.updateCursorPosition(this.getCursorMin() + 1);
                                 }
                             } else if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                this.method_745(this.method_739(1));
+                                this.updateCursorMax(this.method_739(1));
                             } else {
-                                this.method_743(1);
+                                this.updateOffsetCursorMax(1);
                             }
 
                             return;
                         case 207:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                                this.method_749(this.text.length());
+                                this.updateCursorPosition(this.text.length());
                             } else {
                                 this.onTextChanged();
                             }
@@ -286,8 +288,8 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
                 var5 -= 4;
             }
 
-            String var6 = CharacterUtils.method_2752(this.text.substring(this.cursorPosition), this.method_754(), false, textRenderer);
-            this.method_745(CharacterUtils.method_2752(var6, var5, false, textRenderer).length() + this.cursorPosition);
+            String var6 = CharacterUtils.getRenderableString(this.text.substring(this.cursorPosition), this.getBackgroundOffset(), false, textRenderer);
+            this.updateCursorMax(CharacterUtils.getRenderableString(var6, var5, false, textRenderer).length() + this.cursorPosition);
         }
 
     }
@@ -302,6 +304,10 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
 
     @Override
     public void draw() {
+        if (doRenderUpdate) {
+            onTextChanged();
+            doRenderUpdate = false;
+        }
         if (this.shouldDrawBackground()) {
             fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, -6250336);
             fill(this.x, this.y, this.x + this.width, this.y + this.height, -16777216);
@@ -310,7 +316,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
         int var1 = this.field_967 ? this.selectedBorderColour : this.deselectedBorderColour;
         int var2 = this.cursorMax - this.cursorPosition;
         int var3 = this.cursorMin - this.cursorPosition;
-        String var4 = CharacterUtils.method_2752(this.text.substring(this.cursorPosition), this.method_754(), false, textRenderer);
+        String var4 = CharacterUtils.getRenderableString(this.text.substring(this.cursorPosition), this.getBackgroundOffset(), false, textRenderer);
         boolean var5 = var2 >= 0 && var2 <= var4.length();
         boolean var6 = this.selected && this.focusedTicks / 6 % 2 == 0 && var5;
         int firstStringPos = this.shouldDrawBackground ? this.x + 4 : this.x;
@@ -423,37 +429,37 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
         return this.cursorMin;
     }
 
-    public int method_754() {
+    public int getBackgroundOffset() {
         return this.shouldDrawBackground() ? this.width - 8 : this.width;
     }
 
-    public void method_749(int i) {
+    public void updateCursorPosition(int newCursorPos) {
         int var2 = this.text.length();
-        if (i > var2) {
-            i = var2;
+        if (newCursorPos > var2) {
+            newCursorPos = var2;
         }
 
-        if (i < 0) {
-            i = 0;
+        if (newCursorPos < 0) {
+            newCursorPos = 0;
         }
 
-        this.cursorMin = i;
+        this.cursorMin = newCursorPos;
         if (this.textRenderer != null) {
             if (this.cursorPosition > var2) {
                 this.cursorPosition = var2;
             }
 
-            int var3 = this.method_754();
-            String var4 = CharacterUtils.method_2752(this.text.substring(this.cursorPosition), var3, false, textRenderer);
-            int var5 = var4.length() + this.cursorPosition;
-            if (i == this.cursorPosition) {
-                this.cursorPosition -= CharacterUtils.method_2752(this.text, var3, true, textRenderer).length();
+            int backgroundOffset = this.getBackgroundOffset();
+            String visibleString = CharacterUtils.getRenderableString(this.text.substring(this.cursorPosition), backgroundOffset, false, textRenderer);
+            int var5 = visibleString.length() + this.cursorPosition;
+            if (newCursorPos == this.cursorPosition) {
+                this.cursorPosition -= CharacterUtils.getRenderableString(this.text, backgroundOffset, true, textRenderer).length();
             }
 
-            if (i > var5) {
-                this.cursorPosition += i - var5;
-            } else if (i <= this.cursorPosition) {
-                this.cursorPosition -= this.cursorPosition - i;
+            if (newCursorPos > var5) {
+                this.cursorPosition += newCursorPos - var5;
+            } else if (newCursorPos <= this.cursorPosition) {
+                this.cursorPosition -= this.cursorPosition - newCursorPos;
             }
 
             if (this.cursorPosition < 0) {
@@ -467,7 +473,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
 
     }
 
-    public void method_741(boolean flag) {
+    public void setEnabled(boolean flag) {
         this.enabled = flag;
     }
 

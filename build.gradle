@@ -12,7 +12,7 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath 'com.github.Chocohead:Fabric-Loom:66ed9fe'
+		classpath 'com.github.Chocohead:Fabric-Loom:0d0261a'
 	}
 }
 
@@ -45,10 +45,6 @@ repositories {
 	maven {
 		name = "Jitpack"
 		url "https://jitpack.io/"
-	}
-	maven {
-		name = "Glass"
-		url "https://maven.glass-launcher.net/repo/"
 	}
 }
 
@@ -135,6 +131,14 @@ task javadocJar(type: Jar) {
 }
 
 tasks.publishToMavenLocal.dependsOn(tasks.remapJar)
+
+task moveRemappedSrc {
+	doLast {
+		delete './src/main/java/'
+		ant.move file: './remappedSrc/net',
+				todir: './src/main/java/'
+	}
+}
 
 publishing {
 	repositories {

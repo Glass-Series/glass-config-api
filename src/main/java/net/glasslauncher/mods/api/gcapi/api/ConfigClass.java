@@ -9,8 +9,7 @@ public class ConfigClass implements HasConfigFields {
     public static String testConfig1 = "wow";
     public static String asd2 = "hmmm";
     public static String asd3 = "hmmm";
-    public static String asd4 = "hmmm";
-    public static String asd5 = "hmmm";
-    public static String asd6 = "hmmm";
-    public static String asd7 = "hmmm";
+
+//    @Comment("My config category")
+//    public static ConfigCategory configCategory = new ConfigCategory();
 }

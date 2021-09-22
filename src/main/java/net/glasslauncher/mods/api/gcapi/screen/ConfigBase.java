@@ -1,6 +1,8 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 
+import org.jetbrains.annotations.NotNull;
+
 public abstract class ConfigBase {
 
     /**
@@ -19,4 +21,7 @@ public abstract class ConfigBase {
         this.name = name;
         this.description = description;
     }
+
+    @NotNull
+    public abstract HasDrawable getDrawable();
 }
