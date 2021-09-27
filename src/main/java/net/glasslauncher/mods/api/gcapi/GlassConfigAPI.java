@@ -3,7 +3,6 @@ package net.glasslauncher.mods.api.gcapi;
 
 import blue.endless.jankson.Comment;
 import blue.endless.jankson.Jankson;
-import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.HashMultimap;
@@ -19,7 +18,6 @@ import net.glasslauncher.mods.api.gcapi.screen.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.screen.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.screen.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
-import net.glasslauncher.mods.api.gcapi.screen.ScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.ownconfig.StringConfigEntry;
 import net.minecraft.client.gui.screen.ScreenBase;
 import uk.co.benjiweber.expressions.function.TriFunction;
