@@ -4,13 +4,13 @@
   "package": "net.glasslauncher.mods.api.gcapi.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinButton"
   ],
   "server": [
   ],
   "client": [
     "MixinModMenu",
-    "MixinTextbox"
+    "MixinTextbox",
+    "MixinButton"
   ],
   "injectors": {
     "defaultRequire": 1
