@@ -20,15 +20,6 @@
   "entrypoints": {
     "gcapi" : [
       "net.glasslauncher.mods.api.gcapi.impl.example.ConfigClass"
-    ],
-    "modmenu" : [
-    ],
-    "stationapi:event_bus": [
-      "net.glasslauncher.mods.api.gcapi.GlassConfigAPI"
-    ],
-    "stationapi:event_bus_client": [
-    ],
-    "stationapi:event_bus_server": [
     ]
   },
   "custom": {
