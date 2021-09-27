@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "gcapi" : [
-      "net.glasslauncher.mods.api.gcapi.api.ConfigClass"
+      "net.glasslauncher.mods.api.gcapi.impl.example.ConfigClass"
     ],
     "modmenu" : [
     ],
@@ -39,6 +39,7 @@
   ],
 
   "depends": {
-    "minecraft": "1.0.0-beta.7.3"
+    "minecraft": "1.0.0-beta.7.3",
+    "modmenu": "*"
   }
 }

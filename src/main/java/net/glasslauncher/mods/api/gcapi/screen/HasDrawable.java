@@ -7,4 +7,5 @@ public interface HasDrawable {
     void setXYWH(int x, int y, int width, int height);
     void tick();
     void keyPressed(char character, int key);
+    void setID(int id);
 }

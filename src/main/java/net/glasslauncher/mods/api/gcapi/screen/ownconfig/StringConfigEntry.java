@@ -16,7 +16,17 @@ public class StringConfigEntry extends ConfigEntry<String> {
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        textbox = new ExtensibleTextbox(textRenderer, 0, 0, 0, 0);
+        textbox = new ExtensibleTextbox(textRenderer);
+        textbox.setText(value);
+    }
+
+    @Override
+    public String getDrawableValue() {
+        return textbox.getText();
+    }
+
+    @Override
+    public void setDrawableValue(String value) {
         textbox.setText(value);
     }
 

@@ -7,7 +7,7 @@ import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
+public class ExtensibleTextbox<T> extends DrawableHelper implements HasDrawable {
 
     private final TextRenderer textRenderer;
     private int x;
@@ -29,12 +29,12 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
 
     private boolean doRenderUpdate = true;
 
-    public ExtensibleTextbox(TextRenderer textRenderer, int xPos, int yPos, int width, int height) {
+    public ExtensibleTextbox(TextRenderer textRenderer) {
         this.textRenderer = textRenderer;
-        this.x = xPos;
-        this.y = yPos;
-        this.width = width;
-        this.height = height;
+        this.x = 0;
+        this.y = 0;
+        this.width = 0;
+        this.height = 0;
     }
 
     @Override
@@ -276,6 +276,11 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
     }
 
     @Override
+    public void setID(int id) {
+
+    }
+
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int button) {
         boolean isMouseHovering = mouseX >= this.x && mouseX < this.x + this.width && mouseY >= this.y && mouseY < this.y + this.height;
         if (this.enabled) {
@@ -476,5 +481,4 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
     public void setEnabled(boolean flag) {
         this.enabled = flag;
     }
-
 }

@@ -14,4 +14,7 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     }
 
     public abstract void init(ScreenBase parent, TextRenderer textRenderer);
+
+    public abstract T getDrawableValue();
+    public abstract void setDrawableValue(T value);
 }

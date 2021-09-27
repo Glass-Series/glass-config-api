@@ -9,4 +9,10 @@ public interface HasConfigFields {
     default String getConfigPath() {
         return "config";
     }
+
+    /**
+     * Return the name you want to have on the header of your config GUI.
+     * @return a string with your desired name. Supports colour codes.
+     */
+    String getVisibleName();
 }
