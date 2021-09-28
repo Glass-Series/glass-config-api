@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.HasConfigFields;
 import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.ConfigFactories;
@@ -38,7 +39,7 @@ public class GlassConfigAPI {
 
     public static void loadConfigs(ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> builder) {
         ImmutableMap.Builder<Type, TriFunction<String, String, Object, ConfigEntry<?>>> map = ImmutableMap.builder();
-        map.put(String.class, ((s, s2, o) -> new StringConfigEntry(s, s2, o.toString())));
+        map.put(String.class, ((name, description, value) -> new StringConfigEntry(name, description, value.toString())));
         ConfigFactories.factories = map.build();
         AtomicInteger readFields = new AtomicInteger();
 
@@ -47,7 +48,7 @@ public class GlassConfigAPI {
             HasConfigFields config = objectEntrypointContainer.getEntrypoint();
             ModContainerEntrypoint modContainerEntrypoint = new ModContainerEntrypoint(mod, config);
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
-            ConfigCategory typeToValue = new ConfigCategory(config.getConfigPath(), null, HashMultimap.create());
+            ConfigCategory typeToValue = new ConfigCategory(config.getVisibleName(), objectEntrypointContainer.getEntrypoint().getVisibleName(), HashMultimap.create());
             try {
                 File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.getMetadata().getId() + "/" + config.getConfigPath() + ".json");
                 if (!configFile.exists()) {
@@ -86,10 +87,18 @@ public class GlassConfigAPI {
                             if (field.isAnnotationPresent(Comment.class)) {
                                 String comment = field.getAnnotation(Comment.class).value();
                                 jsonObject.setComment(field.getName(), comment);
-                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), comment, value));
+                                try {
+                                    typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), comment, value));
+                                } catch (Exception e) {
+                                    throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
+                                }
                             }
                             else {
-                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), null, value));
+                                try {
+                                    typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), null, value));
+                                } catch (Exception e) {
+                                    throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
+                                }
                             }
                             readFields.getAndIncrement();
                         }
@@ -121,7 +130,7 @@ public class GlassConfigAPI {
         try {
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
             Comment categoryComment = category.getAnnotation(Comment.class);
-            ConfigCategory typeToValue = new ConfigCategory(category.getName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
+            ConfigCategory typeToValue = new ConfigCategory(((IsConfigCategory) category.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
             for (Field field : category.getType().getDeclaredFields()) {
                 typeToField.put(field.getType(), field);
             }
@@ -147,9 +156,17 @@ public class GlassConfigAPI {
                         if (field.isAnnotationPresent(Comment.class)) {
                             String comment = field.getAnnotation(Comment.class).value();
                             jsonObject.setComment(field.getName(), comment);
-                            typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), comment, value));
+                            try {
+                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), comment, value));
+                            } catch (Exception e) {
+                                throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
+                            }
                         } else {
-                            typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), null, value));
+                            try {
+                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), null, value));
+                            } catch (Exception e) {
+                                throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
+                            }
                         }
                         readFields.getAndIncrement();
                     }

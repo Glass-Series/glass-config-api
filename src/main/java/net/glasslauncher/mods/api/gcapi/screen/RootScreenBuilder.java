@@ -3,8 +3,11 @@ package net.glasslauncher.mods.api.gcapi.screen;
 import net.glasslauncher.mods.api.gcapi.GlassConfigAPI;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.minecraft.client.gui.screen.ScreenBase;
+import net.minecraft.client.gui.widgets.Button;
 
 public class RootScreenBuilder extends ScreenBuilder {
+
+    boolean doSave = true;
 
     public RootScreenBuilder(ScreenBase parent, ModContainerEntrypoint mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
@@ -13,7 +16,23 @@ public class RootScreenBuilder extends ScreenBuilder {
     @Override
     public void onClose() {
         super.onClose();
-        GlassConfigAPI.saveConfigs(mod);
-        System.out.println("Saved!");
+        if (doSave) {
+            GlassConfigAPI.saveConfigs(mod);
+            System.out.println("Saved!");
+        }
+    }
+
+    @Override
+    public void init() {
+        doSave = true;
+        super.init();
+    }
+
+    @Override
+    protected void buttonClicked(Button button) {
+        if (button.id != 0) {
+            doSave = false;
+        }
+        super.buttonClicked(button);
     }
 }

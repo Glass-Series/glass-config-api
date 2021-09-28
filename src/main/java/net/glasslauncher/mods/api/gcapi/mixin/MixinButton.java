@@ -25,6 +25,8 @@ public abstract class MixinButton implements HasDrawable {
 
     @Shadow public int id;
 
+    @Shadow protected abstract void postRender(Minecraft minecraft, int mouseX, int mouseY);
+
     @Override
     public void setXYWH(int x, int y, int width, int height) {
         this.x = x;

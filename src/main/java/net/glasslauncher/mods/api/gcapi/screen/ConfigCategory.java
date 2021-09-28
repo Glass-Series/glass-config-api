@@ -15,7 +15,7 @@ public class ConfigCategory extends ConfigBase {
     public ConfigCategory(String name, String description, Multimap<Class<?>, ConfigBase> values) {
         super(name, description);
         this.values = values;
-        button = new Button(0, 0, 0, name);
+        button = new Button(0, 0, 0, "Open");
     }
 
     /**

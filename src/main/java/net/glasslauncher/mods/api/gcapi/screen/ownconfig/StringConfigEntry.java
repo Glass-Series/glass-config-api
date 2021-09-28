@@ -22,7 +22,7 @@ public class StringConfigEntry extends ConfigEntry<String> {
 
     @Override
     public String getDrawableValue() {
-        return textbox.getText();
+        return textbox == null? null : textbox.getText();
     }
 
     @Override

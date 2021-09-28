@@ -1,6 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.glasslauncher.mods.api.gcapi.impl.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
@@ -31,6 +32,14 @@ public class ScreenBuilder extends ScreenBase {
 
     @Override
     public void init() {
+        baseCategory.values.values().forEach((value) -> {
+            if (value instanceof ConfigEntry<?>) {
+                ConfigEntry configEntry = (ConfigEntry<?>) value;
+                if (configEntry.getDrawableValue() != null) {
+                    configEntry.value = configEntry.getDrawableValue();
+                }
+            }
+        });
         buttons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToCategory = new HashMap<>();
@@ -72,7 +81,11 @@ public class ScreenBuilder extends ScreenBase {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         scrollList.render(mouseX, mouseY, delta);
-        super.render(mouseX, mouseY, delta);
+        // Breaks rendering of category buttons.
+        //super.render(mouseX, mouseY, delta);
+        ((Button) buttons.get(0)).render(minecraft, mouseX, mouseY);
+        textManager.drawTextWithShadow(baseCategory.name, (width/2) - (textManager.getTextWidth(baseCategory.name)/2), 4, 16777215);
+        textManager.drawTextWithShadow(baseCategory.description, (width/2) - (textManager.getTextWidth(baseCategory.description)/2), 18, 8421504);
     }
 
     @Override
@@ -110,7 +123,9 @@ public class ScreenBuilder extends ScreenBase {
             }
         });
         super.onClose();
-        System.out.println("saving vars");
+        if (parent instanceof RootScreenBuilder) {
+            ((RootScreenBuilder) parent).doSave = false;
+        }
     }
 
     class ScreenScrollList extends ScrollableBase {
@@ -142,7 +157,7 @@ public class ScreenBuilder extends ScreenBase {
         protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
             ConfigBase configBase = (ConfigBase) ScreenBuilder.this.baseCategory.values.values().toArray()[itemId];
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.name, x + 2, y + 1, 16777215);
-            configBase.getDrawable().setXYWH(x + 2, y + 12, 50, 20);
+            configBase.getDrawable().setXYWH(x + 2, y + 12, 212, 20);
             configBase.getDrawable().draw();
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.description, x + 2, y + 34, 8421504);
         }
