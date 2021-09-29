@@ -3,6 +3,7 @@ package net.glasslauncher.mods.api.gcapi.screen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.impl.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
+import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
@@ -91,6 +92,7 @@ public class ScreenBuilder extends ScreenBase {
     @Override
     public void onMouseEvent() {
         super.onMouseEvent();
+        float dWheel = Mouse.getDWheel();
         if (Mouse.isButtonDown(0)) {
             for (ConfigBase configBase : baseCategory.values.values()) {
                 if (configBase instanceof ConfigEntry) {
@@ -98,8 +100,8 @@ public class ScreenBuilder extends ScreenBase {
                 }
             }
         }
-        else if (Mouse.getDWheel() != 0) {
-
+        else if (dWheel != 0) {
+            scrollList.scroll(-(dWheel/10));
         }
     }
 
@@ -131,6 +133,11 @@ public class ScreenBuilder extends ScreenBase {
     class ScreenScrollList extends ScrollableBase {
         public ScreenScrollList() {
             super(ScreenBuilder.this.minecraft, ScreenBuilder.this.width, ScreenBuilder.this.height, 32, ScreenBuilder.this.height - 32, 48);
+        }
+
+        public void scroll(float value) {
+            ScrollableBaseAccessor baseAccessor = ((ScrollableBaseAccessor) this);
+            baseAccessor.setField_1540(baseAccessor.getField_1540() + value);
         }
 
         @Override

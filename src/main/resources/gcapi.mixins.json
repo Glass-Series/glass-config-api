@@ -8,9 +8,10 @@
   "server": [
   ],
   "client": [
+    "MixinButton",
     "MixinModMenu",
     "MixinTextbox",
-    "MixinButton"
+    "ScrollableBaseAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

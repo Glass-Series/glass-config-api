@@ -8,8 +8,8 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     protected ScreenBase parent;
     protected TextRenderer textRenderer;
 
-    public ConfigEntry(String name, String description, T value) {
-        super(name, description);
+    public ConfigEntry(String id, String name, String description, T value) {
+        super(id, name, description);
         this.value = value;
     }
 

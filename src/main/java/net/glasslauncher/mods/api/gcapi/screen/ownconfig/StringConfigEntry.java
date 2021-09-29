@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 public class StringConfigEntry extends ConfigEntry<String> {
     private ExtensibleTextbox textbox;
 
-    public StringConfigEntry(String name, String description, String value) {
-        super(name, description, value);
+    public StringConfigEntry(String id, String name, String description, String value) {
+        super(id, name, description, value);
     }
 
     @Override

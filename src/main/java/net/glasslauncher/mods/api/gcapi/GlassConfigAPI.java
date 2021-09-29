@@ -21,7 +21,7 @@ import net.glasslauncher.mods.api.gcapi.screen.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.ownconfig.StringConfigEntry;
 import net.minecraft.client.gui.screen.ScreenBase;
-import uk.co.benjiweber.expressions.function.TriFunction;
+import uk.co.benjiweber.expressions.function.QuadFunction;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,8 +38,8 @@ public class GlassConfigAPI {
     public static final HashMap<ModContainerEntrypoint, ConfigCategory> MOD_CONFIGS = new HashMap<>();
 
     public static void loadConfigs(ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> builder) {
-        ImmutableMap.Builder<Type, TriFunction<String, String, Object, ConfigEntry<?>>> map = ImmutableMap.builder();
-        map.put(String.class, ((name, description, value) -> new StringConfigEntry(name, description, value.toString())));
+        ImmutableMap.Builder<Type, QuadFunction<String, String, String, Object, ConfigEntry<?>>> map = ImmutableMap.builder();
+        map.put(String.class, ((id, name, description, value) -> new StringConfigEntry(id, name, description, value.toString())));
         ConfigFactories.factories = map.build();
         AtomicInteger readFields = new AtomicInteger();
 
@@ -48,7 +48,7 @@ public class GlassConfigAPI {
             HasConfigFields config = objectEntrypointContainer.getEntrypoint();
             ModContainerEntrypoint modContainerEntrypoint = new ModContainerEntrypoint(mod, config);
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
-            ConfigCategory typeToValue = new ConfigCategory(config.getVisibleName(), objectEntrypointContainer.getEntrypoint().getVisibleName(), HashMultimap.create());
+            ConfigCategory category = new ConfigCategory(config.getConfigPath(), config.getVisibleName(), objectEntrypointContainer.getEntrypoint().getVisibleName(), HashMultimap.create());
             try {
                 File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.getMetadata().getId() + "/" + config.getConfigPath() + ".json");
                 if (!configFile.exists()) {
@@ -70,7 +70,7 @@ public class GlassConfigAPI {
                             try {
                                 JsonObject categoryObj = new JsonObject();
                                 jsonObject.put(field.getName(), categoryObj);
-                                typeToValue.values.put(key, readDeeper(field.get(null), field, categoryObj, readFields));
+                                category.values.put(key, readDeeper(field.get(null), field, categoryObj, readFields));
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -88,14 +88,14 @@ public class GlassConfigAPI {
                                 String comment = field.getAnnotation(Comment.class).value();
                                 jsonObject.setComment(field.getName(), comment);
                                 try {
-                                    typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), comment, value));
+                                    category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment, value));
                                 } catch (Exception e) {
                                     throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                                 }
                             }
                             else {
                                 try {
-                                    typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), null, value));
+                                    category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), null, value));
                                 } catch (Exception e) {
                                     throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                                 }
@@ -107,7 +107,7 @@ public class GlassConfigAPI {
                         throw new RuntimeException("Data factory not found for \"" + key.getName() + "\"!");
                     }
                 }
-                MOD_CONFIGS.put(modContainerEntrypoint, typeToValue);
+                MOD_CONFIGS.put(modContainerEntrypoint, category);
 
 
                 FileOutputStream fileOutputStream = (new FileOutputStream(configFile));
@@ -118,7 +118,7 @@ public class GlassConfigAPI {
             } catch (Error | Exception e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
+            System.out.println("INFO <GCAPI>: Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
 
         }));
         for (ModContainerEntrypoint mod : MOD_CONFIGS.keySet()) {
@@ -130,7 +130,7 @@ public class GlassConfigAPI {
         try {
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
             Comment categoryComment = category.getAnnotation(Comment.class);
-            ConfigCategory typeToValue = new ConfigCategory(((IsConfigCategory) category.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
+            ConfigCategory typeToValue = new ConfigCategory(category.getName(), ((IsConfigCategory) category.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
             for (Field field : category.getType().getDeclaredFields()) {
                 typeToField.put(field.getType(), field);
             }
@@ -157,13 +157,13 @@ public class GlassConfigAPI {
                             String comment = field.getAnnotation(Comment.class).value();
                             jsonObject.setComment(field.getName(), comment);
                             try {
-                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), comment, value));
+                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment, value));
                             } catch (Exception e) {
                                 throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                             }
                         } else {
                             try {
-                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getAnnotation(ConfigName.class).value(), null, value));
+                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), null, value));
                             } catch (Exception e) {
                                 throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                             }
@@ -187,9 +187,9 @@ public class GlassConfigAPI {
 
         for (ConfigBase entry : category.values.values()) {
             if (entry instanceof ConfigCategory) {
-                jsonObject.put(entry.name, doConfigCategory((ConfigCategory) entry));
+                jsonObject.put(entry.id, doConfigCategory((ConfigCategory) entry));
             } else if (entry instanceof ConfigEntry) {
-                jsonObject.put(entry.name, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
             } else {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
             }

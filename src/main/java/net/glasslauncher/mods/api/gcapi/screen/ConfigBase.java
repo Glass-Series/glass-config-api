@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class ConfigBase {
 
+    public final String id;
+
     /**
      * The name of the category. Supports colour codes. White by default.
      * @return string of maximum length of 50.
@@ -17,7 +19,8 @@ public abstract class ConfigBase {
      */
     public final String description;
 
-    public ConfigBase(String name, String description) {
+    public ConfigBase(String id, String name, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
     }
