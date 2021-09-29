@@ -19,7 +19,7 @@
   "environment": "*",
   "entrypoints": {
     "gcapi" : [
-      "net.glasslauncher.mods.api.gcapi.impl.example.ConfigClass"
+      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfigClass"
     ]
   },
   "custom": {
