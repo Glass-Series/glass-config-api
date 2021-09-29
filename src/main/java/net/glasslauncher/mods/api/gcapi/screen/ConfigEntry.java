@@ -17,4 +17,6 @@ public abstract class ConfigEntry<T> extends ConfigBase {
 
     public abstract T getDrawableValue();
     public abstract void setDrawableValue(T value);
+
+    public abstract boolean isValueValid();
 }

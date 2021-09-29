@@ -13,6 +13,10 @@ public class ExampleConfigCategory implements IsConfigCategory {
     @ConfigName("Oh No!")
     public String ohNo = "reee";
 
+    // And functioning integer config! MUST be the class, not the primitive!
+    @ConfigName("Example Integer!")
+    public Integer ohYes = 0;
+
     /**
      * Also the same as ExampleConfigClass, where this shows up as the name of the button to press, as well as the name shown in the header when the screen is opened.
      */

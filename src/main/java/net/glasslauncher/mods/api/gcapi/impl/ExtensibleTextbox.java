@@ -6,8 +6,14 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.Color;
 
-public class ExtensibleTextbox<T> extends DrawableHelper implements HasDrawable {
+import java.util.function.Function;
+
+/**
+ * Basically a modified Textbox from r1.2.5, but modified for gcapi's use case.
+ */
+public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
 
     private final TextRenderer textRenderer;
     private int x;
@@ -24,17 +30,24 @@ public class ExtensibleTextbox<T> extends DrawableHelper implements HasDrawable 
     private int cursorPosition = 0;
     private int cursorMax = 0;
     private int cursorMin = 0;
-    private int selectedBorderColour = 14737632;
-    private int deselectedBorderColour = 7368816;
+    public int selectedTextColour = 14737632;
+    public int deselectedTextColour = 7368816;
+    public int errorBorderColour = CharacterUtils.getIntFromColour(new Color(200, 50, 50));
 
     private boolean doRenderUpdate = true;
+    private Function<String, Boolean> contentsValidator;
 
-    public ExtensibleTextbox(TextRenderer textRenderer) {
+    public ExtensibleTextbox(TextRenderer textRenderer, Function<String, Boolean> contentsValidator) {
         this.textRenderer = textRenderer;
+        this.contentsValidator = contentsValidator;
         this.x = 0;
         this.y = 0;
         this.width = 0;
         this.height = 0;
+    }
+
+    public boolean isValueValid() {
+        return contentsValidator.apply(getText());
     }
 
     @Override
@@ -314,11 +327,11 @@ public class ExtensibleTextbox<T> extends DrawableHelper implements HasDrawable 
             doRenderUpdate = false;
         }
         if (this.shouldDrawBackground()) {
-            fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, -6250336);
+            fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, isValueValid()? -6250336 : errorBorderColour);
             fill(this.x, this.y, this.x + this.width, this.y + this.height, -16777216);
         }
 
-        int var1 = this.field_967 ? this.selectedBorderColour : this.deselectedBorderColour;
+        int var1 = this.field_967 ? this.selectedTextColour : this.deselectedTextColour;
         int var2 = this.cursorMax - this.cursorPosition;
         int var3 = this.cursorMin - this.cursorPosition;
         String var4 = CharacterUtils.getRenderableString(this.text.substring(this.cursorPosition), this.getBackgroundOffset(), false, textRenderer);

@@ -13,15 +13,17 @@ import net.fabricmc.loader.api.ModContainer;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.HasConfigFields;
 import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
+import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.ConfigFactories;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.glasslauncher.mods.api.gcapi.screen.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.screen.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.screen.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
+import net.glasslauncher.mods.api.gcapi.screen.ownconfig.IntegerConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.ownconfig.StringConfigEntry;
 import net.minecraft.client.gui.screen.ScreenBase;
-import uk.co.benjiweber.expressions.function.QuadFunction;
+import uk.co.benjiweber.expressions.function.QuinFunction;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -38,8 +40,9 @@ public class GlassConfigAPI {
     public static final HashMap<ModContainerEntrypoint, ConfigCategory> MOD_CONFIGS = new HashMap<>();
 
     public static void loadConfigs(ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> builder) {
-        ImmutableMap.Builder<Type, QuadFunction<String, String, String, Object, ConfigEntry<?>>> map = ImmutableMap.builder();
-        map.put(String.class, ((id, name, description, value) -> new StringConfigEntry(id, name, description, value.toString())));
+        ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> map = ImmutableMap.builder();
+        map.put(String.class, ((id, name, description, value, maxLength) -> new StringConfigEntry(id, name, description, value.toString(), maxLength)));
+        map.put(Integer.class, ((id, name, description, value, maxLength) -> new IntegerConfigEntry(id, name, description, Integer.valueOf(value.toString()), maxLength)));
         ConfigFactories.factories = map.build();
         AtomicInteger readFields = new AtomicInteger();
 
@@ -87,21 +90,15 @@ public class GlassConfigAPI {
                             field.set(config, value);
                             JsonPrimitive jsonEntry = new JsonPrimitive(value);
                             jsonObject.put(field.getName(), jsonEntry);
-                            if (field.isAnnotationPresent(Comment.class)) {
-                                String comment = field.getAnnotation(Comment.class).value();
-                                jsonObject.setComment(field.getName(), comment);
-                                try {
-                                    category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment, value));
-                                } catch (Exception e) {
-                                    throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
-                                }
+                            Comment comment = field.getAnnotation(Comment.class);
+                            if (comment != null) {
+                                jsonObject.setComment(field.getName(), comment.value());
                             }
-                            else {
-                                try {
-                                    category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), null, value));
-                                } catch (Exception e) {
-                                    throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
-                                }
+                            MaxLength maxLengthAnnotation = field.getAnnotation(MaxLength.class);
+                            try {
+                                category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
+                            } catch (Exception e) {
+                                throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                             }
                             readFields.getAndIncrement();
                         }
@@ -121,7 +118,7 @@ public class GlassConfigAPI {
             } catch (Error | Exception e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("INFO <GCAPI>: Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
+            System.out.println("[INFO]<GCAPI>: Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
 
         }));
         for (ModContainerEntrypoint mod : MOD_CONFIGS.keySet()) {
@@ -132,9 +129,9 @@ public class GlassConfigAPI {
     private static ConfigCategory readDeeper(Object categoryInstance, Field categoryField, JsonObject jsonObject, AtomicInteger readFields) {
         try {
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
-            Comment categoryComment = category.getAnnotation(Comment.class);
-            ConfigCategory typeToValue = new ConfigCategory(category.getName(), ((IsConfigCategory) category.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
-            for (Field field : category.getType().getDeclaredFields()) {
+            Comment categoryComment = categoryField.getAnnotation(Comment.class);
+            ConfigCategory category = new ConfigCategory(categoryField.getName(), ((IsConfigCategory) categoryField.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
+            for (Field field : categoryField.getType().getDeclaredFields()) {
                 typeToField.put(field.getType(), field);
             }
             for (Class<?> key : typeToField.keySet()) {

@@ -1,14 +1,53 @@
 package net.glasslauncher.mods.api.gcapi.impl;
 
 import net.minecraft.client.render.TextRenderer;
+import org.lwjgl.util.Color;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
 
+/**
+ * Some utility methods copied over from r1.2.5 for use in ExtensibleTextbox.
+ * This should be useful for other things.
+ */
 public class CharacterUtils {
 
+    /**
+     * Custom function for converting an JWJGL colour into minecraft's weird ARGB system.
+     */
+    public static int getIntFromColour(Color colour) {
+        return ((colour.getAlpha() & 255) << 24) | ((colour.getRed() & 255) << 16) | ((colour.getGreen() & 255) << 8) | (colour.getBlue() & 255);
+    }
 
-    public static final boolean isCharacterValid(char c) {
+    /**
+     * Susceptible to overflows, but honestly, I am not too concerned.
+     * https://stackoverflow.com/a/237204
+     */
+    public static boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isCharacterValid(char c) {
         return c != 167 && (net.minecraft.util.CharacterUtils.validCharacters.indexOf(c) >= 0 || c > ' ');
     }
 
@@ -29,7 +68,7 @@ public class CharacterUtils {
         try {
             StringSelection var1 = new StringSelection(string);
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(var1, null);
-        } catch (Exception var2) {
+        } catch (Exception ignored) {
         }
 
     }
@@ -40,7 +79,7 @@ public class CharacterUtils {
             if (var0 != null && var0.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 return (String)var0.getTransferData(DataFlavor.stringFlavor);
             }
-        } catch (Exception var1) {
+        } catch (Exception ignored) {
         }
 
         return "";

@@ -1,7 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.glasslauncher.mods.api.gcapi.impl.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
 import net.minecraft.client.Minecraft;
@@ -121,7 +120,12 @@ public class ScreenBuilder extends ScreenBase {
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry<?>) {
                 ConfigEntry configEntry = (ConfigEntry<?>) value;
-                configEntry.value = configEntry.getDrawableValue();
+                if (configEntry.isValueValid()) {
+                    configEntry.value = configEntry.getDrawableValue();
+                }
+                else {
+                    configEntry.setDrawableValue(configEntry.value);
+                }
             }
         });
         super.onClose();
