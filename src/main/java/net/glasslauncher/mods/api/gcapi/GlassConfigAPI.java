@@ -68,8 +68,11 @@ public class GlassConfigAPI {
                     if (IsConfigCategory.class.isAssignableFrom(key)) {
                         typeToField.get(key).forEach((field) -> {
                             try {
-                                JsonObject categoryObj = new JsonObject();
-                                jsonObject.put(field.getName(), categoryObj);
+                                JsonObject categoryObj = (JsonObject) jsonObject.get(field.getName());
+                                if (categoryObj == null) {
+                                    categoryObj = new JsonObject();
+                                    jsonObject.put(field.getName(), categoryObj);
+                                }
                                 category.values.put(key, readDeeper(field.get(null), field, categoryObj, readFields));
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -126,7 +129,7 @@ public class GlassConfigAPI {
         }
     }
 
-    private static ConfigCategory readDeeper(Object categoryInstance, Field category, JsonObject jsonObject, AtomicInteger readFields) {
+    private static ConfigCategory readDeeper(Object categoryInstance, Field categoryField, JsonObject jsonObject, AtomicInteger readFields) {
         try {
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
             Comment categoryComment = category.getAnnotation(Comment.class);
@@ -138,9 +141,12 @@ public class GlassConfigAPI {
                 if (IsConfigCategory.class.isAssignableFrom(key)) {
                     typeToField.get(key).forEach((field) -> {
                         try {
-                            JsonObject categoryObj = new JsonObject();
-                            jsonObject.put(field.getName(), categoryObj);
-                            typeToValue.values.put(key, readDeeper(field.get(categoryInstance), field, categoryObj, readFields));
+                            JsonObject categoryObj = (JsonObject) jsonObject.get(field.getName());
+                            if (categoryObj == null) {
+                                categoryObj = new JsonObject();
+                                jsonObject.put(field.getName(), categoryObj);
+                            }
+                            category.values.put(key, readDeeper(field.get(null), field, categoryObj, readFields));
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -153,20 +159,15 @@ public class GlassConfigAPI {
                         field.set(categoryInstance, value);
                         JsonPrimitive jsonEntry = new JsonPrimitive(value);
                         jsonObject.put(field.getName(), jsonEntry);
-                        if (field.isAnnotationPresent(Comment.class)) {
-                            String comment = field.getAnnotation(Comment.class).value();
-                            jsonObject.setComment(field.getName(), comment);
-                            try {
-                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment, value));
-                            } catch (Exception e) {
-                                throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
-                            }
-                        } else {
-                            try {
-                                typeToValue.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), null, value));
-                            } catch (Exception e) {
-                                throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
-                            }
+                        Comment comment = field.getAnnotation(Comment.class);
+                        if (comment != null) {
+                            jsonObject.setComment(field.getName(), comment.value());
+                        }
+                        MaxLength maxLengthAnnotation = field.getAnnotation(MaxLength.class);
+                        try {
+                            category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
+                        } catch (Exception e) {
+                            throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                         }
                         readFields.getAndIncrement();
                     }
@@ -174,7 +175,7 @@ public class GlassConfigAPI {
                     throw new RuntimeException("Data factory not found for \"" + key.getName() + "\"!");
                 }
             }
-            return typeToValue;
+            return category;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
