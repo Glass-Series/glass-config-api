@@ -214,10 +214,10 @@ public class GlassConfigAPI {
 
         for (ConfigBase entry : category.values.values()) {
             if (entry instanceof ConfigCategory) {
-                jsonObject.put(entry.name, doConfigCategory((ConfigCategory) entry));
+                jsonObject.put(entry.id, doConfigCategory((ConfigCategory) entry));
             }
             else if (entry instanceof ConfigEntry) {
-                jsonObject.put(entry.name, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
             }
             else {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
