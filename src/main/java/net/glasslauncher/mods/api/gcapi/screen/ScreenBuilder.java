@@ -14,7 +14,9 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ScreenBuilder extends ScreenBase {
 
@@ -26,11 +28,19 @@ public class ScreenBuilder extends ScreenBase {
     protected final ModContainerEntrypoint mod;
     protected int mouseX = -1;
     protected int mouseY = -1;
+    protected List<ConfigBase> configBases = new ArrayList<>();
 
     public ScreenBuilder(ScreenBase parent, ModContainerEntrypoint mod, ConfigCategory baseCategory) {
         this.parent = parent;
         this.mod = mod;
         this.baseCategory = baseCategory;
+        configBases.addAll(baseCategory.values.values());
+        configBases.sort((self, other) -> {
+            if (other instanceof ConfigCategory) {
+                return 1;
+            }
+            return self instanceof ConfigCategory? -1 : self.name.compareTo(other.name);
+        });
     }
 
     @Override
@@ -149,7 +159,7 @@ public class ScreenBuilder extends ScreenBase {
 
         @Override
         protected int getSize() {
-            return baseCategory.values.values().size();
+            return configBases.size();
         }
 
         @Override
@@ -169,7 +179,7 @@ public class ScreenBuilder extends ScreenBase {
 
         @Override
         protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
-            ConfigBase configBase = (ConfigBase) ScreenBuilder.this.baseCategory.values.values().toArray()[itemId];
+            ConfigBase configBase = configBases.get(itemId);
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.name, x + 2, y + 1, 16777215);
             configBase.getDrawable().setXYWH(x + 2, y + 12, 212, 20);
             configBase.getDrawable().draw();

@@ -8,6 +8,7 @@ import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
@@ -19,6 +20,10 @@ import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
 import uk.co.benjiweber.expressions.function.QuinFunction;
 
 import java.io.File;
@@ -26,13 +31,23 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlassConfigAPI implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
     public static final HashMap<ModContainerEntrypoint, ConfigCategory> MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
+    private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
+
+    static {
+        Configurator.setLevel("GCAPI", Level.INFO);
+    }
 
     @Override
     public void onPreLaunch() {
@@ -40,17 +55,16 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
     }
 
     public static void log(String message) {
-        log("INFO", message);
+        LOGGER.info(message);
     }
 
-    public static void log(String level, String message) {
-        System.out.println("[" + level + "]<GCAPI>: " + message);
-
+    public static void log(Level level, String message) {
+        LOGGER.log(level, message);
     }
 
     private static void loadConfigs() {
         if (loaded) {
-            log("WARN", "Tried to load configs a second time! Printing stacktrace and aborting!");
+            log(Level.WARN, "Tried to load configs a second time! Printing stacktrace and aborting!");
             new Exception("Stacktrace for duplicate loadConfigs call!").printStackTrace();
             return;
         }

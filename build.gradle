@@ -89,12 +89,14 @@ dependencies {
 	implementation "com.github.jhalterman:typetools:87240d6"
 
 	implementation "com.github.mineLdiver:expressions:2fa66db"
+	include "com.github.mineLdiver:expressions:2fa66db"
 
 	implementation "com.github.mineLdiver:UnsafeEvents:7efec57"
 
 	modImplementation "com.github.calmilamsy:ModMenu:af21851"
 
 	compile "blue.endless:jankson:1.2.1"
+	include "blue.endless:jankson:1.2.1"
 }
 
 processResources {

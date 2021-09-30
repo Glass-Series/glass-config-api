@@ -10,16 +10,18 @@ import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.TreeSet;
+
 public class ConfigCategory extends ConfigBase {
 
     public Multimap<Class<?>, ConfigBase> values;
 
-    private final Button button;
+    private Button button;
 
     public ConfigCategory(String id, String name, String description, Multimap<Class<?>, ConfigBase> values) {
         super(id, name, description);
         this.values = values;
-        button = new Button(0, 0, 0, "Open");
     }
 
     /**
@@ -33,6 +35,9 @@ public class ConfigCategory extends ConfigBase {
 
     @Override
     public @NotNull HasDrawable getDrawable() {
+        if (button == null) {
+            button = new Button(0, 0, 0, "Open");
+        }
         return (HasDrawable) button;
     }
 }
