@@ -26,8 +26,6 @@ public abstract class ConfigBase {
         this.description = description;
     }
 
-
-
     @NotNull
     public abstract HasDrawable getDrawable();
 }
