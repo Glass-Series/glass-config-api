@@ -1,9 +1,8 @@
-package net.glasslauncher.mods.api.gcapi.screen.ownconfig;
+package net.glasslauncher.mods.api.gcapi.screen.widget;
 
-import net.glasslauncher.mods.api.gcapi.impl.CharacterUtils;
-import net.glasslauncher.mods.api.gcapi.impl.ExtensibleTextbox;
-import net.glasslauncher.mods.api.gcapi.screen.ConfigEntry;
-import net.glasslauncher.mods.api.gcapi.screen.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
+import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;

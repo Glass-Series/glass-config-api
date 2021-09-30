@@ -1,4 +1,4 @@
-package net.glasslauncher.mods.api.gcapi;
+package net.glasslauncher.mods.api.gcapi.impl;
 
 
 import blue.endless.jankson.Comment;
@@ -10,19 +10,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+import net.glasslauncher.mods.api.gcapi.api.ConfigFactoryProvider;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.HasConfigFields;
 import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
-import net.glasslauncher.mods.api.gcapi.impl.ConfigFactories;
-import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
-import net.glasslauncher.mods.api.gcapi.screen.ConfigBase;
-import net.glasslauncher.mods.api.gcapi.screen.ConfigCategory;
-import net.glasslauncher.mods.api.gcapi.screen.ConfigEntry;
-import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
-import net.glasslauncher.mods.api.gcapi.screen.ownconfig.IntegerConfigEntry;
-import net.glasslauncher.mods.api.gcapi.screen.ownconfig.StringConfigEntry;
-import net.minecraft.client.gui.screen.ScreenBase;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import uk.co.benjiweber.expressions.function.QuinFunction;
 
 import java.io.File;
@@ -32,18 +28,39 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
-public class GlassConfigAPI {
+public class GlassConfigAPI implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
-
     public static final HashMap<ModContainerEntrypoint, ConfigCategory> MOD_CONFIGS = new HashMap<>();
+    private static boolean loaded = false;
 
-    public static void loadConfigs(ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> builder) {
-        ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> map = ImmutableMap.builder();
-        map.put(String.class, ((id, name, description, value, maxLength) -> new StringConfigEntry(id, name, description, value.toString(), maxLength)));
-        map.put(Integer.class, ((id, name, description, value, maxLength) -> new IntegerConfigEntry(id, name, description, Integer.valueOf(value.toString()), maxLength)));
-        ConfigFactories.factories = map.build();
+    @Override
+    public void onPreLaunch() {
+        loadConfigs();
+    }
+
+    public static void log(String message) {
+        log("INFO", message);
+    }
+
+    public static void log(String level, String message) {
+        System.out.println("[" + level + "]<GCAPI>: " + message);
+
+    }
+
+    private static void loadConfigs() {
+        if (loaded) {
+            log("WARN", "Tried to load configs a second time! Printing stacktrace and aborting!");
+            new Exception("Stacktrace for duplicate loadConfigs call!").printStackTrace();
+            return;
+        }
+        loaded = true;
+        log("Loading config factories.");
+        ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> immutableBuilder = ImmutableMap.builder();
+        FabricLoader.getInstance().getEntrypointContainers("gcapi:factory_provider", ConfigFactoryProvider.class).forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideFactories(immutableBuilder)));
+        ConfigFactories.factories = immutableBuilder.build();
+        log(ConfigFactories.factories.size() + " config factories loaded.");
+
         AtomicInteger readFields = new AtomicInteger();
 
         FabricLoader.getInstance().getEntrypointContainers(MOD_ID.getMetadata().getId(), HasConfigFields.class).forEach((objectEntrypointContainer -> {
@@ -118,12 +135,9 @@ public class GlassConfigAPI {
             } catch (Error | Exception e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("[INFO]<GCAPI>: Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
+            log("Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
 
         }));
-        for (ModContainerEntrypoint mod : MOD_CONFIGS.keySet()) {
-            builder.put(mod.mod.getMetadata().getId(), screenBase -> new RootScreenBuilder(screenBase, mod, MOD_CONFIGS.get(mod)));
-        }
     }
 
     private static ConfigCategory readDeeper(Object categoryInstance, Field categoryField, JsonObject jsonObject, AtomicInteger readFields) {

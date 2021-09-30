@@ -2,6 +2,9 @@ package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;

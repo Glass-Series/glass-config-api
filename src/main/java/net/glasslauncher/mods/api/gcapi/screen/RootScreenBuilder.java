@@ -1,7 +1,8 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
-import net.glasslauncher.mods.api.gcapi.GlassConfigAPI;
+import net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 
@@ -18,7 +19,7 @@ public class RootScreenBuilder extends ScreenBuilder {
         super.onClose();
         if (doSave) {
             GlassConfigAPI.saveConfigs(mod);
-            System.out.println("Saved!");
+            GlassConfigAPI.log("Saved!");
         }
     }
 

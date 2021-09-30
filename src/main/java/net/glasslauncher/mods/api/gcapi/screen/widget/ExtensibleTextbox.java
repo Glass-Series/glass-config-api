@@ -1,13 +1,14 @@
-package net.glasslauncher.mods.api.gcapi.impl;
+package net.glasslauncher.mods.api.gcapi.screen.widget;
 
-import net.glasslauncher.mods.api.gcapi.screen.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
+import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.Color;
 
+import java.awt.*;
 import java.util.function.Function;
 
 /**
@@ -77,7 +78,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
 
     public void addText(String string) {
         String var2 = "";
-        String var3 = net.glasslauncher.mods.api.gcapi.impl.CharacterUtils.stripInvalidChars(string);
+        String var3 = CharacterUtils.stripInvalidChars(string);
         int var4 = Math.min(this.cursorMax, this.cursorMin);
         int var5 = Math.max(this.cursorMax, this.cursorMin);
         int var6 = this.maxLength - this.text.length() - (var4 - this.cursorMin);

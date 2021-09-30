@@ -1,6 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.mixin;
 
-import net.glasslauncher.mods.api.gcapi.screen.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.gui.widgets.Textbox;
 import org.spongepowered.asm.mixin.Final;

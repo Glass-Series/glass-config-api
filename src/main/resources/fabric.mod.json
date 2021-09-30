@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Glass Config API",
-  "description": "A shitty config GUI with an API to match.",
+  "description": "An actually pretty good config GUI with an API to match. Heavily hackable and extendable.",
   "authors": [
     "calmilamsy"
   ],
@@ -18,8 +18,14 @@
 
   "environment": "*",
   "entrypoints": {
-    "gcapi" : [
+    "preLaunch": [
+      "net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI"
+    ],
+    "gcapi": [
       "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfigClass"
+    ],
+    "gcapi:factory_provider": [
+      "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider"
     ]
   },
   "custom": {

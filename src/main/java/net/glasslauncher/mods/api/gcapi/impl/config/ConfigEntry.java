@@ -1,4 +1,4 @@
-package net.glasslauncher.mods.api.gcapi.screen;
+package net.glasslauncher.mods.api.gcapi.impl.config;
 
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;

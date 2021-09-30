@@ -1,7 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.mixin;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.glasslauncher.mods.api.gcapi.screen.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widgets.Button;
 import org.lwjgl.input.Mouse;

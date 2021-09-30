@@ -1,7 +1,6 @@
-package net.glasslauncher.mods.api.gcapi.impl;
+package net.glasslauncher.mods.api.gcapi.api;
 
 import net.minecraft.client.render.TextRenderer;
-import org.lwjgl.util.Color;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -14,6 +13,7 @@ public class CharacterUtils {
 
     /**
      * Custom function for converting an JWJGL colour into minecraft's weird ARGB system.
+     * Uses AWT Colour class because LWJGL's one doesn't exist on server, so it saves me a headache.
      */
     public static int getIntFromColour(Color colour) {
         return ((colour.getAlpha() & 255) << 24) | ((colour.getRed() & 255) << 16) | ((colour.getGreen() & 255) << 8) | (colour.getBlue() & 255);

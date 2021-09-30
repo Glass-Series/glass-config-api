@@ -1,5 +1,9 @@
-package net.glasslauncher.mods.api.gcapi.screen;
+package net.glasslauncher.mods.api.gcapi.api;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+@Environment(EnvType.CLIENT)
 public interface HasDrawable {
 
     void draw();
