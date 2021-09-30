@@ -10,9 +10,6 @@ import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.TreeSet;
-
 public class ConfigCategory extends ConfigBase {
 
     public Multimap<Class<?>, ConfigBase> values;

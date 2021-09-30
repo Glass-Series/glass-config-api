@@ -8,7 +8,6 @@ import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
@@ -31,12 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GlassConfigAPI implements PreLaunchEntrypoint {
