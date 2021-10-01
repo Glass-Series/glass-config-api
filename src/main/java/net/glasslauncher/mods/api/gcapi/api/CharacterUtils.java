@@ -1,5 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
+import com.google.common.base.CharMatcher;
 import net.minecraft.client.render.TextRenderer;
 
 import java.awt.*;
@@ -56,11 +57,11 @@ public class CharacterUtils {
             return false;
         }
         int length = str.length();
-        if (length == 0) {
+        if (length == 0 || str.charAt(0) == '.' || str.charAt(str.length()-1) == '.' || CharMatcher.is('.').countIn(str) > 1) {
             return false;
         }
         int i = 0;
-        if (str.charAt(0) == '-' || str.charAt(0) == '.' || str.charAt(str.length()-1) == '.') {
+        if (str.charAt(0) == '-') {
             if (length == 1) {
                 return false;
             }
