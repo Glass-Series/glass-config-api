@@ -101,7 +101,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                                     categoryObj = new JsonObject();
                                     jsonObject.put(field.getName(), categoryObj);
                                 }
-                                category.values.put(key, readDeeper(field.get(null), field, categoryObj, readFields));
+                                category.values.put(key, readDeeper(null, field, categoryObj, readFields));
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -165,7 +165,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                                 categoryObj = new JsonObject();
                                 jsonObject.put(field.getName(), categoryObj);
                             }
-                            category.values.put(key, readDeeper(field.get(null), field, categoryObj, readFields));
+                            category.values.put(key, readDeeper(categoryField.get(categoryInstance), field, categoryObj, readFields));
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -174,8 +174,8 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                     for (Field field : typeToField.get(key)) {
                         Object entry = jsonObject.get(key, field.getName());
                         field.setAccessible(true);
-                        Object value = entry == null ? field.get(categoryInstance) : entry;
-                        field.set(categoryInstance, value);
+                        Object value = entry == null ? field.get(categoryField.get(categoryInstance)) : entry;
+                        field.set(categoryField.get(categoryInstance), value);
                         JsonPrimitive jsonEntry = new JsonPrimitive(value);
                         jsonObject.put(field.getName(), jsonEntry);
                         Comment comment = field.getAnnotation(Comment.class);
