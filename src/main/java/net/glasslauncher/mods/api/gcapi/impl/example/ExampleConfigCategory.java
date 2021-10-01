@@ -1,5 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.impl.example;
 
+import blue.endless.jankson.Comment;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 
@@ -16,6 +17,9 @@ public class ExampleConfigCategory implements IsConfigCategory {
     // And functioning integer config! MUST be the class, not the primitive!
     @ConfigName("Example Integer!")
     public Integer ohYes = 0;
+
+    @Comment("Fancy values ahead!")
+    public ExampleConfigCategoryTwo secondCategory = new ExampleConfigCategoryTwo();
 
     /**
      * Also the same as ExampleConfigClass, where this shows up as the name of the button to press, as well as the name shown in the header when the screen is opened.

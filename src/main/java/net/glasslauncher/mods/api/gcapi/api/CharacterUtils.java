@@ -47,6 +47,34 @@ public class CharacterUtils {
         return true;
     }
 
+    /**
+     * Susceptible to overflows, but honestly, I am not too concerned. Modified to look for floats instead.
+     * https://stackoverflow.com/a/237204
+     */
+    public static boolean isFloat(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-' || str.charAt(0) == '.' || str.charAt(str.length()-1) == '.') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if ((c < '0' || c > '9') && c != '.') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean isCharacterValid(char c) {
         return c != 167 && (net.minecraft.util.CharacterUtils.validCharacters.indexOf(c) >= 0 || c > ' ');
     }
