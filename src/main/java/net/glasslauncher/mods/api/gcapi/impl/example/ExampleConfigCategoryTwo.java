@@ -10,6 +10,9 @@ public class ExampleConfigCategoryTwo implements IsConfigCategory {
     @Comment("Floats are cool.")
     public Float yayFloatingPoint = 1.0f;
 
+    @ConfigName("Boolean?!")
+    public Boolean aBoolean = false;
+
     @Override
     public String getVisibleName() {
         return "Fancy Config Category";

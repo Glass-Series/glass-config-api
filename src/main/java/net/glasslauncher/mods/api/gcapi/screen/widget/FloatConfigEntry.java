@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class FloatConfigEntry extends ConfigEntry<Float> {
     private ExtensibleTextbox textbox;
-    private int maxLength;
+    private final int maxLength;
 
     public FloatConfigEntry(String id, String name, String description, Float value, int maxLength) {
         super(id, name, description, value);

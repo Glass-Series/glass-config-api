@@ -1,6 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
@@ -21,7 +22,7 @@ import java.util.List;
 public class ScreenBuilder extends ScreenBase {
 
     protected ScreenScrollList scrollList;
-    protected HashMap<Integer, ConfigCategory> buttonToCategory;
+    protected HashMap<Integer, ConfigBase> buttonToEntry;
     protected final ConfigCategory baseCategory;
     protected int selectedIndex = -1;
     protected final ScreenBase parent;
@@ -55,15 +56,15 @@ public class ScreenBuilder extends ScreenBase {
         });
         buttons.clear();
         this.scrollList = new ScreenScrollList();
-        this.buttonToCategory = new HashMap<>();
+        this.buttonToEntry = new HashMap<>();
         buttons.add(new Button(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry) {
                 ((ConfigEntry<?>) value).init(this, textManager);
             }
-            else if (value.getDrawable() instanceof Button) {
+            if (value.getDrawable() instanceof Button) {
                 value.getDrawable().setID(buttons.size());
-                buttonToCategory.put(buttons.size(), (ConfigCategory) value);
+                buttonToEntry.put(buttons.size(), value);
                 buttons.add(value.getDrawable());
             }
         });
@@ -122,9 +123,11 @@ public class ScreenBuilder extends ScreenBase {
         if (button.id == 0) {
             minecraft.openScreen(parent);
         }
-        else {
-            ConfigCategory configCategory = buttonToCategory.get(button.id);
-            ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(configCategory.getConfigScreen(this, mod));
+        else if (buttonToEntry.get(button.id) instanceof ConfigEntryWithButton) {
+            ((ConfigEntryWithButton) buttonToEntry.get(button.id)).onClick();
+        }
+        else if (buttonToEntry.get(button.id) instanceof ConfigCategory) {
+            ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(((ConfigCategory) buttonToEntry.get(button.id)).getConfigScreen(this, mod));
         }
     }
 

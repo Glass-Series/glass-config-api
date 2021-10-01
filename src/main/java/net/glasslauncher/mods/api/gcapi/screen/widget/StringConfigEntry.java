@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class StringConfigEntry extends ConfigEntry<String> {
     private ExtensibleTextbox textbox;
-    private int maxLength;
+    private final int maxLength;
 
     public StringConfigEntry(String id, String name, String description, String value, int maxLength) {
         super(id, name, description, value);
