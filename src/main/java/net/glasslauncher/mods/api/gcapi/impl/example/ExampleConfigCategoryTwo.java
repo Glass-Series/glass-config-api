@@ -13,6 +13,9 @@ public class ExampleConfigCategoryTwo implements IsConfigCategory {
     @ConfigName("Boolean?!")
     public Boolean aBoolean = false;
 
+    @ConfigName("A LIST??!!")
+    public String[] aList = new String[0];
+
     @Override
     public String getVisibleName() {
         return "Fancy Config Category";

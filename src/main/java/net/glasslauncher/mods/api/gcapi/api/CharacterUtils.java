@@ -1,20 +1,81 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
 import com.google.common.base.CharMatcher;
+import net.glasslauncher.mods.api.gcapi.mixin.DrawableHelperAccessor;
+import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.awt.*;
 import java.awt.datatransfer.*;
+import java.util.List;
 
 /**
  * Some utility methods copied over from r1.2.5 for use in ExtensibleTextbox.
  * This should be useful for other things.
  */
 public class CharacterUtils {
+    // Custom methods
+
+    public static void renderTooltip(TextRenderer font, List<String> tooltip, int i, int j, ScreenBase screenBase) {
+        if (!tooltip.isEmpty()) {
+
+            GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            int k = 0;
+
+            for (String string : tooltip) {
+                int l = font.getTextWidth(string);
+                if (l > k) {
+                    k = l;
+                }
+            }
+
+            int m = i + 12;
+            int n = j - 12;
+            int p = 8;
+            if (tooltip.size() > 1) {
+                p += 2 + (tooltip.size() - 1) * 10;
+            }
+
+            if (m + k > screenBase.width) {
+                m -= 28 + k;
+            }
+
+            if (n + p + 6 > screenBase.height) {
+                n = screenBase.height - p - 6;
+            }
+
+            int transparentGrey = -1073741824;
+            int margin = 3;
+            ((DrawableHelperAccessor) screenBase).invokeFill(m - margin, n - margin, m + k + margin,
+                    n + p + margin, transparentGrey);
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0, 0, 300);
+
+            for(int t = 0; t < tooltip.size(); ++t) {
+                String string2 = tooltip.get(t);
+                if (string2 != null) {
+                    font.drawText(string2, m, n, 0xffffff);
+                }
+
+                if (t == 0) {
+                    n += 2;
+                }
+
+                n += 10;
+            }
+
+            GL11.glPopMatrix();
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        }
+    }
 
     /**
      * Custom function for converting an JWJGL colour into minecraft's weird ARGB system.
-     * Uses AWT Colour class because LWJGL's one doesn't exist on server, so it saves me a headache.
+     * Uses AWT's Colour class because LWJGL's one doesn't exist on server, so it saves me a headache.
      */
     public static int getIntFromColour(Color colour) {
         return ((colour.getAlpha() & 255) << 24) | ((colour.getRed() & 255) << 16) | ((colour.getGreen() & 255) << 8) | (colour.getBlue() & 255);
@@ -75,6 +136,8 @@ public class CharacterUtils {
         }
         return true;
     }
+
+    // 1.2.5 methods
 
     public static boolean isCharacterValid(char c) {
         return c != 167 && (net.minecraft.util.CharacterUtils.validCharacters.indexOf(c) >= 0 || c > ' ');

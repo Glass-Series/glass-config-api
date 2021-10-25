@@ -1,7 +1,9 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
+import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
@@ -100,6 +102,12 @@ public class ScreenBuilder extends ScreenBase {
         ((Button) buttons.get(0)).render(minecraft, mouseX, mouseY);
         textManager.drawTextWithShadow(baseCategory.name, (width/2) - (textManager.getTextWidth(baseCategory.name)/2), 4, 16777215);
         textManager.drawTextWithShadow(baseCategory.description, (width/2) - (textManager.getTextWidth(baseCategory.description)/2), 18, 8421504);
+        ArrayList<HasDrawable> drawables = new ArrayList<>();
+        configBases.forEach((configBase -> drawables.add(configBase.getDrawable())));
+        List<String> tooltip = ((ScreenBaseAccessor) this).getMouseTooltip(mouseX, mouseY, drawables);
+        if (tooltip != null) {
+            CharacterUtils.renderTooltip(textManager, tooltip, mouseX, mouseY, this);
+        }
     }
 
     @Override

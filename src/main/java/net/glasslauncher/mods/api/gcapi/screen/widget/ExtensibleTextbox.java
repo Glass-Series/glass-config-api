@@ -2,6 +2,7 @@ package net.glasslauncher.mods.api.gcapi.screen.widget;
 
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.HasToolTip;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TextRenderer;
@@ -9,12 +10,14 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 /**
  * Basically a modified Textbox from r1.2.5, but modified for gcapi's use case.
  */
-public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
+public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, HasToolTip {
 
     private final TextRenderer textRenderer;
     private int x;
@@ -319,6 +322,16 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable {
         this.y = y;
         this.width = width;
         this.height = height;
+    }
+
+    @Override
+    public List<String> getTooltip() {
+        return Collections.singletonList(isValueValid()? "Value is valid" : "Value is invalid. Check the description of this entry");
+    }
+
+    @Override
+    public int[] getXYWH() {
+        return new int[]{x, y, width, height};
     }
 
     @Override

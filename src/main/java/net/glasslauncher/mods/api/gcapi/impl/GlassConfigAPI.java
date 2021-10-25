@@ -3,6 +3,8 @@ package net.glasslauncher.mods.api.gcapi.impl;
 
 import blue.endless.jankson.Comment;
 import blue.endless.jankson.Jankson;
+import blue.endless.jankson.JsonArray;
+import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
 import com.google.common.collect.HashMultimap;
@@ -10,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.glasslauncher.mods.api.gcapi.api.ConfigFactoryProvider;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
@@ -31,7 +34,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class GlassConfigAPI implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
@@ -64,10 +69,18 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         }
         loaded = true;
         log("Loading config factories.");
-        ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> immutableBuilder = ImmutableMap.builder();
-        FabricLoader.getInstance().getEntrypointContainers("gcapi:factory_provider", ConfigFactoryProvider.class).forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideFactories(immutableBuilder)));
-        ConfigFactories.factories = immutableBuilder.build();
-        log(ConfigFactories.factories.size() + " config factories loaded.");
+
+        List<EntrypointContainer<ConfigFactoryProvider>> containers = FabricLoader.getInstance().getEntrypointContainers("gcapi:factory_provider", ConfigFactoryProvider.class);
+
+        ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> loadImmutableBuilder = ImmutableMap.builder();
+        containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideLoadFactories(loadImmutableBuilder)));
+        ConfigFactories.loadFactories = loadImmutableBuilder.build();
+        log(ConfigFactories.loadFactories.size() + " config load factories loaded.");
+
+        ImmutableMap.Builder<Type, Function<Object, JsonElement>> saveImmutableBuilder = ImmutableMap.builder();
+        containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideSaveFactories(saveImmutableBuilder)));
+        ConfigFactories.saveFactories = saveImmutableBuilder.build();
+        log(ConfigFactories.saveFactories.size() + " config save factories loaded.");
 
         AtomicInteger readFields = new AtomicInteger();
 
@@ -76,7 +89,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
             HasConfigFields config = objectEntrypointContainer.getEntrypoint();
             ModContainerEntrypoint modContainerEntrypoint = new ModContainerEntrypoint(mod, config);
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
-            ConfigCategory category = new ConfigCategory(config.getConfigPath(), config.getVisibleName(), objectEntrypointContainer.getEntrypoint().getVisibleName(), HashMultimap.create());
+            ConfigCategory category = new ConfigCategory(config.getConfigPath(), config.getVisibleName(), objectEntrypointContainer.getEntrypoint().getVisibleName(), HashMultimap.create(), true);
             try {
                 File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.getMetadata().getId() + "/" + config.getConfigPath() + ".json");
                 if (!configFile.exists()) {
@@ -107,7 +120,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                             }
                         });
                     }
-                    else if (ConfigFactories.factories.containsKey(key)) {
+                    else if (ConfigFactories.loadFactories.containsKey(key)) {
                         for (Field field : typeToField.get(key)) {
                             Object entry = jsonObject.get(key, field.getName());
                             field.setAccessible(true);
@@ -121,7 +134,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                             }
                             MaxLength maxLengthAnnotation = field.getAnnotation(MaxLength.class);
                             try {
-                                category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
+                                category.values.put(key, ConfigFactories.loadFactories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
                             } catch (Exception e) {
                                 throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                             }
@@ -152,7 +165,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         try {
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
             Comment categoryComment = categoryField.getAnnotation(Comment.class);
-            ConfigCategory category = new ConfigCategory(categoryField.getName(), ((IsConfigCategory) categoryField.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create());
+            ConfigCategory category = new ConfigCategory(categoryField.getName(), ((IsConfigCategory) categoryField.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create(), false);
             for (Field field : categoryField.getType().getDeclaredFields()) {
                 typeToField.put(field.getType(), field);
             }
@@ -170,21 +183,29 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                             throw new RuntimeException(e);
                         }
                     });
-                } else if (ConfigFactories.factories.containsKey(key)) {
+                } else if (ConfigFactories.loadFactories.containsKey(key)) {
                     for (Field field : typeToField.get(key)) {
                         Object entry = jsonObject.get(key, field.getName());
                         field.setAccessible(true);
                         Object value = entry == null ? field.get(categoryField.get(categoryInstance)) : entry;
                         field.set(categoryField.get(categoryInstance), value);
-                        JsonPrimitive jsonEntry = new JsonPrimitive(value);
-                        jsonObject.put(field.getName(), jsonEntry);
+                        if (value instanceof String[]) {
+                            JsonArray jsonArray = new JsonArray();
+                            for (String valu : (String[]) value) {
+                                jsonArray.add(new JsonPrimitive(valu));
+                            }
+                            jsonObject.put(field.getName(), jsonArray);
+                        }
+                        else {
+                            jsonObject.put(field.getName(), new JsonPrimitive(value));
+                        }
                         Comment comment = field.getAnnotation(Comment.class);
                         if (comment != null) {
                             jsonObject.setComment(field.getName(), comment.value());
                         }
                         MaxLength maxLengthAnnotation = field.getAnnotation(MaxLength.class);
                         try {
-                            category.values.put(key, ConfigFactories.factories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
+                            category.values.put(key, ConfigFactories.loadFactories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
                         } catch (Exception e) {
                             throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                         }
@@ -209,7 +230,16 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
             if (entry instanceof ConfigCategory) {
                 jsonObject.put(entry.id, doConfigCategory((ConfigCategory) entry));
             } else if (entry instanceof ConfigEntry) {
-                jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                if (((ConfigEntry<?>) entry).value instanceof String[]) {
+                    JsonArray jsonArray = new JsonArray();
+                    for (String valu : ((ConfigEntry<String[]>) entry).value) {
+                        jsonArray.add(new JsonPrimitive(valu));
+                    }
+                    jsonObject.put(entry.id, jsonArray, entry.description);
+                }
+                else {
+                    jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                }
             } else {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
             }
@@ -237,7 +267,14 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 jsonObject.put(entry.id, doConfigCategory((ConfigCategory) entry));
             }
             else if (entry instanceof ConfigEntry) {
-                jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
+                System.out.println(((ConfigEntry<?>) entry).value.getClass());
+                if (configFactory != null) {
+                    jsonObject.put(entry.id, configFactory.apply(((ConfigEntry<?>) entry).value), entry.description);
+                }
+                else {
+                    jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                }
             }
             else {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");

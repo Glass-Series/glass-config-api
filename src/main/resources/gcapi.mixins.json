@@ -4,6 +4,8 @@
   "package": "net.glasslauncher.mods.api.gcapi.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "DrawableHelperAccessor",
+    "MixinScreenBase"
   ],
   "server": [
   ],

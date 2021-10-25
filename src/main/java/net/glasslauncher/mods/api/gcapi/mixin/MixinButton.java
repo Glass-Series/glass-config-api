@@ -61,4 +61,9 @@ public abstract class MixinButton implements HasDrawable {
     public void setID(int id) {
         this.id = id;
     }
+
+    @Override
+    public int[] getXYWH() {
+        return new int[]{x, y, width, height};
+    }
 }
