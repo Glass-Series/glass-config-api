@@ -27,7 +27,7 @@ public class DefaultFactoryProvider implements ConfigFactoryProvider {
         immutableBuilder.put(Integer.class, ((id, name, description, value, maxLength) -> new IntegerConfigEntry(id, name, description, Integer.valueOf(value.toString()), maxLength)));
         immutableBuilder.put(Float.class, ((id, name, description, value, maxLength) -> new FloatConfigEntry(id, name, description, Float.valueOf(value.toString()), maxLength)));
         immutableBuilder.put(Boolean.class, ((id, name, description, value, maxLength) -> new BooleanConfigEntry(id, name, description, (boolean) value, maxLength)));
-        immutableBuilder.put(String[].class, ((id, name, description, value, maxLength) -> new ListStringEntry(id, name, description, Arrays.asList((String[]) value), maxLength)));
+        immutableBuilder.put(String[].class, ((id, name, description, value, maxLength) -> new ListStringEntry(id, name, description, new ArrayList<>(Arrays.asList((String[]) value)), maxLength))); // the new ArrayList is required or it returns java.util.Arrays.ArrayList, which is fucking dumb.
     }
 
     @Override
