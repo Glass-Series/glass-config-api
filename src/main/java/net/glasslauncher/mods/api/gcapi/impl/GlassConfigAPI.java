@@ -81,9 +81,12 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         ConfigFactories.saveFactories = saveImmutableBuilder.build();
         log(ConfigFactories.saveFactories.size() + " config save factories loaded.");
 
-        AtomicInteger readFields = new AtomicInteger();
+        AtomicInteger totalReadFields = new AtomicInteger();
+        AtomicInteger totalReadCategories = new AtomicInteger();
 
         FabricLoader.getInstance().getEntrypointContainers(MOD_ID.getMetadata().getId(), HasConfigFields.class).forEach((objectEntrypointContainer -> {
+            AtomicInteger readValues = new AtomicInteger();
+            AtomicInteger readCategories = new AtomicInteger();
             ModContainer mod = objectEntrypointContainer.getProvider();
             HasConfigFields config = objectEntrypointContainer.getEntrypoint();
             ModContainerEntrypoint modContainerEntrypoint = new ModContainerEntrypoint(mod, config);
@@ -113,7 +116,8 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                                     categoryObj = new JsonObject();
                                     savedValues.put(field.getName(), categoryObj);
                                 }
-                                category.values.put(key, readDeeper(null, field, categoryObj, readFields));
+                                category.values.put(key, readDeeper(null, field, categoryObj, readValues, readCategories));
+                                readCategories.incrementAndGet();
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
@@ -134,7 +138,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                             } catch (Exception e) {
                                 throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
                             }
-                            readFields.getAndIncrement();
+                            readValues.getAndIncrement();
                         }
                     }
                     else {
@@ -142,18 +146,21 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                     }
                 }
                 MOD_CONFIGS.put(modContainerEntrypoint, category);
+                totalReadFields.addAndGet(readValues.get());
+                totalReadCategories.addAndGet(readCategories.get());
+                log("Successfully read " + readCategories + " categories, containing " + readValues.get() + " values for " + mod.getMetadata().getName() + "(" + mod.getMetadata().getId() + ").");
 
             } catch (Error | Exception e) {
                 throw new RuntimeException(e);
             }
-            log("Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + readFields.get() + " values.");
 
+            log("Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + totalReadFields.get() + " values.");
             saveConfigs(modContainerEntrypoint);
 
         }));
     }
 
-    private static ConfigCategory readDeeper(Object categoryInstance, Field categoryField, JsonObject savedValues, AtomicInteger readFields) {
+    private static ConfigCategory readDeeper(Object categoryInstance, Field categoryField, JsonObject savedValues, AtomicInteger readFields, AtomicInteger readCategories) {
         try {
             Multimap<Class<?>, Field> typeToField = HashMultimap.create();
             Comment categoryComment = categoryField.getAnnotation(Comment.class);
@@ -170,7 +177,8 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                                 categoryObj = new JsonObject();
                                 savedValues.put(field.getName(), categoryObj);
                             }
-                            category.values.put(key, readDeeper(categoryField.get(categoryInstance), field, categoryObj, readFields));
+                            category.values.put(key, readDeeper(categoryField.get(categoryInstance), field, categoryObj, readFields, readCategories));
+                            readCategories.incrementAndGet();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
 
@@ -203,13 +211,16 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
     }
 
     public static void saveConfigs(ModContainerEntrypoint mod) {
+        AtomicInteger readValues = new AtomicInteger();
+        AtomicInteger readCategories = new AtomicInteger();
         ConfigCategory category = MOD_CONFIGS.get(mod);
         File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.mod.getMetadata().getId() + "/" + mod.entrypoint.getConfigPath() + ".json");
         JsonObject jsonObject = new JsonObject();
 
         for (ConfigBase entry : category.values.values()) {
             if (entry instanceof ConfigCategory) {
-                jsonObject.put(entry.id, doConfigCategory((ConfigCategory) entry));
+                jsonObject.put(entry.id, saveDeeper((ConfigCategory) entry, readValues, readCategories));
+                readCategories.getAndIncrement();
             }
             else if (entry instanceof ConfigEntry) {
                 Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
@@ -219,6 +230,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 else {
                     jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
                 }
+                readValues.getAndIncrement();
             } else {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
             }
@@ -233,17 +245,19 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
             fileOutputStream.write(jsonObject.toJson(true, true).getBytes());
             fileOutputStream.flush();
             fileOutputStream.close();
+            log("Successfully saved " + readCategories + " categories, containing " + readValues.get() + " values for " + mod.mod.getMetadata().getName() + "(" + mod.mod.getMetadata().getId() + ").");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static JsonObject doConfigCategory(ConfigCategory category) {
+    private static JsonObject saveDeeper(ConfigCategory category, AtomicInteger readValues, AtomicInteger readCategories) {
         JsonObject jsonObject = new JsonObject();
 
         for (ConfigBase entry : category.values.values()) {
             if (entry instanceof ConfigCategory) {
-                jsonObject.put(entry.id, doConfigCategory((ConfigCategory) entry));
+                jsonObject.put(entry.id, saveDeeper((ConfigCategory) entry, readValues, readCategories));
+                readCategories.getAndIncrement();
             }
             else if (entry instanceof ConfigEntry) {
                 Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
@@ -253,6 +267,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 else {
                     jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
                 }
+                readValues.getAndIncrement();
             }
             else {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");

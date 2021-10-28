@@ -19,7 +19,6 @@ public class RootScreenBuilder extends ScreenBuilder {
         super.onClose();
         if (doSave) {
             GlassConfigAPI.saveConfigs(mod);
-            GlassConfigAPI.log("Saved!");
         }
     }
 
