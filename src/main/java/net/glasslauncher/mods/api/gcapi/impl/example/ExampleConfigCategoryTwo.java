@@ -16,6 +16,12 @@ public class ExampleConfigCategoryTwo implements IsConfigCategory {
     @ConfigName("A LIST??!!")
     public String[] aList = new String[0];
 
+    @ConfigName("AN INTEGER LIST??!!")
+    public Integer[] aIList = new Integer[0];
+
+    @ConfigName("A FLOAT LIST??!!")
+    public Float[] aFList = new Float[0];
+
     @Override
     public String getVisibleName() {
         return "Fancy Config Category";

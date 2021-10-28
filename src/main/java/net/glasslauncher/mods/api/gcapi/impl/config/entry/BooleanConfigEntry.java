@@ -1,4 +1,4 @@
-package net.glasslauncher.mods.api.gcapi.screen.widget;
+package net.glasslauncher.mods.api.gcapi.impl.config.entry;
 
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
