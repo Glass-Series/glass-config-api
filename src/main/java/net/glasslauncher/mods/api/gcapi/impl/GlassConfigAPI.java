@@ -6,6 +6,7 @@ import blue.endless.jankson.Jankson;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.JsonPrimitive;
+import blue.endless.jankson.api.SyntaxError;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -81,6 +82,10 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         ConfigFactories.saveFactories = saveImmutableBuilder.build();
         log(ConfigFactories.saveFactories.size() + " config save factories loaded.");
 
+        log("Loading config event listeners.");
+        EventStorage.loadListeners();
+        log("Loaded config event listeners.");
+
         AtomicInteger totalReadFields = new AtomicInteger();
         AtomicInteger totalReadCategories = new AtomicInteger();
 
@@ -148,6 +153,11 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 MOD_CONFIGS.put(modContainerEntrypoint, category);
                 totalReadFields.addAndGet(readValues.get());
                 totalReadCategories.addAndGet(readCategories.get());
+
+                if (EventStorage.POST_LOAD_LISTENERS.containsKey(mod.getMetadata().getId())) {
+                    EventStorage.POST_LOAD_LISTENERS.get(mod.getMetadata().getId()).getEntrypoint().PostConfigLoaded();
+                }
+
                 log("Successfully read " + readCategories + " categories, containing " + readValues.get() + " values for " + mod.getMetadata().getName() + "(" + mod.getMetadata().getId() + ").");
 
             } catch (Error | Exception e) {
@@ -215,20 +225,20 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         AtomicInteger readCategories = new AtomicInteger();
         ConfigCategory category = MOD_CONFIGS.get(mod);
         File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.mod.getMetadata().getId() + "/" + mod.entrypoint.getConfigPath() + ".json");
-        JsonObject jsonObject = new JsonObject();
+        JsonObject newValues = new JsonObject();
 
         for (ConfigBase entry : category.values.values()) {
             if (entry instanceof ConfigCategory) {
-                jsonObject.put(entry.id, saveDeeper((ConfigCategory) entry, readValues, readCategories));
+                newValues.put(entry.id, saveDeeper((ConfigCategory) entry, readValues, readCategories));
                 readCategories.getAndIncrement();
             }
             else if (entry instanceof ConfigEntry) {
                 Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
                 if (configFactory != null) {
-                    jsonObject.put(entry.id, configFactory.apply(((ConfigEntry<?>) entry).value), entry.description);
+                    newValues.put(entry.id, configFactory.apply(((ConfigEntry<?>) entry).value), entry.description);
                 }
                 else {
-                    jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                    newValues.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
                 }
                 readValues.getAndIncrement();
             } else {
@@ -237,16 +247,21 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         }
 
         try {
+            if (EventStorage.PRE_SAVE_LISTENERS.containsKey(mod.mod.getMetadata().getId())) {
+                EventStorage.PRE_SAVE_LISTENERS.get(mod.mod.getMetadata().getId()).getEntrypoint().onPreConfigSaved(configFile.exists()? Jankson.builder().build().load(configFile) : new JsonObject(), newValues);
+            }
+
             if (!configFile.exists()) {
                 configFile.getParentFile().mkdirs();
                 configFile.createNewFile();
             }
+
             FileOutputStream fileOutputStream = (new FileOutputStream(configFile));
-            fileOutputStream.write(jsonObject.toJson(true, true).getBytes());
+            fileOutputStream.write(newValues.toJson(true, true).getBytes());
             fileOutputStream.flush();
             fileOutputStream.close();
             log("Successfully saved " + readCategories + " categories, containing " + readValues.get() + " values for " + mod.mod.getMetadata().getName() + "(" + mod.mod.getMetadata().getId() + ").");
-        } catch (IOException e) {
+        } catch (IOException | SyntaxError e) {
             throw new RuntimeException(e);
         }
     }
