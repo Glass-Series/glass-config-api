@@ -2,14 +2,15 @@ package net.glasslauncher.mods.api.gcapi.impl.example;
 
 import blue.endless.jankson.Comment;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
-import net.glasslauncher.mods.api.gcapi.api.HasConfigFields;
+import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
+import net.minecraft.util.maths.Vec3f;
 
 /**
  * An example config class, you can view this in-game inside modmenu's settings button for gcapi.
  * Make sure to add it inside your gcapi entrypoints in your fabric.mod.json. Look at the one for this mod for an example.
  */
-public class ExampleConfigClass implements HasConfigFields {
+public class ExampleConfigClass implements IsConfigCategory {
 
     @ConfigName("Tested Config") // Shows up above the config entry in white, unless you use colour codes, then it will use those.
     @Comment("Used to translate nerd") // Shows up in grey under the config entry.
@@ -24,6 +25,9 @@ public class ExampleConfigClass implements HasConfigFields {
 
     @ConfigName("ASD 3")
     public static String asd3 = "hmmm";
+
+    @ConfigName("Vector!")
+    public static Vec3f vec3f = Vec3f.from(0, 0, 0);
 
     /**
      * A config category, you can put other categories inside a category too.

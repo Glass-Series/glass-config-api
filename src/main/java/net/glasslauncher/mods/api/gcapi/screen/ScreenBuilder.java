@@ -1,10 +1,10 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
-import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
@@ -28,12 +28,12 @@ public class ScreenBuilder extends ScreenBase {
     protected final ConfigCategory baseCategory;
     protected int selectedIndex = -1;
     protected final ScreenBase parent;
-    protected final ModContainerEntrypoint mod;
+    protected final EntrypointContainer<Object> mod;
     protected int mouseX = -1;
     protected int mouseY = -1;
     protected List<ConfigBase> configBases = new ArrayList<>();
 
-    public ScreenBuilder(ScreenBase parent, ModContainerEntrypoint mod, ConfigCategory baseCategory) {
+    public ScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         this.parent = parent;
         this.mod = mod;
         this.baseCategory = baseCategory;

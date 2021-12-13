@@ -5,7 +5,6 @@ public interface HasDrawable {
     void draw();
     void mouseClicked(int mouseX, int mouseY, int button);
     void setXYWH(int x, int y, int width, int height);
-    int[] getXYWH();
     void tick();
     void keyPressed(char character, int key);
     void setID(int id);

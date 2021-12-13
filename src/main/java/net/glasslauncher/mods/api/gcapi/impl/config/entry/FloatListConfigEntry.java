@@ -1,5 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.impl.config.entry;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
@@ -11,22 +13,24 @@ import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FloatListConfigEntry extends ConfigEntry<List<Float>> implements ConfigEntryWithButton {
     private FloatListScreenBuilder listScreen;
+    @Environment(EnvType.CLIENT)
     private Button button;
     private final int maxLength;
 
-    public FloatListConfigEntry(String id, String name, String description, List<Float> value, int maxLength) {
-        super(id, name, description, value);
+    public FloatListConfigEntry(String id, String name, String description, Field parentField, List<Float> value, int maxLength) {
+        super(id, name, description, parentField, value);
         this.maxLength = maxLength;
     }
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new Button(10, 0, 0, 0, 0, "Open List...");
+        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.size() + " values)");
         listScreen = new FloatListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
     }
@@ -37,7 +41,11 @@ public class FloatListConfigEntry extends ConfigEntry<List<Float>> implements Co
             return null;
         }
         List<Float> list = new ArrayList<>();
-        listScreen.textboxes.forEach((val) -> list.add(Float.parseFloat(val.getText())));
+        listScreen.textboxes.forEach((val) -> {
+            if (val.isValueValid()) {
+                list.add(Float.parseFloat(val.getText()));
+            }
+        });
         return list;
     }
 
@@ -56,6 +64,7 @@ public class FloatListConfigEntry extends ConfigEntry<List<Float>> implements Co
         return (HasDrawable) button;
     }
 
+    @Environment(EnvType.CLIENT)
     @Override
     public void onClick() {
         ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);

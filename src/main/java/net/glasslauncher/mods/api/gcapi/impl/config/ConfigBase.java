@@ -4,6 +4,8 @@ package net.glasslauncher.mods.api.gcapi.impl.config;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+
 public abstract class ConfigBase {
 
     public final String id;
@@ -20,10 +22,13 @@ public abstract class ConfigBase {
      */
     public final String description;
 
-    public ConfigBase(String id, String name, String description) {
+    public final Field parentField;
+
+    public ConfigBase(String id, String name, String description, Field parentField) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.parentField = parentField;
     }
 
     @NotNull

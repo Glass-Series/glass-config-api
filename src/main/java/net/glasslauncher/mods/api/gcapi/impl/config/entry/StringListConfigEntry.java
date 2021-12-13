@@ -1,5 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.impl.config.entry;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
@@ -11,22 +13,24 @@ import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StringListConfigEntry extends ConfigEntry<List<String>> implements ConfigEntryWithButton {
     private StringListScreenBuilder listScreen;
+    @Environment(EnvType.CLIENT)
     private Button button;
     private final int maxLength;
 
-    public StringListConfigEntry(String id, String name, String description, List<String> value, int maxLength) {
-        super(id, name, description, value);
+    public StringListConfigEntry(String id, String name, String description, Field parentField, List<String> value, int maxLength) {
+        super(id, name, description, parentField, value);
         this.maxLength = maxLength;
     }
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new Button(10, 0, 0, 0, 0, "Open List...");
+        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.size() + " values)");
         listScreen = new StringListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
     }
@@ -56,6 +60,7 @@ public class StringListConfigEntry extends ConfigEntry<List<String>> implements 
         return (HasDrawable) button;
     }
 
+    @Environment(EnvType.CLIENT)
     @Override
     public void onClick() {
         ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);

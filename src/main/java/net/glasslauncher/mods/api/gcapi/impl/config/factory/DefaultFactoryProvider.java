@@ -14,8 +14,11 @@ import net.glasslauncher.mods.api.gcapi.impl.config.entry.IntegerConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.IntegerListConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringListConfigEntry;
-import uk.co.benjiweber.expressions.function.QuinFunction;
+import net.glasslauncher.mods.api.gcapi.impl.config.entry.Vec3fConfigEntry;
+import net.minecraft.util.maths.Vec3f;
+import uk.co.benjiweber.expressions.function.SexFunction;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,21 +27,26 @@ import java.util.function.Function;
 public class DefaultFactoryProvider implements ConfigFactoryProvider {
 
     @Override
-    public void provideLoadFactories(ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> immutableBuilder) {
-        immutableBuilder.put(String.class, ((id, name, description, value, maxLength) -> new StringConfigEntry(id, name, description, value.toString(), maxLength)));
-        immutableBuilder.put(Integer.class, ((id, name, description, value, maxLength) -> new IntegerConfigEntry(id, name, description, Integer.valueOf(value.toString()), maxLength)));
-        immutableBuilder.put(Float.class, ((id, name, description, value, maxLength) -> new FloatConfigEntry(id, name, description, Float.valueOf(value.toString()), maxLength)));
-        immutableBuilder.put(Boolean.class, ((id, name, description, value, maxLength) -> new BooleanConfigEntry(id, name, description, (boolean) value, maxLength)));
-        immutableBuilder.put(String[].class, ((id, name, description, value, maxLength) -> new StringListConfigEntry(id, name, description, new ArrayList<>(Arrays.asList((String[]) value)), maxLength))); // the new ArrayList is required or it returns java.util.Arrays.ArrayList, which is fucking dumb.
-        immutableBuilder.put(Integer[].class, ((id, name, description, value, maxLength) -> new IntegerListConfigEntry(id, name, description, new ArrayList<>(Arrays.asList((Integer[]) value)), maxLength))); // the new ArrayList is required or it returns java.util.Arrays.ArrayList, which is fucking dumb.
-        immutableBuilder.put(Float[].class, ((id, name, description, value, maxLength) -> new FloatListConfigEntry(id, name, description, new ArrayList<>(Arrays.asList((Float[]) value)), maxLength))); // the new ArrayList is required or it returns java.util.Arrays.ArrayList, which is fucking dumb.
+    public void provideLoadFactories(ImmutableMap.Builder<Type, SexFunction<String, String, String, Field, Object, Integer, ConfigEntry<?>>> immutableBuilder) {
+        immutableBuilder.put(String.class, ((id, name, description, parentField, value, maxLength) -> new StringConfigEntry(id, name, description, parentField, value.toString(), maxLength)));
+        immutableBuilder.put(Integer.class, ((id, name, description, parentField, value, maxLength) -> new IntegerConfigEntry(id, name, description, parentField, Integer.valueOf(value.toString()), maxLength)));
+        immutableBuilder.put(Float.class, ((id, name, description, parentField, value, maxLength) -> new FloatConfigEntry(id, name, description, parentField, Float.valueOf(value.toString()), maxLength)));
+        immutableBuilder.put(Boolean.class, ((id, name, description, parentField, value, maxLength) -> new BooleanConfigEntry(id, name, description, parentField, (boolean) value)));
+        immutableBuilder.put(String[].class, ((id, name, description, parentField, value, maxLength) -> new StringListConfigEntry(id, name, description, parentField, new ArrayList<>(Arrays.asList((String[]) value)), maxLength))); // the new ArrayList is required or it returns java.util.Arrays.ArrayList, which is fucking dumb.
+        immutableBuilder.put(Integer[].class, ((id, name, description, parentField, value, maxLength) -> new IntegerListConfigEntry(id, name, description, parentField, new ArrayList<>(Arrays.asList((Integer[]) value)), maxLength)));
+        immutableBuilder.put(Float[].class, ((id, name, description, parentField, value, maxLength) -> new FloatListConfigEntry(id, name, description, parentField, new ArrayList<>(Arrays.asList((Float[]) value)), maxLength)));
+        immutableBuilder.put(Vec3f.class, ((id, name, description, parentField, value, maxLength) -> new Vec3fConfigEntry(id, name, description, parentField, (Vec3f) value)));
     }
 
     @Override
     public void provideSaveFactories(ImmutableMap.Builder<Type, Function<Object, JsonElement>> immutableBuilder) {
+        immutableBuilder.put(String.class, JsonPrimitive::new);
+        immutableBuilder.put(Integer.class, JsonPrimitive::new);
+        immutableBuilder.put(Float.class, JsonPrimitive::new);
+        immutableBuilder.put(Boolean.class, JsonPrimitive::new);
         immutableBuilder.put(ArrayList.class, (value) -> {
             JsonArray jsonArray = new JsonArray();
-            for (Object valu : (ArrayList<?>) value) {
+            for (Object valu : (ArrayList) value) {
                 Function<Object, JsonElement> factory = ConfigFactories.saveFactories.get(valu.getClass());
                 if (factory != null) {
                     jsonArray.add(factory.apply(valu));
@@ -49,5 +57,6 @@ public class DefaultFactoryProvider implements ConfigFactoryProvider {
             }
             return jsonArray;
         });
+        immutableBuilder.put(Vec3f.class, (value) -> new JsonPrimitive(((Vec3f) value).x + "," + ((Vec3f) value).y + "," + ((Vec3f) value).z));
     }
 }

@@ -5,47 +5,77 @@ import blue.endless.jankson.Comment;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
-import blue.endless.jankson.JsonPrimitive;
-import blue.endless.jankson.api.SyntaxError;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Multimap;
+import lombok.Getter;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 import net.glasslauncher.mods.api.gcapi.api.ConfigFactoryProvider;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
-import net.glasslauncher.mods.api.gcapi.api.HasConfigFields;
+import net.glasslauncher.mods.api.gcapi.api.GConfig;
 import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
+import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
+import net.minecraft.util.io.CompoundTag;
+import net.modificationstation.stationapi.api.util.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import uk.co.benjiweber.expressions.function.QuinFunction;
+import uk.co.benjiweber.expressions.function.SexFunction;
+import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class GlassConfigAPI implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
-    public static final HashMap<ModContainerEntrypoint, ConfigCategory> MOD_CONFIGS = new HashMap<>();
+    public static final HashMap<ModContainer, BiTuple<EntrypointContainer<Object>, ConfigCategory>> MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
 
+    @Getter
+    private static boolean serverConfLoaded = false;
+
     static {
         Configurator.setLevel("GCAPI", Level.INFO);
+    }
+
+    public static void loadServerConfig(String modID, String string) {
+        serverConfLoaded = true;
+        AtomicReference<ModContainer> mod = new AtomicReference<>();
+        MOD_CONFIGS.keySet().forEach(modContainer -> {
+            if (modContainer.getMetadata().getId().equals(modID)) {
+                mod.set(modContainer);
+            }
+        });
+        if (mod.get() != null) {
+            try {
+                ConfigCategory category = MOD_CONFIGS.get(mod.get()).two();
+                loadModConfig(category.parentField.get(null), mod.get(), category.parentField, string);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void exportConfigsForServer(CompoundTag compoundTag) {
+        for (ModContainer modContainer : MOD_CONFIGS.keySet()) {
+            BiTuple<EntrypointContainer<Object>, ConfigCategory> entry = MOD_CONFIGS.get(modContainer);
+            compoundTag.put(modContainer.getMetadata().getId(), saveConfig(entry.one(), entry.two()));
+        }
     }
 
     @Override
@@ -72,7 +102,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
 
         List<EntrypointContainer<ConfigFactoryProvider>> containers = FabricLoader.getInstance().getEntrypointContainers("gcapi:factory_provider", ConfigFactoryProvider.class);
 
-        ImmutableMap.Builder<Type, QuinFunction<String, String, String, Object, Integer, ConfigEntry<?>>> loadImmutableBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<Type, SexFunction<String, String, String, Field, Object, Integer, ConfigEntry<?>>> loadImmutableBuilder = ImmutableMap.builder();
         containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideLoadFactories(loadImmutableBuilder)));
         ConfigFactories.loadFactories = loadImmutableBuilder.build();
         log(ConfigFactories.loadFactories.size() + " config load factories loaded.");
@@ -86,169 +116,127 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         EventStorage.loadListeners();
         log("Loaded config event listeners.");
 
-        AtomicInteger totalReadFields = new AtomicInteger();
-        AtomicInteger totalReadCategories = new AtomicInteger();
-
-        FabricLoader.getInstance().getEntrypointContainers(MOD_ID.getMetadata().getId(), HasConfigFields.class).forEach((objectEntrypointContainer -> {
-            AtomicInteger readValues = new AtomicInteger();
-            AtomicInteger readCategories = new AtomicInteger();
-            ModContainer mod = objectEntrypointContainer.getProvider();
-            HasConfigFields config = objectEntrypointContainer.getEntrypoint();
-            ModContainerEntrypoint modContainerEntrypoint = new ModContainerEntrypoint(mod, config);
-            Multimap<Class<?>, Field> typeToField = HashMultimap.create();
-            ConfigCategory category = new ConfigCategory(config.getConfigPath(), config.getVisibleName(), objectEntrypointContainer.getEntrypoint().getVisibleName(), HashMultimap.create(), true);
+        FabricLoader.getInstance().getEntrypointContainers(MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
-                File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.getMetadata().getId() + "/" + config.getConfigPath() + ".json");
-                if (!configFile.exists()) {
-                    if (configFile.getParentFile().mkdirs() && configFile.createNewFile()) {
-                        FileOutputStream fileOutputStream = (new FileOutputStream(configFile));
-                        fileOutputStream.write("{}".getBytes());
-                        fileOutputStream.flush();
-                        fileOutputStream.close();
-                    }
+                MOD_CONFIGS.put(entrypointContainer.getProvider(), BiTuple.of(entrypointContainer, null));
+                for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
+                    loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, null);
+                    saveConfig(entrypointContainer, MOD_CONFIGS.get(entrypointContainer.getProvider()).two());
                 }
-
-                for (Field field : config.getClass().getDeclaredFields()) {
-                    typeToField.put(field.getType(), field);
-                }
-                JsonObject savedValues = Jankson.builder().build().load(configFile);
-                for (Class<?> key : typeToField.keySet()) {
-                    if (IsConfigCategory.class.isAssignableFrom(key)) {
-                        typeToField.get(key).forEach((field) -> {
-                            try {
-                                JsonObject categoryObj = (JsonObject) savedValues.get(field.getName());
-                                if (categoryObj == null) {
-                                    categoryObj = new JsonObject();
-                                    savedValues.put(field.getName(), categoryObj);
-                                }
-                                category.values.put(key, readDeeper(null, field, categoryObj, readValues, readCategories));
-                                readCategories.incrementAndGet();
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                    }
-                    else if (ConfigFactories.loadFactories.containsKey(key)) {
-                        for (Field field : typeToField.get(key)) {
-                            Object entry = savedValues.get(key, field.getName());
-                            field.setAccessible(true);
-                            Object value = entry == null ? field.get(config) : entry;
-                            field.set(config, value);
-                            Function<Object, JsonElement> factory = ConfigFactories.saveFactories.get(field.getType());
-                            JsonElement jsonEntry = factory == null? new JsonPrimitive(value) : factory.apply(value);
-                            savedValues.put(field.getName(), jsonEntry);
-                            MaxLength maxLengthAnnotation = field.getAnnotation(MaxLength.class);
-                            try {
-                                category.values.put(key, ConfigFactories.loadFactories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), savedValues.getComment(field.getName()), value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
-                            } catch (Exception e) {
-                                throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
-                            }
-                            readValues.getAndIncrement();
-                        }
-                    }
-                    else {
-                        throw new RuntimeException("Data factory not found for \"" + key.getName() + "\"!");
-                    }
-                }
-                MOD_CONFIGS.put(modContainerEntrypoint, category);
-                totalReadFields.addAndGet(readValues.get());
-                totalReadCategories.addAndGet(readCategories.get());
-
-                if (EventStorage.POST_LOAD_LISTENERS.containsKey(mod.getMetadata().getId())) {
-                    EventStorage.POST_LOAD_LISTENERS.get(mod.getMetadata().getId()).getEntrypoint().PostConfigLoaded();
-                }
-
-                log("Successfully read " + readCategories + " categories, containing " + readValues.get() + " values for " + mod.getMetadata().getName() + "(" + mod.getMetadata().getId() + ").");
-
-            } catch (Error | Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
-            log("Successfully read " + MOD_CONFIGS.size() + " mod configs, reading " + totalReadFields.get() + " values.");
-            saveConfigs(modContainerEntrypoint);
-
         }));
     }
 
-    private static ConfigCategory readDeeper(Object categoryInstance, Field categoryField, JsonObject savedValues, AtomicInteger readFields, AtomicInteger readCategories) {
+    private static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, String jsonOverrideString) {
+        AtomicInteger totalReadCategories = new AtomicInteger();
+        AtomicInteger totalReadFields = new AtomicInteger();
         try {
-            Multimap<Class<?>, Field> typeToField = HashMultimap.create();
-            Comment categoryComment = categoryField.getAnnotation(Comment.class);
-            ConfigCategory category = new ConfigCategory(categoryField.getName(), ((IsConfigCategory) categoryField.get(categoryInstance)).getVisibleName(), categoryComment == null? null : categoryComment.value(), HashMultimap.create(), false);
-            for (Field field : categoryField.getType().getDeclaredFields()) {
-                typeToField.put(field.getType(), field);
-            }
-            for (Class<?> key : typeToField.keySet()) {
-                if (IsConfigCategory.class.isAssignableFrom(key)) {
-                    typeToField.get(key).forEach((field) -> {
-                        try {
-                            JsonObject categoryObj = (JsonObject) savedValues.get(field.getName());
-                            if (categoryObj == null) {
-                                categoryObj = new JsonObject();
-                                savedValues.put(field.getName(), categoryObj);
-                            }
-                            category.values.put(key, readDeeper(categoryField.get(categoryInstance), field, categoryObj, readFields, readCategories));
-                            readCategories.incrementAndGet();
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-
-                        }
-                    });
-                } else if (ConfigFactories.loadFactories.containsKey(key)) {
-                    for (Field field : typeToField.get(key)) {
-                        Object entry = savedValues.get(key, field.getName());
-                        field.setAccessible(true);
-                        Object value = entry == null ? field.get(categoryField.get(categoryInstance)) : entry;
-                        field.set(categoryField.get(categoryInstance), value);
-
-                        Comment comment = field.getAnnotation(Comment.class);
-                        MaxLength maxLengthAnnotation = field.getAnnotation(MaxLength.class);
-                        try {
-                            category.values.put(key, ConfigFactories.loadFactories.get(key).apply(field.getName(), field.getAnnotation(ConfigName.class).value(), comment != null? comment.value() : null, value, maxLengthAnnotation != null? maxLengthAnnotation.value() : 32));
-                        } catch (Exception e) {
-                            throw new RuntimeException("Annotate your config entries with '@ConfigName(\"myname\")'!", e);
-                        }
-                        readFields.getAndIncrement();
-                    }
-                } else {
-                    throw new RuntimeException("Data factory not found for \"" + key.getName() + "\"!");
+            configField.setAccessible(true);
+            Object objField = configField.get(rootConfigObject);
+            File modConfigFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), modContainer.getMetadata().getId() + "/" + configField.getAnnotation(GConfig.class).value() + ".json");
+            JsonObject rootJsonObject;
+            if (jsonOverrideString == null) {
+                if (modConfigFile.exists()) {
+                    rootJsonObject = Jankson.builder().build().load(modConfigFile);
+                }
+                else {
+                    rootJsonObject = new JsonObject();
                 }
             }
-            return category;
+            else {
+                log("Loading server config!");
+                serverConfLoaded = true;
+                rootJsonObject = Jankson.builder().build().load(jsonOverrideString);
+            }
+            ConfigCategory configCategory = new ConfigCategory(modContainer.getMetadata().getId(), configField.getAnnotation(GConfig.class).visibleName(), null, configField, HashMultimap.create(), true);
+            for (Field field : objField.getClass().getDeclaredFields()) {
+                Object childObjField = field.get(objField);
+                if (childObjField instanceof IsConfigCategory) {
+                    JsonObject jsonCategory = rootJsonObject.getObject(field.getName());
+                    if (jsonCategory == null) {
+                        jsonCategory = new JsonObject();
+                        rootJsonObject.put(field.getName(), jsonCategory);
+                    }
+                    ConfigCategory childCategory = new ConfigCategory(field.getName(), ((IsConfigCategory) childObjField).getVisibleName(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, HashMultimap.create(), false);
+                    configCategory.values.put(IsConfigCategory.class, childCategory);
+                    readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories);
+                }
+                else {
+                    if (!field.isAnnotationPresent(ConfigName.class)) {
+                        throw new RuntimeException("Config value \"" + field.getClass().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
+                    }
+                    SexFunction<String, String, String, Field, Object, Integer, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
+                    if (function == null) {
+                        throw new RuntimeException("Config value \"" + field.getClass().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
+                    }
+                    field.setAccessible(true);
+                    ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class).value() : 32);
+                    configCategory.values.put(field.getType(), configEntry);
+                }
+            }
+            MOD_CONFIGS.put(modContainer, BiTuple.of(MOD_CONFIGS.remove(modContainer).one(), configCategory));
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        log("Successfully read \"" + modContainer.getMetadata().getId() + "\"'s mod configs, reading " + totalReadCategories.get() + " categories, and " + totalReadFields.get() + " values.");
     }
 
-    public static void saveConfigs(ModContainerEntrypoint mod) {
-        AtomicInteger readValues = new AtomicInteger();
-        AtomicInteger readCategories = new AtomicInteger();
-        ConfigCategory category = MOD_CONFIGS.get(mod);
-        File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.mod.getMetadata().getId() + "/" + mod.entrypoint.getConfigPath() + ".json");
-        JsonObject newValues = new JsonObject();
+    private static void readDeeper(Object rootConfigObject, Field configField, JsonObject rootJsonObject, ConfigCategory category, AtomicInteger totalReadFields, AtomicInteger totalReadCategories) throws IllegalAccessException {
+        configField.setAccessible(true);
+        Object objField = configField.get(rootConfigObject);
 
-        for (ConfigBase entry : category.values.values()) {
-            if (entry instanceof ConfigCategory) {
-                newValues.put(entry.id, saveDeeper((ConfigCategory) entry, readValues, readCategories));
-                readCategories.getAndIncrement();
+        for (Field field : objField.getClass().getDeclaredFields()) {
+            Object childObjField = field.get(objField);
+            if (childObjField instanceof IsConfigCategory) {
+                JsonObject jsonCategory = rootJsonObject.getObject(field.getName());
+                if (jsonCategory == null) {
+                    jsonCategory = new JsonObject();
+                    rootJsonObject.put(field.getName(), jsonCategory);
+                }
+                ConfigCategory childCategory = new ConfigCategory(field.getName(), ((IsConfigCategory) childObjField).getVisibleName(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, HashMultimap.create(), false);
+                category.values.put(IsConfigCategory.class, childCategory);
+                readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories);
             }
-            else if (entry instanceof ConfigEntry) {
-                Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
-                if (configFactory != null) {
-                    newValues.put(entry.id, configFactory.apply(((ConfigEntry<?>) entry).value), entry.description);
+            else {
+                if (!field.isAnnotationPresent(ConfigName.class)) {
+                    throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
                 }
-                else {
-                    newValues.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                SexFunction<String, String, String, Field, Object, Integer, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
+                if (function == null) {
+                    throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
                 }
-                readValues.getAndIncrement();
-            } else {
-                throw new RuntimeException("What?! Config contains a non-serializable entry!");
+                field.setAccessible(true);
+                ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class).value() : 32);
+                category.values.put(field.getType(), configEntry);
             }
         }
+    }
 
+    public static String saveConfig(EntrypointContainer<Object> container, ConfigCategory category) {
         try {
-            if (EventStorage.PRE_SAVE_LISTENERS.containsKey(mod.mod.getMetadata().getId())) {
-                EventStorage.PRE_SAVE_LISTENERS.get(mod.mod.getMetadata().getId()).getEntrypoint().onPreConfigSaved(configFile.exists()? Jankson.builder().build().load(configFile) : new JsonObject(), newValues);
+            AtomicInteger readValues = new AtomicInteger();
+            AtomicInteger readCategories = new AtomicInteger();
+            File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), container.getProvider().getMetadata().getId() + "/" + category.parentField.getAnnotation(GConfig.class).value() + ".json");
+            JsonObject newValues = new JsonObject();
+
+            for (ConfigBase entry : category.values.values()) {
+                if (entry instanceof ConfigCategory) {
+                    newValues.put(entry.id, saveDeeper((ConfigCategory) entry, entry.parentField, entry.parentField.get(null), readValues, readCategories));
+                    readCategories.getAndIncrement();
+                } else if (entry instanceof ConfigEntry) {
+                    Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
+                    newValues.put(entry.id, configFactory.apply(((ConfigEntry) entry).value), entry.description);
+                    readValues.getAndIncrement();
+                } else {
+                    throw new RuntimeException("What?! Config contains a non-serializable entry!");
+                }
+            }
+
+            if (EventStorage.PRE_SAVE_LISTENERS.containsKey(container.getProvider().getMetadata().getId())) {
+                EventStorage.PRE_SAVE_LISTENERS.get(container.getProvider().getMetadata().getId()).getEntrypoint().onPreConfigSaved(configFile.exists() ? Jankson.builder().build().load(configFile) : new JsonObject(), newValues);
             }
 
             if (!configFile.exists()) {
@@ -260,27 +248,30 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
             fileOutputStream.write(newValues.toJson(true, true).getBytes());
             fileOutputStream.flush();
             fileOutputStream.close();
-            log("Successfully saved " + readCategories + " categories, containing " + readValues.get() + " values for " + mod.mod.getMetadata().getName() + "(" + mod.mod.getMetadata().getId() + ").");
-        } catch (IOException | SyntaxError e) {
+            log("Successfully saved " + readCategories + " categories, containing " + readValues.get() + " values for " + container.getProvider().getMetadata().getName() + "(" + container.getProvider().getMetadata().getId() + ").");
+            return newValues.toJson();
+        }
+        catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static JsonObject saveDeeper(ConfigCategory category, AtomicInteger readValues, AtomicInteger readCategories) {
+    private static JsonObject saveDeeper(ConfigCategory category, Field childField, Object parentObject, AtomicInteger readValues, AtomicInteger readCategories) throws IllegalAccessException, NoSuchFieldException {
         JsonObject jsonObject = new JsonObject();
 
         for (ConfigBase entry : category.values.values()) {
+            Object childObject = childField.get(parentObject);
             if (entry instanceof ConfigCategory) {
-                jsonObject.put(entry.id, saveDeeper((ConfigCategory) entry, readValues, readCategories));
+                jsonObject.put(entry.id, saveDeeper((ConfigCategory) entry, entry.parentField, childObject, readValues, readCategories));
                 readCategories.getAndIncrement();
             }
             else if (entry instanceof ConfigEntry) {
                 Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
                 if (configFactory != null) {
-                    jsonObject.put(entry.id, configFactory.apply(((ConfigEntry<?>) entry).value), entry.description);
+                    jsonObject.put(entry.id, configFactory.apply(((ConfigEntry) entry).value), entry.description);
                 }
                 else {
-                    jsonObject.put(entry.id, new JsonPrimitive(((ConfigEntry<?>) entry).value), entry.description);
+                    throw new RuntimeException("What?! Config contains a non-serializable entry!");
                 }
                 readValues.getAndIncrement();
             }

@@ -1,13 +1,17 @@
 package net.glasslauncher.mods.api.gcapi.impl.config;
 
 import com.google.common.collect.Multimap;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
-import net.glasslauncher.mods.api.gcapi.impl.ModContainerEntrypoint;
 import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.ScreenBuilder;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
 
 public class ConfigCategory extends ConfigBase {
 
@@ -16,8 +20,8 @@ public class ConfigCategory extends ConfigBase {
 
     private Button button;
 
-    public ConfigCategory(String id, String name, String description, Multimap<Class<?>, ConfigBase> values, boolean isRoot) {
-        super(id, name, description);
+    public ConfigCategory(String id, String name, String description, Field parentField, Multimap<Class<?>, ConfigBase> values, boolean isRoot) {
+        super(id, name, description, parentField);
         this.values = values;
         this.isRoot = isRoot;
     }
@@ -26,7 +30,8 @@ public class ConfigCategory extends ConfigBase {
      * The ScreenBuilder for this category. Can only have config entries.
      * @return ScreenBuilder
      */
-    public @NotNull ScreenBuilder getConfigScreen(ScreenBase parent, ModContainerEntrypoint mod) {
+    @Environment(EnvType.CLIENT)
+    public @NotNull ScreenBuilder getConfigScreen(ScreenBase parent, EntrypointContainer<Object> mod) {
         return isRoot ? new RootScreenBuilder(parent, mod, this) : new ScreenBuilder(parent, mod, this);
     }
 

@@ -7,12 +7,14 @@ import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Field;
+
 public class StringConfigEntry extends ConfigEntry<String> {
     private ExtensibleTextbox textbox;
     private final int maxLength;
 
-    public StringConfigEntry(String id, String name, String description, String value, int maxLength) {
-        super(id, name, description, value);
+    public StringConfigEntry(String id, String name, String description, Field parentField, String value, int maxLength) {
+        super(id, name, description, parentField, value);
         this.maxLength = maxLength;
     }
 

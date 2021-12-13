@@ -10,7 +10,8 @@
   ],
   "contact": {
     "homepage": "https://glass-launcher.net/",
-    "sources": "https://github.com/calmilamsy/Glass-Config-API"
+    "sources": "https://github.com/calmilamsy/Glass-Config-API",
+    "issues": "https://github.com/calmilamsy/Glass-Config-API/issues"
   },
 
   "license": "CC0-1.0",
@@ -22,10 +23,16 @@
       "net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI"
     ],
     "gcapi": [
-      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfigClass"
+      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfig"
     ],
     "gcapi:factory_provider": [
       "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider"
+    ],
+    "stapi:eventbus_server": [
+      "net.glasslauncher.mods.api.gcapi.events.InitServerNetworking"
+    ],
+    "stapi:eventbus_client": [
+      "net.glasslauncher.mods.api.gcapi.events.InitClientNetworking"
     ]
   },
   "custom": {
