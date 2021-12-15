@@ -4,11 +4,9 @@ import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.minecraft.client.gui.screen.ScreenBase;
 
-import java.util.List;
-
 public class FloatListScreenBuilder extends BaseListScreenBuilder<Float> {
 
-    public FloatListScreenBuilder(ScreenBase parent, int maxLength, ConfigEntry<List<Float>> configEntry) {
+    public FloatListScreenBuilder(ScreenBase parent, int maxLength, ConfigEntry<Float[]> configEntry) {
         super(parent, maxLength, configEntry, CharacterUtils::isFloat);
     }
 

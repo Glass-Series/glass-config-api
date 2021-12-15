@@ -24,11 +24,17 @@ public abstract class ConfigBase {
 
     public final Field parentField;
 
-    public ConfigBase(String id, String name, String description, Field parentField) {
+    public final Object parentObject;
+
+    public final boolean multiplayerSynced;
+
+    public ConfigBase(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.parentField = parentField;
+        this.parentObject = parentObject;
+        this.multiplayerSynced = multiplayerSynced;
     }
 
     @NotNull

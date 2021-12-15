@@ -15,6 +15,7 @@ import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
@@ -25,13 +26,13 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     protected final ScreenBase parent;
     protected int mouseX = -1;
     protected int mouseY = -1;
-    protected ConfigEntry<List<T>> configEntry;
+    protected ConfigEntry<T[]> configEntry;
     public final List<ExtensibleTextbox> textboxes = new ArrayList<>();
     protected Function<String, Boolean> validator;
     protected final int maxLength;
     private boolean isInUse = false;
 
-    protected BaseListScreenBuilder(ScreenBase parent, int maxLength, ConfigEntry<List<T>> configEntry, Function<String, Boolean> validator) {
+    protected BaseListScreenBuilder(ScreenBase parent, int maxLength, ConfigEntry<T[]> configEntry, Function<String, Boolean> validator) {
         this.parent = parent;
         this.maxLength = maxLength;
         this.configEntry = configEntry;
@@ -46,6 +47,10 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
             textbox.setText(String.valueOf(value));
             textboxes.add(textbox);
         });
+    }
+
+    public void setValues(T[] list) {
+        setValues(Arrays.asList(list));
     }
 
     @Override
@@ -73,10 +78,13 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
         setValues(configEntry.value);
         buttons.clear();
         this.scrollList = new ScreenScrollList();
+        //noinspection unchecked
         buttons.add(new Button(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
+        //noinspection unchecked
         buttons.add(new TexturedButton(1,((width/3)*2)-75, height-48, 20, 20, 0, 0, "assets/gcapi/add_button.png", 32, 64, "Add a new entry at the end"));
         AtomicInteger id = new AtomicInteger(1);
         textboxes.forEach((te) -> {
+            //noinspection unchecked
             buttons.add(new TexturedButton(id.incrementAndGet(),0, 0, 20, 20, 0, 0, "assets/gcapi/remove_button.png", 32, 64, "Remove the entry on this line"));
         });
         isInUse = true;
@@ -139,6 +147,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
             ExtensibleTextbox textbox = new ExtensibleTextbox(textManager, validator);
             textbox.setText("");
             textboxes.add(textbox);
+            //noinspection unchecked
             buttons.add(new TexturedButton(buttons.size(),0, 0, 20, 20, 0, 0, "assets/gcapi/remove_button.png", 32, 64, "Remove the entry on this line"));
         }
         else if (button.id > 1) {
@@ -163,7 +172,8 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
                 list.add(convertStringToValue(value.getText()));
             }
         });
-        configEntry.value = list;
+        //noinspection unchecked
+        configEntry.value = (T[]) list.toArray();
         super.onClose();
         if (parent instanceof RootScreenBuilder) {
             ((RootScreenBuilder) parent).doSave = false;

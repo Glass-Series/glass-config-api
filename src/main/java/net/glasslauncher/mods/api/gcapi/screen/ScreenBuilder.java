@@ -50,6 +50,7 @@ public class ScreenBuilder extends ScreenBase {
     public void init() {
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry<?>) {
+                //noinspection rawtypes
                 ConfigEntry configEntry = (ConfigEntry<?>) value;
                 if (configEntry.getDrawableValue() != null) {
                     configEntry.value = configEntry.getDrawableValue();
@@ -59,6 +60,7 @@ public class ScreenBuilder extends ScreenBase {
         buttons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToEntry = new HashMap<>();
+        //noinspection unchecked
         buttons.add(new Button(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry) {
@@ -67,6 +69,7 @@ public class ScreenBuilder extends ScreenBase {
             if (value.getDrawable() instanceof Button) {
                 value.getDrawable().setID(buttons.size());
                 buttonToEntry.put(buttons.size(), value);
+                //noinspection unchecked
                 buttons.add(value.getDrawable());
             }
         });
@@ -143,11 +146,13 @@ public class ScreenBuilder extends ScreenBase {
     public void onClose() {
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry<?>) {
+                //noinspection rawtypes
                 ConfigEntry configEntry = (ConfigEntry<?>) value;
                 if (configEntry.isValueValid()) {
                     configEntry.value = configEntry.getDrawableValue();
                 }
                 else {
+                    //noinspection unchecked
                     configEntry.setDrawableValue(configEntry.value);
                 }
             }

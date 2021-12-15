@@ -14,8 +14,8 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     @Environment(EnvType.CLIENT)
     protected TextRenderer textRenderer;
 
-    public ConfigEntry(String id, String name, String description, Field parentField, T value) {
-        super(id, name, description, parentField);
+    public ConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, T value) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced);
         this.value = value;
     }
 
@@ -26,4 +26,8 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     public abstract void setDrawableValue(T value);
 
     public abstract boolean isValueValid();
+
+    public void saveToField() throws IllegalAccessException {
+        parentField.set(parentObject, value);
+    }
 }

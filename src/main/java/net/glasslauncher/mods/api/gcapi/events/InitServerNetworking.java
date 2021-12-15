@@ -28,6 +28,7 @@ public class InitServerNetworking {
     @EventListener
     private void registerNetworkShit(MessageListenerRegistryEvent event) {
         event.registry.register(Identifier.of(modID, "ping"), (playerBase, message) -> {
+            GlassConfigAPI.log("Ping successful! Sending config to " + playerBase.name);
             GCAPI_PLAYERS.put(playerBase, true);
             Message configSync = new Message(Identifier.of(modID, "config_sync"));
             CompoundTag compoundTag = new CompoundTag();
@@ -41,7 +42,9 @@ public class InitServerNetworking {
 
     @EventListener
     private void doPlayerShit(PlayerLoginEvent event) {
+        System.out.println("Test!");
         if (((ModdedPacketHandler) event.player.packetHandler).isModded()) {
+            GlassConfigAPI.log("Sending ping event to " + event.player.name);
             PacketHelper.sendTo(event.player, new Message(Identifier.of(modID, "ping")));
         }
     }

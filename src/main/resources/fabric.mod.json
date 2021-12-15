@@ -28,10 +28,10 @@
     "gcapi:factory_provider": [
       "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider"
     ],
-    "stapi:eventbus_server": [
+    "stationapi:event_bus_server": [
       "net.glasslauncher.mods.api.gcapi.events.InitServerNetworking"
     ],
-    "stapi:eventbus_client": [
+    "stationapi:event_bus_client": [
       "net.glasslauncher.mods.api.gcapi.events.InitClientNetworking"
     ]
   },

@@ -13,8 +13,8 @@ public class StringConfigEntry extends ConfigEntry<String> {
     private ExtensibleTextbox textbox;
     private final int maxLength;
 
-    public StringConfigEntry(String id, String name, String description, Field parentField, String value, int maxLength) {
-        super(id, name, description, parentField, value);
+    public StringConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, String value, int maxLength) {
+        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
         this.maxLength = maxLength;
     }
 

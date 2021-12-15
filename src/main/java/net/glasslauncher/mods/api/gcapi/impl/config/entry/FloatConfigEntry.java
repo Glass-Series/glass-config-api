@@ -14,8 +14,8 @@ public class FloatConfigEntry extends ConfigEntry<Float> {
     private ExtensibleTextbox textbox;
     private final int maxLength;
 
-    public FloatConfigEntry(String id, String name, String description, Field parentField, Float value, int maxLength) {
-        super(id, name, description, parentField, value);
+    public FloatConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Float value, int maxLength) {
+        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
         this.maxLength = maxLength;
     }
 

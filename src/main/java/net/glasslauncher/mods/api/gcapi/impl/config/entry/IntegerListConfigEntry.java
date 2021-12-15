@@ -17,36 +17,36 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntegerListConfigEntry extends ConfigEntry<List<Integer>> implements ConfigEntryWithButton {
+public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements ConfigEntryWithButton {
     private IntegerListScreenBuilder listScreen;
     @Environment(EnvType.CLIENT)
     private Button button;
     private final int maxLength;
 
-    public IntegerListConfigEntry(String id, String name, String description, Field parentField, List<Integer> value, int maxLength) {
-        super(id, name, description, parentField, value);
+    public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Integer[] value, int maxLength) {
+        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
         this.maxLength = maxLength;
     }
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.size() + " values)");
+        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new IntegerListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
     }
 
     @Override
-    public List<Integer> getDrawableValue() {
+    public Integer[] getDrawableValue() {
         if (listScreen == null) {
             return null;
         }
         List<Integer> list = new ArrayList<>();
         listScreen.textboxes.forEach((val) -> list.add(Integer.parseInt(val.getText())));
-        return list;
+        return (Integer[]) list.toArray();
     }
 
     @Override
-    public void setDrawableValue(List<Integer> value) {
+    public void setDrawableValue(Integer[] value) {
         listScreen.setValues(value);
     }
 

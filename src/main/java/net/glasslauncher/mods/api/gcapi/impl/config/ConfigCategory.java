@@ -20,8 +20,8 @@ public class ConfigCategory extends ConfigBase {
 
     private Button button;
 
-    public ConfigCategory(String id, String name, String description, Field parentField, Multimap<Class<?>, ConfigBase> values, boolean isRoot) {
-        super(id, name, description, parentField);
+    public ConfigCategory(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Multimap<Class<?>, ConfigBase> values, boolean isRoot) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced);
         this.values = values;
         this.isRoot = isRoot;
     }

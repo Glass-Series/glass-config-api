@@ -14,27 +14,24 @@ public class ExampleConfigClass implements IsConfigCategory {
 
     @ConfigName("Tested Config") // Shows up above the config entry in white, unless you use colour codes, then it will use those.
     @Comment("Used to translate nerd") // Shows up in grey under the config entry.
-    public static String testedConfig = "nerd";
+    public String testedConfig = "nerd";
 
     @ConfigName("Tested Config 1")
     @MultiplayerSynced // Marks this entry to be synced with the server on join, and when server config changes. Do not use for client-side configs, you will annoy your users.
-    public static String testConfig1 = "wow";
+    public String testConfig1 = "wow";
 
     @ConfigName("ASD 2")
-    public static String asd2 = "hmmm";
+    public String asd2 = "hmmm";
 
     @ConfigName("ASD 3")
-    public static String asd3 = "hmmm";
-
-    @ConfigName("Vector!")
-    public static Vec3f vec3f = Vec3f.from(0, 0, 0);
+    public String asd3 = "hmmm";
 
     /**
      * A config category, you can put other categories inside a category too.
      * See the ExampleConfigCategory class for more detail.
      */
     @Comment("My config category")
-    public static ExampleConfigCategory configCategory = new ExampleConfigCategory();
+    public ExampleConfigCategory configCategory = new ExampleConfigCategory();
 
     /**
      * This shows up in white, or whatever colour codes you choose at the top of the screen when you open it.

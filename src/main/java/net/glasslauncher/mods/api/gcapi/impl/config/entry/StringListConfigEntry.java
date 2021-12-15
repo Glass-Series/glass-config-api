@@ -17,36 +17,36 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StringListConfigEntry extends ConfigEntry<List<String>> implements ConfigEntryWithButton {
+public class StringListConfigEntry extends ConfigEntry<String[]> implements ConfigEntryWithButton {
     private StringListScreenBuilder listScreen;
     @Environment(EnvType.CLIENT)
     private Button button;
     private final int maxLength;
 
-    public StringListConfigEntry(String id, String name, String description, Field parentField, List<String> value, int maxLength) {
-        super(id, name, description, parentField, value);
+    public StringListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, String[] value, int maxLength) {
+        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
         this.maxLength = maxLength;
     }
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.size() + " values)");
+        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new StringListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
     }
 
     @Override
-    public List<String> getDrawableValue() {
+    public String[] getDrawableValue() {
         if (listScreen == null) {
             return null;
         }
         List<String> list = new ArrayList<>();
         listScreen.textboxes.forEach((val) -> list.add(val.getText()));
-        return list;
+        return (String[]) list.toArray();
     }
 
     @Override
-    public void setDrawableValue(List<String> value) {
+    public void setDrawableValue(String[] value) {
         listScreen.setValues(value);
     }
 

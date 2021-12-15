@@ -15,8 +15,8 @@ import java.lang.reflect.Field;
 public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEntryWithButton {
     private Button button;
 
-    public BooleanConfigEntry(String id, String name, String description, Field parentField, Boolean value) {
-        super(id, name, description, parentField, value);
+    public BooleanConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Boolean value) {
+        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
     }
 
     @Override

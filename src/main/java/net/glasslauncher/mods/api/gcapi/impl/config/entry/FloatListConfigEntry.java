@@ -17,26 +17,26 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FloatListConfigEntry extends ConfigEntry<List<Float>> implements ConfigEntryWithButton {
+public class FloatListConfigEntry extends ConfigEntry<Float[]> implements ConfigEntryWithButton {
     private FloatListScreenBuilder listScreen;
     @Environment(EnvType.CLIENT)
     private Button button;
     private final int maxLength;
 
-    public FloatListConfigEntry(String id, String name, String description, Field parentField, List<Float> value, int maxLength) {
-        super(id, name, description, parentField, value);
+    public FloatListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Float[] value, int maxLength) {
+        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
         this.maxLength = maxLength;
     }
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.size() + " values)");
+        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new FloatListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
     }
 
     @Override
-    public List<Float> getDrawableValue() {
+    public Float[] getDrawableValue() {
         if (listScreen == null) {
             return null;
         }
@@ -46,11 +46,11 @@ public class FloatListConfigEntry extends ConfigEntry<List<Float>> implements Co
                 list.add(Float.parseFloat(val.getText()));
             }
         });
-        return list;
+        return (Float[]) list.toArray();
     }
 
     @Override
-    public void setDrawableValue(List<Float> value) {
+    public void setDrawableValue(Float[] value) {
         listScreen.setValues(value);
     }
 
