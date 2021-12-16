@@ -33,6 +33,7 @@ public class FloatListConfigEntry extends ConfigEntry<Float[]> implements Config
         button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new FloatListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
+        button.active = !multiplayerLoaded;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class FloatListConfigEntry extends ConfigEntry<Float[]> implements Config
                 list.add(Float.parseFloat(val.getText()));
             }
         });
-        return (Float[]) list.toArray();
+        return list.toArray(new Float[0]);
     }
 
     @Override

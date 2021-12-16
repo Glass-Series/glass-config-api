@@ -13,6 +13,7 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     protected ScreenBase parent;
     @Environment(EnvType.CLIENT)
     protected TextRenderer textRenderer;
+    public boolean multiplayerLoaded = false;
 
     public ConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, T value) {
         super(id, name, description, parentField, parentObject, multiplayerSynced);

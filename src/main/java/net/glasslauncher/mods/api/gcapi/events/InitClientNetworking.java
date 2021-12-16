@@ -1,10 +1,8 @@
 package net.glasslauncher.mods.api.gcapi.events;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
 import net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI;
-import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.util.io.CompoundTag;
 import net.minecraft.util.io.NBTIO;

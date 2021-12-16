@@ -22,6 +22,7 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
         button = new Button(10, 0, 0, 0, 0, value.toString());
+        button.active = !multiplayerLoaded;
     }
 
     @Override

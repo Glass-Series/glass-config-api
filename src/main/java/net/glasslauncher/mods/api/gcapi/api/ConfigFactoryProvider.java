@@ -4,7 +4,6 @@ import blue.endless.jankson.JsonElement;
 import com.google.common.collect.ImmutableMap;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import uk.co.benjiweber.expressions.function.OctFunction;
-import uk.co.benjiweber.expressions.function.SeptFunction;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

@@ -4,7 +4,6 @@ import blue.endless.jankson.Comment;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
-import net.minecraft.util.maths.Vec3f;
 
 /**
  * An example config class, you can view this in-game inside modmenu's settings button for gcapi.

@@ -33,6 +33,7 @@ public class StringListConfigEntry extends ConfigEntry<String[]> implements Conf
         button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new StringListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
+        button.active = !multiplayerLoaded;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class StringListConfigEntry extends ConfigEntry<String[]> implements Conf
         }
         List<String> list = new ArrayList<>();
         listScreen.textboxes.forEach((val) -> list.add(val.getText()));
-        return (String[]) list.toArray();
+        return list.toArray(new String[0]);
     }
 
     @Override

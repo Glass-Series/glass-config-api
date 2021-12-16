@@ -13,9 +13,7 @@ import net.glasslauncher.mods.api.gcapi.impl.config.entry.IntegerConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.IntegerListConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringListConfigEntry;
-import net.minecraft.util.maths.Vec3f;
 import uk.co.benjiweber.expressions.function.OctFunction;
-import uk.co.benjiweber.expressions.function.SeptFunction;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

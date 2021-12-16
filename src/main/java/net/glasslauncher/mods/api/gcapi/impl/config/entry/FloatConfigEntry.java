@@ -24,6 +24,7 @@ public class FloatConfigEntry extends ConfigEntry<Float> {
         textbox = new ExtensibleTextbox(textRenderer, CharacterUtils::isFloat);
         textbox.setMaxLength(maxLength);
         textbox.setText(value.toString());
+        textbox.setEnabled(!multiplayerLoaded);
     }
 
     @Override

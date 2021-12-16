@@ -24,6 +24,7 @@ public class IntegerConfigEntry extends ConfigEntry<Integer> {
         textbox = new ExtensibleTextbox(textRenderer, CharacterUtils::isInteger);
         textbox.setMaxLength(maxLength);
         textbox.setText(value.toString());
+        textbox.setEnabled(!multiplayerLoaded);
     }
 
     @Override

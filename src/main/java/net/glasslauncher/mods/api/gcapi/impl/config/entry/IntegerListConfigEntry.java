@@ -33,6 +33,7 @@ public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements Co
         button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new IntegerListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
+        button.active = !multiplayerLoaded;
     }
 
     @Override
@@ -42,7 +43,7 @@ public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements Co
         }
         List<Integer> list = new ArrayList<>();
         listScreen.textboxes.forEach((val) -> list.add(Integer.parseInt(val.getText())));
-        return (Integer[]) list.toArray();
+        return list.toArray(new Integer[0]);
     }
 
     @Override

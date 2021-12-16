@@ -23,6 +23,7 @@ public class StringConfigEntry extends ConfigEntry<String> {
         textbox = new ExtensibleTextbox(textRenderer, (text) -> true);
         textbox.setMaxLength(maxLength);
         textbox.setText(value);
+        textbox.setEnabled(!multiplayerLoaded);
     }
 
     @Override
