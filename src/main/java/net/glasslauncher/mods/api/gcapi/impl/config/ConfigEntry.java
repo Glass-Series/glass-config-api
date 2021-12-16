@@ -29,6 +29,8 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     public abstract boolean isValueValid();
 
     public void saveToField() throws IllegalAccessException {
-        parentField.set(parentObject, value);
+        if (!multiplayerLoaded) {
+            parentField.set(parentObject, value);
+        }
     }
 }
