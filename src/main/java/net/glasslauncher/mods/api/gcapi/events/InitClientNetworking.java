@@ -45,7 +45,6 @@ public class InitClientNetworking {
     private void onClientDisconnect(MultiplayerLogoutEvent event) {
         FabricLoader.getInstance().getEntrypointContainers(GlassConfigAPI.MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
-                GlassConfigAPI.MOD_CONFIGS.put(entrypointContainer.getProvider(), BiTuple.of(entrypointContainer, null));
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
                     GlassConfigAPI.loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, null);
                 }
