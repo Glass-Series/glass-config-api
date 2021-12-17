@@ -168,6 +168,7 @@ public class ScreenBuilder extends ScreenBase {
     class ScreenScrollList extends ScrollableBase {
         public ScreenScrollList() {
             super(ScreenBuilder.this.minecraft, ScreenBuilder.this.width, ScreenBuilder.this.height, 32, ScreenBuilder.this.height - 32, 48);
+            setDrawingSelectionBackground(false);
         }
 
         public void scroll(float value) {
