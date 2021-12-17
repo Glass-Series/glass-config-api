@@ -132,7 +132,6 @@ public class ScreenBuilder extends ScreenBase {
 
     @Override
     protected void buttonClicked(Button button) {
-        System.out.println("Clicked " + button.id);
         if (button.id == 0) {
             minecraft.openScreen(parent);
         }
