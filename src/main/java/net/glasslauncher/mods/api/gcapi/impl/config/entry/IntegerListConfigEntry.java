@@ -7,9 +7,9 @@ import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.IntegerListScreenBuilder;
+import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +20,7 @@ import java.util.List;
 public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements ConfigEntryWithButton {
     private IntegerListScreenBuilder listScreen;
     @Environment(EnvType.CLIENT)
-    private Button button;
+    private FancyButton button;
     private final int maxLength;
 
     public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Integer[] value, int maxLength) {
@@ -30,7 +30,7 @@ public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements Co
 
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new Button(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
+        button = new FancyButton(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         listScreen = new IntegerListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
         button.active = !multiplayerLoaded;

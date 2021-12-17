@@ -19,6 +19,8 @@ import java.util.function.Function;
  */
 public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, HasToolTip {
 
+    private static final int serverSyncedBorder = CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255));
+    private static final int serverSyncedText = CharacterUtils.getIntFromColour(new Color(170, 139, 21, 255));
     private final TextRenderer textRenderer;
     private int x;
     private int y;
@@ -326,7 +328,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
 
     @Override
     public List<String> getTooltip() {
-        return Collections.singletonList(isValueValid()? "Value is valid" : "Value is invalid. Check the description of this entry");
+        return Collections.singletonList(isValueValid()? enabled? "Value is valid" : "Server synced, you cannot change this value" : "Value is invalid. Check the description of this entry");
     }
 
     @Override
@@ -335,17 +337,17 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     }
 
     @Override
-    public void draw() {
+    public void draw(int mouseX, int mouseY) {
         if (doRenderUpdate) {
             onTextChanged();
             doRenderUpdate = false;
         }
         if (this.shouldDrawBackground()) {
-            fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, isValueValid()? -6250336 : errorBorderColour);
+            fill(this.x - 1, this.y - 1, this.x + this.width + 1, this.y + this.height + 1, isValueValid()? enabled? -6250336 : serverSyncedBorder : errorBorderColour);
             fill(this.x, this.y, this.x + this.width, this.y + this.height, -16777216);
         }
 
-        int var1 = this.field_967 ? this.selectedTextColour : this.deselectedTextColour;
+        int var1 = this.field_967 ? enabled? this.selectedTextColour : serverSyncedText : this.deselectedTextColour;
         int var2 = this.cursorMax - this.cursorPosition;
         int var3 = this.cursorMin - this.cursorPosition;
         String var4 = CharacterUtils.getRenderableString(this.text.substring(this.cursorPosition), this.getBackgroundOffset(), false, textRenderer);

@@ -198,7 +198,7 @@ public class ScreenBuilder extends ScreenBase {
             ConfigBase configBase = configBases.get(itemId);
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.name, x + 2, y + 1, 16777215);
             configBase.getDrawable().setXYWH(x + 2, y + 12, 212, 20);
-            configBase.getDrawable().draw();
+            configBase.getDrawable().draw(mouseX, mouseY);
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.description, x + 2, y + 34, 8421504);
         }
     }

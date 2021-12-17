@@ -220,7 +220,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
             ((TexturedButton) buttons.get(itemId+2)).setPos(x + 214 + 34, y+2);
             ((TexturedButton) buttons.get(itemId+2)).render(minecraft, mouseX, mouseY);
             configBase.setXYWH(x + 2, y + 1, 212, 20);
-            configBase.draw();
+            configBase.draw(mouseX, mouseY);
         }
     }
 }

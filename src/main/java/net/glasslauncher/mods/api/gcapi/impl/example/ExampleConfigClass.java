@@ -25,6 +25,10 @@ public class ExampleConfigClass implements IsConfigCategory {
     @ConfigName("ASD 3")
     public String asd3 = "hmmm";
 
+    @ConfigName("MP Synced Boolean")
+    @MultiplayerSynced
+    public Boolean mpBool = false;
+
     /**
      * A config category, you can put other categories inside a category too.
      * See the ExampleConfigCategory class for more detail.

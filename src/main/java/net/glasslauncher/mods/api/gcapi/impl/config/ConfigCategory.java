@@ -7,8 +7,8 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.ScreenBuilder;
+import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
 import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.gui.widgets.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -18,7 +18,7 @@ public class ConfigCategory extends ConfigBase {
     public final boolean isRoot;
     public Multimap<Class<?>, ConfigBase> values;
 
-    private Button button;
+    private FancyButton button;
 
     public ConfigCategory(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Multimap<Class<?>, ConfigBase> values, boolean isRoot) {
         super(id, name, description, parentField, parentObject, multiplayerSynced);
@@ -38,7 +38,7 @@ public class ConfigCategory extends ConfigBase {
     @Override
     public @NotNull HasDrawable getDrawable() {
         if (button == null) {
-            button = new Button(0, 0, 0, "Open");
+            button = new FancyButton(0, 0, 0, "Open");
         }
         return (HasDrawable) button;
     }

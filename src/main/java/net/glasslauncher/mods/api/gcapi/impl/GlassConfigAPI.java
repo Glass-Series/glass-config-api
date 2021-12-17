@@ -163,11 +163,11 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 }
                 else {
                     if (!field.isAnnotationPresent(ConfigName.class)) {
-                        throw new RuntimeException("Config value \"" + field.getClass().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
+                        throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
                     }
                     OctFunction<String, String, String, Field, Object, Boolean, Object, Integer, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
                     if (function == null) {
-                        throw new RuntimeException("Config value \"" + field.getClass().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
+                        throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
                     }
                     field.setAccessible(true);
                     ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class).value() : 32);

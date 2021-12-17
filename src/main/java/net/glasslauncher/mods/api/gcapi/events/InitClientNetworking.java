@@ -15,7 +15,6 @@ import net.modificationstation.stationapi.api.registry.Identifier;
 import net.modificationstation.stationapi.api.registry.ModID;
 import net.modificationstation.stationapi.api.util.Null;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
-import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
