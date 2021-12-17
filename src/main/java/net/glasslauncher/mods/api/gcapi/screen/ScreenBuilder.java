@@ -66,12 +66,13 @@ public class ScreenBuilder extends ScreenBase {
             if (value instanceof ConfigEntry) {
                 ((ConfigEntry<?>) value).init(this, textManager);
             }
-            if (value.getDrawable() instanceof Button) {
-                value.getDrawable().setID(buttons.size());
-                buttonToEntry.put(buttons.size(), value);
-                //noinspection unchecked
-                buttons.add(value.getDrawable());
-            }
+            value.getDrawables().forEach(val -> {
+                if (val instanceof Button) {
+                    val.setID(buttons.size());
+                    buttonToEntry.put(buttons.size(), value);
+                    buttons.add(val);
+                }
+            });
         });
     }
 
@@ -80,7 +81,7 @@ public class ScreenBuilder extends ScreenBase {
         super.tick();
         for (ConfigBase configBase : baseCategory.values.values()) {
             if (configBase instanceof ConfigEntry) {
-                configBase.getDrawable().tick();
+                configBase.getDrawables().forEach(HasDrawable::tick);
             }
         }
     }
@@ -90,7 +91,7 @@ public class ScreenBuilder extends ScreenBase {
         super.keyPressed(character, key);
         for (ConfigBase configBase : baseCategory.values.values()) {
             if (configBase instanceof ConfigEntry) {
-                configBase.getDrawable().keyPressed(character, key);
+                configBase.getDrawables().forEach(val -> val.keyPressed(character, key));
             }
         }
     }
@@ -106,7 +107,7 @@ public class ScreenBuilder extends ScreenBase {
         textManager.drawTextWithShadow(baseCategory.name, (width/2) - (textManager.getTextWidth(baseCategory.name)/2), 4, 16777215);
         textManager.drawTextWithShadow(baseCategory.description, (width/2) - (textManager.getTextWidth(baseCategory.description)/2), 18, 8421504);
         ArrayList<HasDrawable> drawables = new ArrayList<>();
-        configBases.forEach((configBase -> drawables.add(configBase.getDrawable())));
+        configBases.forEach((configBase -> drawables.addAll(configBase.getDrawables())));
         List<String> tooltip = ((ScreenBaseAccessor) this).getMouseTooltip(mouseX, mouseY, drawables);
         if (tooltip != null) {
             CharacterUtils.renderTooltip(textManager, tooltip, mouseX, mouseY, this);
@@ -120,7 +121,7 @@ public class ScreenBuilder extends ScreenBase {
         if (Mouse.isButtonDown(0)) {
             for (ConfigBase configBase : baseCategory.values.values()) {
                 if (configBase instanceof ConfigEntry) {
-                    configBase.getDrawable().mouseClicked(mouseX, mouseY, 0);
+                    configBase.getDrawables().forEach(val -> val.mouseClicked(mouseX, mouseY, 0));
                 }
             }
         }
@@ -131,6 +132,7 @@ public class ScreenBuilder extends ScreenBase {
 
     @Override
     protected void buttonClicked(Button button) {
+        System.out.println("Clicked " + button.id);
         if (button.id == 0) {
             minecraft.openScreen(parent);
         }
@@ -197,8 +199,8 @@ public class ScreenBuilder extends ScreenBase {
         protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
             ConfigBase configBase = configBases.get(itemId);
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.name, x + 2, y + 1, 16777215);
-            configBase.getDrawable().setXYWH(x + 2, y + 12, 212, 20);
-            configBase.getDrawable().draw(mouseX, mouseY);
+            configBase.getDrawables().forEach(val -> val.setXYWH(x + 2, y + 12, 212, 20));
+            configBase.getDrawables().forEach(val -> val.draw(mouseX, mouseY));
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.description, x + 2, y + 34, 8421504);
         }
     }

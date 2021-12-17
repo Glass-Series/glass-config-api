@@ -5,6 +5,7 @@ import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public abstract class ConfigBase {
 
@@ -38,5 +39,5 @@ public abstract class ConfigBase {
     }
 
     @NotNull
-    public abstract HasDrawable getDrawable();
+    public abstract List<HasDrawable> getDrawables();
 }

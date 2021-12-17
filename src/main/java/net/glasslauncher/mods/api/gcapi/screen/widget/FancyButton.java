@@ -2,12 +2,16 @@ package net.glasslauncher.mods.api.gcapi.screen.widget;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.HasToolTip;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.opengl.GL11;
 
-public class FancyButton extends Button implements HasDrawable {
+import java.util.Collections;
+import java.util.List;
+
+public class FancyButton extends Button implements HasDrawable, HasToolTip {
 
     private int disabledColour = -6250336;
 
@@ -78,5 +82,15 @@ public class FancyButton extends Button implements HasDrawable {
     @Override
     public void setID(int id) {
         this.id = id;
+    }
+
+    @Override
+    public List<String> getTooltip() {
+        return active? null : Collections.singletonList("Server synced, you cannot change this value");
+    }
+
+    @Override
+    public int[] getXYWH() {
+        return new int[] {x, y, width, height};
     }
 }

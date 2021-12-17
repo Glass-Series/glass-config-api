@@ -12,13 +12,15 @@ import net.minecraft.client.gui.screen.ScreenBase;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
 
 public class ConfigCategory extends ConfigBase {
 
     public final boolean isRoot;
     public Multimap<Class<?>, ConfigBase> values;
 
-    private FancyButton button;
+    private List<HasDrawable> button;
 
     public ConfigCategory(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Multimap<Class<?>, ConfigBase> values, boolean isRoot) {
         super(id, name, description, parentField, parentObject, multiplayerSynced);
@@ -36,10 +38,10 @@ public class ConfigCategory extends ConfigBase {
     }
 
     @Override
-    public @NotNull HasDrawable getDrawable() {
+    public @NotNull List<HasDrawable> getDrawables() {
         if (button == null) {
-            button = new FancyButton(0, 0, 0, "Open");
+            button = Collections.singletonList(new FancyButton(0, 0, 0, "Open"));
         }
-        return (HasDrawable) button;
+        return button;
     }
 }

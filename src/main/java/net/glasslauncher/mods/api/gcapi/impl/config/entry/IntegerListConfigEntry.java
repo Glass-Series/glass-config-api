@@ -8,6 +8,7 @@ import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.IntegerListScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
+import net.glasslauncher.mods.api.gcapi.screen.widget.Icon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;
@@ -22,6 +23,7 @@ public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements Co
     @Environment(EnvType.CLIENT)
     private FancyButton button;
     private final int maxLength;
+    private List<HasDrawable> drawableList;
 
     public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Integer[] value, int maxLength) {
         super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
@@ -31,6 +33,10 @@ public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements Co
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
         button = new FancyButton(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
+        drawableList = new ArrayList<HasDrawable>() {{add(button);}};
+        if (multiplayerSynced) {
+            drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
+        }
         listScreen = new IntegerListScreenBuilder(parent, maxLength, this);
         listScreen.setValues(value);
         button.active = !multiplayerLoaded;
@@ -57,8 +63,8 @@ public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements Co
     }
 
     @Override
-    public @NotNull HasDrawable getDrawable() {
-        return (HasDrawable) button;
+    public @NotNull List<HasDrawable> getDrawables() {
+        return drawableList;
     }
 
     @Environment(EnvType.CLIENT)
