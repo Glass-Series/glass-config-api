@@ -18,7 +18,15 @@ import java.util.List;
 public class CharacterUtils {
     // Custom methods
 
-    public static void renderTooltip(TextRenderer font, List<String> tooltip, int i, int j, ScreenBase screenBase) {
+    /**
+     * Renders a tooltip on screen at the provided place, handling flipping of the tooltip where required.
+     * @param textRenderer the text renderer to use. You can use <code>((Minecraft) FabricLoader.getInstance().getGameInstance()).textRenderer</code> for this.
+     * @param tooltip the tooltip to render. Can be multiline using multiple elements on the list.
+     * @param x the X position where the tooltip should be. Typically mouseX.
+     * @param y the Y position where the tooltip should be. Typically mouseY.
+     * @param screenBase the screen where the tooltip is being rendered.
+     */
+    public static void renderTooltip(TextRenderer textRenderer, List<String> tooltip, int x, int y, ScreenBase screenBase) {
         if (!tooltip.isEmpty()) {
 
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
@@ -26,14 +34,14 @@ public class CharacterUtils {
             int k = 0;
 
             for (String string : tooltip) {
-                int l = font.getTextWidth(string);
+                int l = textRenderer.getTextWidth(string);
                 if (l > k) {
                     k = l;
                 }
             }
 
-            int m = i + 12;
-            int n = j - 12;
+            int m = x + 12;
+            int n = y - 12;
             int p = 8;
             if (tooltip.size() > 1) {
                 p += 2 + (tooltip.size() - 1) * 10;
@@ -57,7 +65,7 @@ public class CharacterUtils {
             for(int t = 0; t < tooltip.size(); ++t) {
                 String string2 = tooltip.get(t);
                 if (string2 != null) {
-                    font.drawText(string2, m, n, 0xffffff);
+                    textRenderer.drawText(string2, m, n, 0xffffff);
                 }
 
                 if (t == 0) {
@@ -137,7 +145,7 @@ public class CharacterUtils {
         return true;
     }
 
-    // 1.2.5 methods
+    // 1.2.5 methods. Most of these I have no real explanation for.
 
     public static boolean isCharacterValid(char c) {
         return c != 167 && (net.minecraft.util.CharacterUtils.validCharacters.indexOf(c) >= 0 || c > ' ');
@@ -156,6 +164,10 @@ public class CharacterUtils {
         return var1.toString();
     }
 
+    /**
+     * Tries to set the given string as clipboard text. Silently fails.
+     * @param string the text to set.
+     */
     public static void setClipboardText(String string) {
         try {
             StringSelection var1 = new StringSelection(string);
@@ -165,6 +177,10 @@ public class CharacterUtils {
 
     }
 
+    /**
+     * Gets the current text on clipboard. Strips formatting.
+     * @return the current text of the clipboard. Can be empty, but never null. Fails silently.
+     */
     public static String getClipboardText() {
         try {
             Transferable var0 = Toolkit.getDefaultToolkit().getSystemClipboard().getContents(null);
@@ -177,6 +193,9 @@ public class CharacterUtils {
         return "";
     }
 
+    /**
+     * Processes string colours. I think. I have no idea, honestly.
+     */
     public static String getRenderableString(String string, int maxPixelWidth, boolean flag, TextRenderer textRenderer) {
         StringBuilder var4 = new StringBuilder();
         int currentPixelWidth = 0;

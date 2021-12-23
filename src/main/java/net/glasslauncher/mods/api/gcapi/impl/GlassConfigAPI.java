@@ -21,6 +21,7 @@ import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.minecraft.util.io.CompoundTag;
+import net.modificationstation.stationapi.api.registry.Identifier;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +43,7 @@ import java.util.function.Function;
 
 public class GlassConfigAPI implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
-    public static final HashMap<ModContainer, BiTuple<EntrypointContainer<Object>, ConfigCategory>> MOD_CONFIGS = new HashMap<>();
+    public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, ConfigCategory>> MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
 
@@ -51,24 +52,24 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
     }
 
     public static void loadServerConfig(String modID, String string) {
-        AtomicReference<ModContainer> mod = new AtomicReference<>();
+        AtomicReference<Identifier> mod = new AtomicReference<>();
         MOD_CONFIGS.keySet().forEach(modContainer -> {
-            if (modContainer.getMetadata().getId().equals(modID)) {
+            if (modContainer.toString().equals(modID)) {
                 mod.set(modContainer);
             }
         });
         if (mod.get() != null) {
             BiTuple<EntrypointContainer<Object>, ConfigCategory> category = MOD_CONFIGS.get(mod.get());
             for (Field field : ReflectionHelper.getFieldsWithAnnotation(category.one().getEntrypoint().getClass(), GConfig.class)) {
-                loadModConfig(category.one().getEntrypoint(), mod.get(), field, string);
+                loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), field, mod.get(), string);
             }
         }
     }
 
     public static void exportConfigsForServer(CompoundTag compoundTag) {
-        for (ModContainer modContainer : MOD_CONFIGS.keySet()) {
+        for (Identifier modContainer : MOD_CONFIGS.keySet()) {
             BiTuple<EntrypointContainer<Object>, ConfigCategory> entry = MOD_CONFIGS.get(modContainer);
-            compoundTag.put(modContainer.getMetadata().getId(), saveConfig(entry.one(), entry.two()));
+            compoundTag.put(modContainer.toString(), saveConfig(entry.one(), entry.two()));
         }
     }
 
@@ -111,10 +112,11 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
 
         FabricLoader.getInstance().getEntrypointContainers(MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
-                MOD_CONFIGS.put(entrypointContainer.getProvider(), BiTuple.of(entrypointContainer, null));
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
-                    loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, null);
-                    saveConfig(entrypointContainer, MOD_CONFIGS.get(entrypointContainer.getProvider()).two());
+                    Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(GConfig.class).value());
+                    MOD_CONFIGS.put(configID, BiTuple.of(entrypointContainer, null));
+                    loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, configID, null);
+                    saveConfig(entrypointContainer, MOD_CONFIGS.get(configID).two());
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -123,7 +125,7 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         loaded = true;
     }
 
-    public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, String jsonOverrideString) {
+    public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, Identifier configID, String jsonOverrideString) {
         log(rootConfigObject.getClass().getName());
         log(configField.getName());
         AtomicInteger totalReadCategories = new AtomicInteger();
@@ -178,9 +180,9 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 }
             }
             if (!loaded) {
-                MOD_CONFIGS.put(modContainer, BiTuple.of(MOD_CONFIGS.remove(modContainer).one(), configCategory));
+                MOD_CONFIGS.put(configID, BiTuple.of(MOD_CONFIGS.remove(configID).one(), configCategory));
             } else {
-                MOD_CONFIGS.get(modContainer).two().values = configCategory.values;
+                MOD_CONFIGS.get(configID).two().values = configCategory.values;
             }
 
         } catch (Exception e) {

@@ -32,6 +32,8 @@ public class ScreenBuilder extends ScreenBase {
     protected int mouseX = -1;
     protected int mouseY = -1;
     protected List<ConfigBase> configBases = new ArrayList<>();
+    protected int backButtonID;
+    protected List<Button> screenButtons = new ArrayList<>();
 
     public ScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         this.parent = parent;
@@ -58,10 +60,13 @@ public class ScreenBuilder extends ScreenBase {
             }
         });
         buttons.clear();
+        screenButtons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToEntry = new HashMap<>();
         //noinspection unchecked
-        buttons.add(new Button(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
+        Button button = new Button(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel"));
+        buttons.add(button);
+        screenButtons.add(button);
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry) {
                 ((ConfigEntry<?>) value).init(this, textManager);
@@ -103,7 +108,8 @@ public class ScreenBuilder extends ScreenBase {
         scrollList.render(mouseX, mouseY, delta);
         // Breaks rendering of category buttons.
         //super.render(mouseX, mouseY, delta);
-        ((Button) buttons.get(0)).render(minecraft, mouseX, mouseY);
+        //((Button) buttons.get(backButtonID)).render(minecraft, mouseX, mouseY);
+        screenButtons.forEach(button -> button.render(minecraft, mouseX, mouseY));
         textManager.drawTextWithShadow(baseCategory.name, (width/2) - (textManager.getTextWidth(baseCategory.name)/2), 4, 16777215);
         textManager.drawTextWithShadow(baseCategory.description, (width/2) - (textManager.getTextWidth(baseCategory.description)/2), 18, 8421504);
         ArrayList<HasDrawable> drawables = new ArrayList<>();
@@ -132,7 +138,7 @@ public class ScreenBuilder extends ScreenBase {
 
     @Override
     protected void buttonClicked(Button button) {
-        if (button.id == 0) {
+        if (button.id == backButtonID) {
             minecraft.openScreen(parent);
         }
         else if (buttonToEntry.get(button.id) instanceof ConfigEntryWithButton) {

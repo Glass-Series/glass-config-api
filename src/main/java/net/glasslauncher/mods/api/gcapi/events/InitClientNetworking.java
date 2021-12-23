@@ -32,7 +32,7 @@ public class InitClientNetworking {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.bytes);
             CompoundTag compoundTag = NBTIO.readGzipped(byteArrayInputStream);
             GlassConfigAPI.log(compoundTag.toString());
-            new HashMap<>(GlassConfigAPI.MOD_CONFIGS).keySet().stream().map(modContainerEntrypoint -> modContainerEntrypoint.getMetadata().getId()).filter(compoundTag::containsKey).forEach(modID -> {
+            new HashMap<>(GlassConfigAPI.MOD_CONFIGS).keySet().stream().map(modContainerEntrypoint -> modContainerEntrypoint.id).filter(compoundTag::containsKey).forEach(modID -> {
                 GlassConfigAPI.log(compoundTag.getString(modID));
                 GlassConfigAPI.loadServerConfig(modID, compoundTag.getString(modID));
             }); // oneliner go brrrrrrr
@@ -45,7 +45,8 @@ public class InitClientNetworking {
         FabricLoader.getInstance().getEntrypointContainers(GlassConfigAPI.MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
-                    GlassConfigAPI.loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, null);
+                    Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(GConfig.class).value());
+                    GlassConfigAPI.loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, configID, null);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);

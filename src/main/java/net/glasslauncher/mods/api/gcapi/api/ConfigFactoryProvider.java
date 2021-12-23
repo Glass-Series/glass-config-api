@@ -13,15 +13,15 @@ public interface ConfigFactoryProvider {
 
     /**
      * Return custom factories for certain config class types.
-     * @param immutableBuilder Arguments for the QuinFunction are: id, name, description, value, maxLength.
+     * @param immutableBuilder Arguments for the OctFunction are: id, name, description, field, parentObject, value, multiplayerSynced, maxLength.
      *                         Should return a class returning a config entry for your custom config type.
      */
     void provideLoadFactories(ImmutableMap.Builder<Type, OctFunction<String, String, String, Field, Object, Boolean, Object, Integer, ConfigEntry<?>>> immutableBuilder);
 
     /**
      * Return custom factories for certain config class types.
-     * @param immutableBuilder Arguments for the QuinFunction are: id, name, description, value, maxLength.
-     *                         Should return a JsonObject containing the config values for your custom config type.
+     * @param immutableBuilder Arguments for the Function are: value.
+     *                         Should return a JsonElement containing the serialized value for your custom config type.
      */
     void provideSaveFactories(ImmutableMap.Builder<Type, Function<Object, JsonElement>> immutableBuilder);
 }

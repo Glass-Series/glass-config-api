@@ -5,7 +5,7 @@ import blue.endless.jankson.JsonObject;
 public interface PreConfigSavedListener {
 
     /**
-     * New values are already applied, this is so you can revert invalid values or do some config pos-processing.
+     * New values are already applied, this is so you can revert invalid values or do some config post-processing.
      * Called before config is saved to file.
      * You can modify newValues to modify what is saved to file.
      * This entrypoint is called once for just your mod. Do not use to modify other mod's configs.

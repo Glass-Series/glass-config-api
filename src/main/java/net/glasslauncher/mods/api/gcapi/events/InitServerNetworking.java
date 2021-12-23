@@ -42,7 +42,6 @@ public class InitServerNetworking {
 
     @EventListener
     private void doPlayerShit(PlayerLoginEvent event) {
-        System.out.println("Test!");
         if (((ModdedPacketHandler) event.player.packetHandler).isModded()) {
             GlassConfigAPI.log("Sending ping event to " + event.player.name);
             PacketHelper.sendTo(event.player, new Message(Identifier.of(modID, "ping")));
