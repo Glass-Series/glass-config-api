@@ -18,7 +18,7 @@ import net.modificationstation.stationapi.api.util.ReflectionHelper;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class InitClientNetworking {
 
@@ -31,11 +31,7 @@ public class InitClientNetworking {
             GlassConfigAPI.log("Got config from server!");
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.bytes);
             CompoundTag compoundTag = NBTIO.readGzipped(byteArrayInputStream);
-            GlassConfigAPI.log(compoundTag.toString());
-            new HashMap<>(GlassConfigAPI.MOD_CONFIGS).keySet().stream().map(modContainerEntrypoint -> modContainerEntrypoint.id).filter(compoundTag::containsKey).forEach(modID -> {
-                GlassConfigAPI.log(compoundTag.getString(modID));
-                GlassConfigAPI.loadServerConfig(modID, compoundTag.getString(modID));
-            }); // oneliner go brrrrrrr
+            new ArrayList<>(GlassConfigAPI.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(compoundTag::containsKey).forEach(modID -> GlassConfigAPI.loadServerConfig(modID, compoundTag.getString(modID))); // oneliner go brrrrrrr
         });
         event.registry.register(Identifier.of(modID, "ping"), ((playerBase, message) -> PacketHelper.send(new Message(Identifier.of(modID, "ping")))));
     }

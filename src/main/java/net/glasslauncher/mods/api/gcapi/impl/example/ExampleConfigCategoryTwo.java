@@ -2,9 +2,8 @@ package net.glasslauncher.mods.api.gcapi.impl.example;
 
 import blue.endless.jankson.Comment;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
-import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 
-public class ExampleConfigCategoryTwo implements IsConfigCategory {
+public class ExampleConfigCategoryTwo {
 
     @ConfigName("Floating Point Value!")
     @Comment("Floats are cool.")
@@ -21,9 +20,4 @@ public class ExampleConfigCategoryTwo implements IsConfigCategory {
 
     @ConfigName("A FLOAT LIST??!!")
     public Float[] aFList = new Float[0];
-
-    @Override
-    public String getVisibleName() {
-        return "Fancy Config Category";
-    }
 }

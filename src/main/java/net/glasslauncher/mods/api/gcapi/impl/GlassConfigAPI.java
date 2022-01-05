@@ -11,14 +11,13 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
+import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.ConfigFactoryProvider;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
-import net.glasslauncher.mods.api.gcapi.api.IsConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
-import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.minecraft.util.io.CompoundTag;
 import net.modificationstation.stationapi.api.registry.Identifier;
@@ -43,7 +42,7 @@ import java.util.function.Function;
 
 public class GlassConfigAPI implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
-    public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, ConfigCategory>> MOD_CONFIGS = new HashMap<>();
+    public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
 
@@ -59,16 +58,14 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
             }
         });
         if (mod.get() != null) {
-            BiTuple<EntrypointContainer<Object>, ConfigCategory> category = MOD_CONFIGS.get(mod.get());
-            for (Field field : ReflectionHelper.getFieldsWithAnnotation(category.one().getEntrypoint().getClass(), GConfig.class)) {
-                loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), field, mod.get(), string);
-            }
+            BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory> category = MOD_CONFIGS.get(mod.get());
+            loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), string);
         }
     }
 
     public static void exportConfigsForServer(CompoundTag compoundTag) {
         for (Identifier modContainer : MOD_CONFIGS.keySet()) {
-            BiTuple<EntrypointContainer<Object>, ConfigCategory> entry = MOD_CONFIGS.get(modContainer);
+            BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory> entry = MOD_CONFIGS.get(modContainer);
             compoundTag.put(modContainer.toString(), saveConfig(entry.one(), entry.two()));
         }
     }
@@ -150,17 +147,17 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 rootJsonObject = Jankson.builder().build().load(jsonOverrideString);
             }
             log(Arrays.toString(rootJsonObject.keySet().toArray()));
-            ConfigCategory configCategory = new ConfigCategory(modContainer.getMetadata().getId(), configField.getAnnotation(GConfig.class).visibleName(), null, configField, objField, configField.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), true);
+            net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory configCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(modContainer.getMetadata().getId(), configField.getAnnotation(GConfig.class).visibleName(), null, configField, objField, configField.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), true);
             for (Field field : objField.getClass().getDeclaredFields()) {
                 Object childObjField = field.get(objField);
-                if (childObjField instanceof IsConfigCategory) {
+                if (field.isAnnotationPresent(ConfigCategory.class)) {
                     JsonObject jsonCategory = rootJsonObject.getObject(field.getName());
                     if (jsonCategory == null) {
                         jsonCategory = new JsonObject();
                         rootJsonObject.put(field.getName(), jsonCategory);
                     }
-                    ConfigCategory childCategory = new ConfigCategory(field.getName(), ((IsConfigCategory) childObjField).getVisibleName(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), false);
-                    configCategory.values.put(IsConfigCategory.class, childCategory);
+                    net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory childCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(field.getName(), field.getAnnotation(ConfigCategory.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), false);
+                    configCategory.values.put(ConfigCategory.class, childCategory);
                     readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories, isMultiplayer);
                 }
                 else {
@@ -191,21 +188,21 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         log("Successfully read \"" + modContainer.getMetadata().getId() + "\"'s mod configs, reading " + totalReadCategories.get() + " categories, and " + totalReadFields.get() + " values.");
     }
 
-    private static void readDeeper(Object rootConfigObject, Field configField, JsonObject rootJsonObject, ConfigCategory category, AtomicInteger totalReadFields, AtomicInteger totalReadCategories, boolean isMultiplayer) throws IllegalAccessException {
+    private static void readDeeper(Object rootConfigObject, Field configField, JsonObject rootJsonObject, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, AtomicInteger totalReadFields, AtomicInteger totalReadCategories, boolean isMultiplayer) throws IllegalAccessException {
         totalReadCategories.getAndIncrement();
         configField.setAccessible(true);
         Object objField = configField.get(rootConfigObject);
 
         for (Field field : objField.getClass().getDeclaredFields()) {
             Object childObjField = field.get(objField);
-            if (childObjField instanceof IsConfigCategory) {
+            if (field.isAnnotationPresent(ConfigCategory.class)) {
                 JsonObject jsonCategory = rootJsonObject.getObject(field.getName());
                 if (jsonCategory == null) {
                     jsonCategory = new JsonObject();
                     rootJsonObject.put(field.getName(), jsonCategory);
                 }
-                ConfigCategory childCategory = new ConfigCategory(field.getName(), ((IsConfigCategory) childObjField).getVisibleName(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), false);
-                category.values.put(IsConfigCategory.class, childCategory);
+                net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory childCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(field.getName(), field.getAnnotation(ConfigCategory.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), false);
+                category.values.put(ConfigCategory.class, childCategory);
                 readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories, isMultiplayer);
             }
             else {
@@ -226,19 +223,25 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         }
     }
 
-    public static String saveConfig(EntrypointContainer<Object> container, ConfigCategory category) {
+    public static String saveConfig(EntrypointContainer<Object> container, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category) {
         try {
             AtomicInteger readValues = new AtomicInteger();
             AtomicInteger readCategories = new AtomicInteger();
             File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), container.getProvider().getMetadata().getId() + "/" + category.parentField.getAnnotation(GConfig.class).value() + ".json");
-            JsonObject newValues = new JsonObject();
+            JsonObject newValues;
+            if (configFile.exists()) {
+                newValues = Jankson.builder().build().load(configFile);
+            }
+            else {
+                newValues = new JsonObject();
+            }
             JsonObject serverExported = new JsonObject();
 
             for (ConfigBase entry : category.values.values()) {
-                if (entry instanceof ConfigCategory) {
+                if (entry instanceof net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) {
                     log(entry.parentField.getDeclaringClass().getName());
                     log(container.getEntrypoint().getClass().getName());
-                    BiTuple<JsonObject, JsonObject> values = saveDeeper((ConfigCategory) entry, entry.parentField, readValues, readCategories);
+                    BiTuple<JsonObject, JsonObject> values = saveDeeper((net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) entry, entry.parentField, readValues, readCategories);
                     newValues.put(entry.id, values.one());
                     serverExported.put(entry.id, values.two());
                     readCategories.getAndIncrement();
@@ -248,7 +251,9 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                         throw new RuntimeException("Config value \"" + entry.parentObject.getClass().getName() + ";" + entry.id + "\" has no config saver for it's type!");
                     }
                     JsonElement jsonElement = configFactory.apply(((ConfigEntry<?>) entry).value);
-                    newValues.put(entry.id, jsonElement, entry.description);
+                    if (!((ConfigEntry<?>) entry).multiplayerLoaded) {
+                        newValues.put(entry.id, jsonElement, entry.description);
+                    }
                     if (entry.multiplayerSynced) {
                         serverExported.put(entry.id, jsonElement, entry.description);
                     }
@@ -281,15 +286,15 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
         }
     }
 
-    private static BiTuple<JsonObject, JsonObject> saveDeeper(ConfigCategory category, Field childField, AtomicInteger readValues, AtomicInteger readCategories) throws IllegalAccessException {
-        JsonObject jsonObject = new JsonObject();
+    private static BiTuple<JsonObject, JsonObject> saveDeeper(net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, Field childField, AtomicInteger readValues, AtomicInteger readCategories) throws IllegalAccessException {
+        JsonObject newValues = new JsonObject();
         JsonObject serverExported = new JsonObject();
 
         for (ConfigBase entry : category.values.values()) {
             childField.setAccessible(true);
-            if (entry instanceof ConfigCategory) {
-                BiTuple<JsonObject, JsonObject> values = saveDeeper((ConfigCategory) entry, entry.parentField, readValues, readCategories);
-                jsonObject.put(entry.id, values.one());
+            if (entry instanceof net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) {
+                BiTuple<JsonObject, JsonObject> values = saveDeeper((net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) entry, entry.parentField, readValues, readCategories);
+                newValues.put(entry.id, values.one());
                 serverExported.put(entry.id, values.two());
                 readCategories.getAndIncrement();
             }
@@ -299,11 +304,12 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                     throw new RuntimeException("Config value \"" + entry.parentObject.getClass().getName() + ";" + entry.id + "\" has no config saver for it's type!");
                 }
                 JsonElement jsonElement = configFactory.apply(((ConfigEntry<?>) entry).value);
-                jsonObject.put(entry.id, jsonElement, entry.description);
+                if (!((ConfigEntry<?>) entry).multiplayerLoaded) {
+                    newValues.put(entry.id, jsonElement, entry.description);
+                }
                 if (entry.multiplayerSynced) {
                     serverExported.put(entry.id, jsonElement, entry.description);
                 }
-                entry.parentField.setAccessible(true);
                 ((ConfigEntry<?>) entry).saveToField();
                 readValues.getAndIncrement();
             }
@@ -311,6 +317,6 @@ public class GlassConfigAPI implements PreLaunchEntrypoint {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
             }
         }
-        return BiTuple.of(jsonObject, serverExported);
+        return BiTuple.of(newValues, serverExported);
     }
 }

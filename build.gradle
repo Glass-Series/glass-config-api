@@ -87,16 +87,12 @@ dependencies {
 	modImplementation "com.github.modificationstation:StationAPI:${project.stapi_version}"
 
 	implementation "com.github.jhalterman:typetools:87240d6"
-
 	implementation "com.github.mineLdiver:expressions:f676bbe"
-
 	implementation "com.github.mineLdiver:UnsafeEvents:7efec57"
-
 	implementation "it.unimi.dsi:fastutil:8.5.6"
-
 	implementation "com.github.ben-manes.caffeine:caffeine:2.9.3"
 
-	modImplementation "com.github.calmilamsy:ModMenu:af21851"
+	modImplementation "com.github.calmilamsy:ModMenu:${project.modmenu_version}"
 
 	compile "blue.endless:jankson:1.2.1"
 	include "blue.endless:jankson:1.2.1"

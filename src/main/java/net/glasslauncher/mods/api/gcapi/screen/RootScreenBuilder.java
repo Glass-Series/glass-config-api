@@ -9,23 +9,22 @@ import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
-    private Map<String, BiFunction<ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new HashMap<>();
-    private List<Integer> otherRootIDs = new ArrayList<>();
+    private ArrayList<BiFunction<ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
+    private List<Integer> switchButtons = new ArrayList<>();
+    public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
 
     boolean doSave = true;
 
     public RootScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
         GlassConfigAPI.MOD_CONFIGS.forEach((key, value) -> {
-            if (key.modID.toString().equals(mod.getProvider().getMetadata().getId())){// && !value.two().id.equals(baseCategory.id)) {
-                otherRoots.put(value.two().name, (parent1, mod2) -> value.two().getConfigScreen(parent1, mod2));
+            if (key.modID.toString().equals(mod.getProvider().getMetadata().getId())) {
+                otherRoots.add((parent1, mod2) -> value.two().getConfigScreen(parent1, mod2));
             }
         });
     }
@@ -42,13 +41,15 @@ public class RootScreenBuilder extends ScreenBuilder {
     public void init() {
         super.init();
         doSave = true;
-        otherRootIDs.clear();
-        otherRoots.keySet().forEach((key) -> {
-            Button button = new Button(buttons.size(), 81*otherRootIDs.size(), 0, 80, 20, key);
-            buttons.add(button);
-            screenButtons.add(button);
-            otherRootIDs.add(button.id);
-        });
+        switchButtons.clear();
+        Button button = new Button(buttons.size(), 2, 0, 20, 20, "<");
+        buttons.add(button);
+        screenButtons.add(button);
+        switchButtons.add(button.id);
+        button = new Button(buttons.size(), 24, 0, 20, 20, ">");
+        buttons.add(button);
+        screenButtons.add(button);
+        switchButtons.add(button.id);
     }
 
     @Override
@@ -56,8 +57,18 @@ public class RootScreenBuilder extends ScreenBuilder {
         if (button.id != backButtonID) {
             doSave = false;
         }
-        if (otherRootIDs.contains(button.id)) {
-            ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(otherRoots.get(button.text).apply(parent, mod));
+        if (switchButtons.contains(button.id)) {
+            int index = switchButtons.get(0) == button.id? -1 : 1;
+            index += currentIndex;
+            if (index > otherRoots.size()-1) {
+                index = 0;
+            }
+            else if (index < 0) {
+                index = otherRoots.size()-1;
+            }
+            RootScreenBuilder builder = (RootScreenBuilder) otherRoots.get(index).apply(parent, mod);
+            builder.currentIndex = index;
+            ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(builder);
         }
         super.buttonClicked(button);
     }
