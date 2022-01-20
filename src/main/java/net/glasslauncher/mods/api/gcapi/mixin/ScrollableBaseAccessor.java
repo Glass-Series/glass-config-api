@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface ScrollableBaseAccessor {
 
     @Accessor
-    float getField_1540();
+    float gcapi$getField_1540();
 
     @Accessor
-    void setField_1540(float value);
+    void gcapi$setField_1540(float value);
 }

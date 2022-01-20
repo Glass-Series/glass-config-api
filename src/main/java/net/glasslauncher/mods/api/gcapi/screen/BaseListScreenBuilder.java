@@ -188,7 +188,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
 
         public void scroll(float value) {
             ScrollableBaseAccessor baseAccessor = ((ScrollableBaseAccessor) this);
-            baseAccessor.setField_1540(baseAccessor.getField_1540() + value);
+            baseAccessor.gcapi$setField_1540(baseAccessor.gcapi$getField_1540() + value);
         }
 
         @Override

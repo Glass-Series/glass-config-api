@@ -57,7 +57,7 @@ public class CharacterUtils {
 
             int transparentGrey = -1073741824;
             int margin = 3;
-            ((DrawableHelperAccessor) screenBase).invokeFill(m - margin, n - margin, m + k + margin,
+            ((DrawableHelperAccessor) screenBase).gcapi$invokeFill(m - margin, n - margin, m + k + margin,
                     n + p + margin, transparentGrey);
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, 300);

@@ -8,5 +8,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface DrawableHelperAccessor {
 
     @Invoker
-    void invokeFill(int x1, int y1, int x2, int y2, int colour);
+    void gcapi$invokeFill(int x1, int y1, int x2, int y2, int colour);
 }
