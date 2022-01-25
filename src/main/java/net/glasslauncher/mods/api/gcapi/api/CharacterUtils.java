@@ -1,7 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
 import com.google.common.base.CharMatcher;
-import net.glasslauncher.mods.api.gcapi.mixin.DrawableHelperAccessor;
+import net.glasslauncher.mods.api.gcapi.impl.DrawableHelperAccessor;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.opengl.GL11;
@@ -57,7 +57,7 @@ public class CharacterUtils {
 
             int transparentGrey = -1073741824;
             int margin = 3;
-            ((DrawableHelperAccessor) screenBase).gcapi$invokeFill(m - margin, n - margin, m + k + margin,
+            ((DrawableHelperAccessor) screenBase).invokeFill(m - margin, n - margin, m + k + margin,
                     n + p + margin, transparentGrey);
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, 300);
