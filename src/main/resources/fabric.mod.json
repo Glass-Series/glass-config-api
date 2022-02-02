@@ -20,7 +20,7 @@
   "environment": "*",
   "entrypoints": {
     "preLaunch": [
-      "net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI"
+      "net.glasslauncher.mods.api.gcapi.impl.GCCore"
     ],
     "gcapi": [
       "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfig"

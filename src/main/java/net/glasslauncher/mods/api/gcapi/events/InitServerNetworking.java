@@ -1,6 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.events;
 
-import net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI;
+import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.entity.player.PlayerBase;
 import net.minecraft.util.io.CompoundTag;
@@ -28,11 +28,11 @@ public class InitServerNetworking {
     @EventListener
     private void registerNetworkShit(MessageListenerRegistryEvent event) {
         event.registry.register(Identifier.of(modID, "ping"), (playerBase, message) -> {
-            GlassConfigAPI.log("Ping successful! Sending config to " + playerBase.name);
+            GCCore.log("Ping successful! Sending config to " + playerBase.name);
             GCAPI_PLAYERS.put(playerBase, true);
             Message configSync = new Message(Identifier.of(modID, "config_sync"));
             CompoundTag compoundTag = new CompoundTag();
-            GlassConfigAPI.exportConfigsForServer(compoundTag);
+            GCCore.exportConfigsForServer(compoundTag);
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             NBTIO.writeGzipped(compoundTag, byteArrayOutputStream);
             configSync.bytes = byteArrayOutputStream.toByteArray();
@@ -43,7 +43,7 @@ public class InitServerNetworking {
     @EventListener
     private void doPlayerShit(PlayerLoginEvent event) {
         if (((ModdedPacketHandler) event.player.packetHandler).isModded()) {
-            GlassConfigAPI.log("Sending ping event to " + event.player.name);
+            GCCore.log("Sending ping event to " + event.player.name);
             PacketHelper.sendTo(event.player, new Message(Identifier.of(modID, "ping")));
         }
     }

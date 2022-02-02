@@ -2,7 +2,7 @@ package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
-import net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI;
+import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
@@ -22,7 +22,7 @@ public class RootScreenBuilder extends ScreenBuilder {
 
     public RootScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
-        GlassConfigAPI.MOD_CONFIGS.forEach((key, value) -> {
+        GCCore.MOD_CONFIGS.forEach((key, value) -> {
             if (key.modID.toString().equals(mod.getProvider().getMetadata().getId())) {
                 otherRoots.add((parent1, mod2) -> value.two().getConfigScreen(parent1, mod2));
             }
@@ -33,7 +33,7 @@ public class RootScreenBuilder extends ScreenBuilder {
     public void onClose() {
         super.onClose();
         if (doSave) {
-            GlassConfigAPI.saveConfig(mod, baseCategory);
+            GCCore.saveConfig(mod, baseCategory);
         }
     }
 

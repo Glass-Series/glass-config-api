@@ -2,7 +2,7 @@ package net.glasslauncher.mods.api.gcapi.events;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
-import net.glasslauncher.mods.api.gcapi.impl.GlassConfigAPI;
+import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.util.io.CompoundTag;
 import net.minecraft.util.io.NBTIO;
@@ -28,21 +28,21 @@ public class InitClientNetworking {
     @EventListener
     private void registerNetworkShit(MessageListenerRegistryEvent event) {
         event.registry.register(Identifier.of(modID, "config_sync"), (playerBase, message) -> {
-            GlassConfigAPI.log("Got config from server!");
+            GCCore.log("Got config from server!");
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.bytes);
             CompoundTag compoundTag = NBTIO.readGzipped(byteArrayInputStream);
-            new ArrayList<>(GlassConfigAPI.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(compoundTag::containsKey).forEach(modID -> GlassConfigAPI.loadServerConfig(modID, compoundTag.getString(modID))); // oneliner go brrrrrrr
+            new ArrayList<>(GCCore.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(compoundTag::containsKey).forEach(modID -> GCCore.loadServerConfig(modID, compoundTag.getString(modID))); // oneliner go brrrrrrr
         });
         event.registry.register(Identifier.of(modID, "ping"), ((playerBase, message) -> PacketHelper.send(new Message(Identifier.of(modID, "ping")))));
     }
 
     @EventListener
     private void onClientDisconnect(MultiplayerLogoutEvent event) {
-        FabricLoader.getInstance().getEntrypointContainers(GlassConfigAPI.MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
+        FabricLoader.getInstance().getEntrypointContainers(GCCore.MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
                     Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(GConfig.class).value());
-                    GlassConfigAPI.loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, configID, null);
+                    GCCore.loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, configID, null);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
