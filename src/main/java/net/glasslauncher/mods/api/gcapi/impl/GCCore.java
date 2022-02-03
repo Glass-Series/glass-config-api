@@ -149,10 +149,10 @@ public class GCCore implements PreLaunchEntrypoint {
                 forceNotMultiplayer = rootJsonObject.getBoolean("forceNotMultiplayer", false);
                 if (!forceNotMultiplayer) {
                     isMultiplayer = true;
-                    log("Loading server config!");
+                    log("Loading server config for " + modContainer.getMetadata().getId() + "!");
                 }
                 else {
-                    log("Loading forced mod config!");
+                    log("Loading forced mod config for " + modContainer.getMetadata().getId() + "!");
                 }
             }
             log(Arrays.toString(rootJsonObject.keySet().toArray()));

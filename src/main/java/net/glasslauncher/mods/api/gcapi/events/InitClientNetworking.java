@@ -38,6 +38,7 @@ public class InitClientNetworking {
 
     @EventListener
     private void onClientDisconnect(MultiplayerLogoutEvent event) {
+        GCCore.log("Unloading server synced config!");
         FabricLoader.getInstance().getEntrypointContainers(GCCore.MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {

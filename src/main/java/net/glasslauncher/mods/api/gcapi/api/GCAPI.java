@@ -15,11 +15,11 @@ import java.util.concurrent.atomic.*;
 public class GCAPI {
 
     /**
-     * Force a config reload, or load your own config json! Can be partial.bbb
-     * @param configID Should be an identifier formatted like
-     * @param configJson Optional config overwrite
+     * Force a config reload, or load your own config json! Can be partial.
+     * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
+     * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
-    public static void reloadConfig(Identifier configID, @Nullable String configJson) {
+    public static void reloadConfig(Identifier configID, @Nullable String overrideConfigJson) {
         AtomicReference<Identifier> mod = new AtomicReference<>();
         GCCore.MOD_CONFIGS.keySet().forEach(modContainer -> {
             if (modContainer.toString().equals(configID.toString())) {
@@ -28,9 +28,17 @@ public class GCAPI {
         });
         if (mod.get() != null) {
             BiTuple<EntrypointContainer<Object>, ConfigCategory> category = GCCore.MOD_CONFIGS.get(mod.get());
-            GCCore.loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), configJson);
+            GCCore.loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), overrideConfigJson);
             GCCore.saveConfig(category.one(), category.two());
         }
+    }
+
+    /**
+     * Force a config reload, or load your own config json! Can be partial.
+     * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
+     */
+    public static void reloadConfig(Identifier configID) {
+        reloadConfig(configID, null);
     }
 
 }
