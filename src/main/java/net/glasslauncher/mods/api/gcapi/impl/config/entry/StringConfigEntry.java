@@ -28,7 +28,9 @@ public class StringConfigEntry extends ConfigEntry<String> {
         textbox.setMaxLength(maxLength);
         textbox.setText(value);
         textbox.setEnabled(!multiplayerLoaded);
-        drawableList = new ArrayList<HasDrawable>() {{add(textbox);}};
+        drawableList = new ArrayList<>() {{
+            add(textbox);
+        }};
         if (multiplayerSynced) {
             drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
         }

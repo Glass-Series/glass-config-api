@@ -14,8 +14,8 @@ import java.util.function.BiFunction;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
-    private ArrayList<BiFunction<ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
-    private List<Integer> switchButtons = new ArrayList<>();
+    private final ArrayList<BiFunction<ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
+    private final List<Integer> switchButtons = new ArrayList<>();
     public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
 
     boolean doSave = true;
@@ -43,10 +43,12 @@ public class RootScreenBuilder extends ScreenBuilder {
         doSave = true;
         switchButtons.clear();
         Button button = new Button(buttons.size(), 2, 0, 20, 20, "<");
+        //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
         switchButtons.add(button.id);
         button = new Button(buttons.size(), 24, 0, 20, 20, ">");
+        //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
         switchButtons.add(button.id);
@@ -68,6 +70,7 @@ public class RootScreenBuilder extends ScreenBuilder {
             }
             RootScreenBuilder builder = (RootScreenBuilder) otherRoots.get(index).apply(parent, mod);
             builder.currentIndex = index;
+            //noinspection deprecation
             ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(builder);
         }
         super.buttonClicked(button);

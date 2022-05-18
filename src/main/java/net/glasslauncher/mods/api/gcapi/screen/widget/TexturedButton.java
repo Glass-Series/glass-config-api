@@ -19,6 +19,7 @@ public class TexturedButton extends Button implements HasToolTip {
 	private final int uWidth;
 	private final int vHeight;
 
+	@SuppressWarnings("unused")
 	public TexturedButton(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight) {
 		this(buttonId, x, y, width, height, u, v, texture, uWidth, vHeight, "");
 	}

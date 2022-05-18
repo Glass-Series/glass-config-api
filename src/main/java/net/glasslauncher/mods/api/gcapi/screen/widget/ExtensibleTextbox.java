@@ -32,7 +32,8 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     private boolean shouldDrawBackground = true;
     private boolean enabled = true;
     private boolean selected = false;
-    private boolean field_967 = true;
+    @SuppressWarnings("FieldMayBeFinal")
+    private boolean focusable = true;
     private int cursorPosition = 0;
     private int cursorMax = 0;
     private int cursorMin = 0;
@@ -41,7 +42,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     public int errorBorderColour = CharacterUtils.getIntFromColour(new Color(200, 50, 50));
 
     private boolean doRenderUpdate = true;
-    private Function<String, Boolean> contentsValidator;
+    private final Function<String, Boolean> contentsValidator;
 
     public ExtensibleTextbox(TextRenderer textRenderer, Function<String, Boolean> contentsValidator) {
         this.textRenderer = textRenderer;
@@ -87,7 +88,6 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
         int var4 = Math.min(this.cursorMax, this.cursorMin);
         int var5 = Math.max(this.cursorMax, this.cursorMin);
         int var6 = this.maxLength - this.text.length() - (var4 - this.cursorMin);
-        boolean var7 = false;
         if (this.text.length() > 0) {
             var2 = var2 + this.text.substring(0, var4);
         }
@@ -207,7 +207,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
 
     @Override
     public void keyPressed(char c, int i) {
-        if (this.field_967 && this.selected) {
+        if (this.focusable && this.selected) {
             switch(c) {
                 case '\u0001':
                     this.onTextChanged();
@@ -303,7 +303,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     public void mouseClicked(int mouseX, int mouseY, int button) {
         boolean isMouseHovering = mouseX >= this.x && mouseX < this.x + this.width && mouseY >= this.y && mouseY < this.y + this.height;
         if (this.enabled) {
-            this.setSelected(this.field_967 && isMouseHovering);
+            this.setSelected(this.focusable && isMouseHovering);
         }
 
         if (this.selected && button == 0) {
@@ -347,7 +347,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
             fill(this.x, this.y, this.x + this.width, this.y + this.height, -16777216);
         }
 
-        int var1 = this.field_967 ? enabled? this.selectedTextColour : serverSyncedText : this.deselectedTextColour;
+        int var1 = this.focusable ? enabled? this.selectedTextColour : serverSyncedText : this.deselectedTextColour;
         int var2 = this.cursorMax - this.cursorPosition;
         int var3 = this.cursorMin - this.cursorPosition;
         String var4 = CharacterUtils.getRenderableString(this.text.substring(this.cursorPosition), this.getBackgroundOffset(), false, textRenderer);
@@ -443,6 +443,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
         return this.shouldDrawBackground;
     }
 
+    @SuppressWarnings("unused")
     public void setShouldDrawBackground(boolean flag) {
         this.shouldDrawBackground = flag;
     }
@@ -455,6 +456,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
         this.selected = flag;
     }
 
+    @SuppressWarnings("unused")
     public boolean isSelected() {
         return this.selected;
     }

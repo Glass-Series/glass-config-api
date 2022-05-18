@@ -47,6 +47,7 @@ public class FancyButton extends Button implements HasDrawable, HasToolTip {
 
     @Override
     public void draw(int mouseX, int mouseY) {
+        //noinspection deprecation
         render((Minecraft) FabricLoader.getInstance().getGameInstance(), mouseX, mouseY);
     }
 

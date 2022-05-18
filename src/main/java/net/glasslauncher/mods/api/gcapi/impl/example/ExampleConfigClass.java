@@ -7,7 +7,6 @@ import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 
 /**
  * An example config class, you can view this in-game inside modmenu's settings button for gcapi.
- * Make sure to add it inside your gcapi entrypoints in your fabric.mod.json. Look at the one for this mod for an example.
  */
 public class ExampleConfigClass {
 

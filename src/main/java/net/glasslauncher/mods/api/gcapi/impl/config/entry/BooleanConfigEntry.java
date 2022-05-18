@@ -28,7 +28,9 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
         button = new FancyButton(10, 0, 0, 0, 0, value.toString(), CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255)));
-        drawableList = new ArrayList<HasDrawable>() {{add(button);}};
+        drawableList = new ArrayList<>() {{
+            add(button);
+        }};
         if (multiplayerSynced) {
             drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
         }

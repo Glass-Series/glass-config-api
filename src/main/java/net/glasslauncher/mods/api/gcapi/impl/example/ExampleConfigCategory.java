@@ -5,8 +5,8 @@ import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 
 /**
- * An example config category, note the use of IsConfigCategory.
- * You must use that interface in order for gcapi to recognise your category.
+ * An example config category. Note the use of @ConfigCategory for defining a category.
+ * Make sure to add it inside your gcapi entrypoints in your fabric.mod.json. Look at the one for this mod for an example.
  */
 public class ExampleConfigCategory {
 

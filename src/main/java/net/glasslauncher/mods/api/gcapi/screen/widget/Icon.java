@@ -28,6 +28,7 @@ public class Icon implements HasDrawable, HasToolTip {
 
     @Override
     public void draw(int mouseX, int mouseY) {
+        //noinspection deprecation
         Minecraft minecraft = (Minecraft) FabricLoader.getInstance().getGameInstance();
         GL11.glBindTexture(3553, minecraft.textureManager.getTextureId(icon));
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

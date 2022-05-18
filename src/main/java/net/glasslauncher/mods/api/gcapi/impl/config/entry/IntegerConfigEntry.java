@@ -29,7 +29,9 @@ public class IntegerConfigEntry extends ConfigEntry<Integer> {
         textbox.setMaxLength(maxLength);
         textbox.setText(value.toString());
         textbox.setEnabled(!multiplayerLoaded);
-        drawableList = new ArrayList<HasDrawable>() {{add(textbox);}};
+        drawableList = new ArrayList<>() {{
+            add(textbox);
+        }};
         if (multiplayerSynced) {
             drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
         }

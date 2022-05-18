@@ -20,8 +20,10 @@ public class MixinModMenu {
 
     @Inject(method = "onInitializeClient", at = @At(target = "Lcom/google/common/collect/ImmutableMap$Builder;build()Lcom/google/common/collect/ImmutableMap;", value = "INVOKE", shift = At.Shift.BEFORE), locals = LocalCapture.CAPTURE_FAILHARD, remap = false)
     private void hijackConfigScreens(CallbackInfo ci, ImmutableMap.Builder<String, Function<ScreenBase, ? extends ScreenBase>> builder) {
+        //noinspection deprecation
         GCCore.log("Adding config screens to ModMenu...");
         Map<String, Function<ScreenBase, ? extends ScreenBase>> map = new HashMap<>();
+        //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
             if (!map.containsKey(key.modID.toString()) || value.two().parentField.getAnnotation(GConfig.class).primary()) {
                 map.remove(key.modID.toString());

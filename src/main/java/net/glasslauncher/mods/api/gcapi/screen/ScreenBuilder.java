@@ -63,8 +63,8 @@ public class ScreenBuilder extends ScreenBase {
         screenButtons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToEntry = new HashMap<>();
-        //noinspection unchecked
         Button button = new Button(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel"));
+        //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
         baseCategory.values.values().forEach((value) -> {
@@ -75,6 +75,7 @@ public class ScreenBuilder extends ScreenBase {
                 if (val instanceof Button) {
                     val.setID(buttons.size());
                     buttonToEntry.put(buttons.size(), value);
+                    //noinspection unchecked
                     buttons.add(val);
                 }
             });
@@ -101,6 +102,7 @@ public class ScreenBuilder extends ScreenBase {
         }
     }
 
+    @SuppressWarnings("CommentedOutCode") // I want to show code differences.
     @Override
     public void render(int mouseX, int mouseY, float delta) {
         this.mouseX = mouseX;
@@ -145,6 +147,7 @@ public class ScreenBuilder extends ScreenBase {
             ((ConfigEntryWithButton) buttonToEntry.get(button.id)).onClick();
         }
         else if (buttonToEntry.get(button.id) instanceof ConfigCategory) {
+            //noinspection deprecation
             ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(((ConfigCategory) buttonToEntry.get(button.id)).getConfigScreen(this, mod));
         }
     }
@@ -178,7 +181,7 @@ public class ScreenBuilder extends ScreenBase {
 
         public void scroll(float value) {
             ScrollableBaseAccessor baseAccessor = ((ScrollableBaseAccessor) this);
-            baseAccessor.gcapi$setField_1540(baseAccessor.gcapi$getField_1540() + value);
+            baseAccessor.setScrollAmount(baseAccessor.getScrollAmount() + value);
         }
 
         @Override

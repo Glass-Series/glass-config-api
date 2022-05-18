@@ -33,7 +33,9 @@ public class StringListConfigEntry extends ConfigEntry<String[]> implements Conf
     @Override
     public void init(ScreenBase parent, TextRenderer textRenderer) {
         button = new FancyButton(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
-        drawableList = new ArrayList<HasDrawable>() {{add(button);}};
+        drawableList = new ArrayList<>() {{
+            add(button);
+        }};
         if (multiplayerSynced) {
             drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
         }
@@ -70,6 +72,7 @@ public class StringListConfigEntry extends ConfigEntry<String[]> implements Conf
     @Environment(EnvType.CLIENT)
     @Override
     public void onClick() {
+        //noinspection deprecation
         ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);
     }
 }

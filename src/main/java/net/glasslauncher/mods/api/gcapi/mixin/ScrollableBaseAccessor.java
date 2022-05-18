@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(ScrollableBase.class)
 public interface ScrollableBaseAccessor {
 
-    @Accessor("field_1540")
-    float gcapi$getField_1540();
+    @Accessor("scrollAmount")
+    float getScrollAmount();
 
-    @Accessor("field_1540")
-    void gcapi$setField_1540(float value);
+    @Accessor("scrollAmount")
+    void setScrollAmount(float value);
 }

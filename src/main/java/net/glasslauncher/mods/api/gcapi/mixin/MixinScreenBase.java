@@ -23,6 +23,7 @@ public class MixinScreenBase extends DrawableHelper implements ScreenBaseAccesso
 
     @Shadow protected TextRenderer textManager;
 
+    @SuppressWarnings("rawtypes")
     @Shadow protected List buttons;
 
     @Inject(method = "render", at = @At(value = "TAIL"))
@@ -36,6 +37,7 @@ public class MixinScreenBase extends DrawableHelper implements ScreenBaseAccesso
     @Override
     public List<String> getMouseTooltip(int mouseX, int mouseY, List<?> extraObjectsToCheck) {
         AtomicReference<List<String>> tooltip = new AtomicReference<>(null);
+        //noinspection unchecked
         Stream.of(buttons, extraObjectsToCheck).flatMap(Collection::stream).forEach((widget) -> {
             if (widget instanceof HasToolTip && isMouseInBounds(((HasToolTip) widget).getXYWH(), mouseX, mouseY)) {
                 tooltip.set(((HasToolTip) widget).getTooltip());
