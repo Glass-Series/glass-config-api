@@ -18,6 +18,7 @@ import net.modificationstation.stationapi.api.util.Null;
 import java.io.ByteArrayOutputStream;
 import java.util.WeakHashMap;
 
+@SuppressWarnings("deprecation")
 public class InitServerNetworking {
 
     public static final WeakHashMap<PlayerBase, Boolean> GCAPI_PLAYERS = new WeakHashMap<>();

@@ -44,6 +44,7 @@ import java.util.function.Function;
  * Do not use this class directly in your code.
  * This class changes a lot between updates, and should never ever be used by a mod using GCAPI, as there are update-safe wrappers for most of this class' functionality inside other classes.
  */
+@SuppressWarnings("DeprecatedIsStillUsed") // shush, I just don't want others using this class without getting yelled at.
 @Deprecated
 public class GCCore implements PreLaunchEntrypoint {
     public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
@@ -284,7 +285,9 @@ public class GCCore implements PreLaunchEntrypoint {
             }
 
             if (!configFile.exists()) {
+                //noinspection ResultOfMethodCallIgnored
                 configFile.getParentFile().mkdirs();
+                //noinspection ResultOfMethodCallIgnored
                 configFile.createNewFile();
             }
 

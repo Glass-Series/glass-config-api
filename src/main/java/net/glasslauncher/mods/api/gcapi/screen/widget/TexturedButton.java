@@ -75,7 +75,7 @@ public class TexturedButton extends Button implements HasToolTip {
 			return null;
 		}
 		else {
-			return new ArrayList<String>() {{
+			return new ArrayList<>() {{
 				add(text);
 			}};
 		}

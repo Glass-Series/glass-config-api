@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+@SuppressWarnings("deprecation")
 public class InitClientNetworking {
 
     @Entrypoint.ModID

@@ -19,6 +19,7 @@ public class GCAPI {
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
+    @SuppressWarnings("deprecation")
     public static void reloadConfig(Identifier configID, @Nullable String overrideConfigJson) {
         AtomicReference<Identifier> mod = new AtomicReference<>();
         GCCore.MOD_CONFIGS.keySet().forEach(modContainer -> {
@@ -34,7 +35,7 @@ public class GCAPI {
     }
 
     /**
-     * Force a config reload, or load your own config json! Can be partial.
+     * Force a config reload.
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      */
     public static void reloadConfig(Identifier configID) {
