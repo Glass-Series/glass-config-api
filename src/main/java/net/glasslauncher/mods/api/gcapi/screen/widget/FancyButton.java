@@ -8,8 +8,7 @@ import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class FancyButton extends Button implements HasDrawable, HasToolTip {
 

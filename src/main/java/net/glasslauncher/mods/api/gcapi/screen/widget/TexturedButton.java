@@ -6,8 +6,7 @@ import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.render.Tessellator;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Copied from ModMenu

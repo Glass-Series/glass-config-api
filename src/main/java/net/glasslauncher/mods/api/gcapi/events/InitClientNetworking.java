@@ -16,9 +16,9 @@ import net.modificationstation.stationapi.api.registry.ModID;
 import net.modificationstation.stationapi.api.util.Null;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
 
 @SuppressWarnings("deprecation")
 public class InitClientNetworking {

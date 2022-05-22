@@ -13,16 +13,16 @@ import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.lang.reflect.*;
 import java.util.List;
+import java.util.*;
 
 public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEntryWithButton {
     private FancyButton button;
     private List<HasDrawable> drawableList;
 
-    public BooleanConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Boolean value) {
-        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
+    public BooleanConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Boolean value) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, null);
     }
 
     @Override

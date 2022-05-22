@@ -4,8 +4,8 @@ package net.glasslauncher.mods.api.gcapi.impl.config;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
-import java.util.List;
+import java.lang.reflect.*;
+import java.util.*;
 
 public abstract class ConfigBase {
 

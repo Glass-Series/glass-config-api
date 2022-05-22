@@ -11,9 +11,8 @@ import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
 import net.minecraft.client.gui.screen.ScreenBase;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.*;
+import java.util.*;
 
 public class ConfigCategory extends ConfigBase {
 

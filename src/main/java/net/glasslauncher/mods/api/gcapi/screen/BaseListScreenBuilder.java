@@ -1,6 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
+import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
 import net.glasslauncher.mods.api.gcapi.screen.widget.ExtensibleTextbox;
@@ -13,12 +14,13 @@ import net.minecraft.client.gui.widgets.ScrollableBase;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
+import uk.co.benjiweber.expressions.tuple.BiTuple;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.awt.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 public abstract class BaseListScreenBuilder<T> extends ScreenBase {
 
@@ -28,11 +30,11 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     protected int mouseY = -1;
     protected ConfigEntry<T[]> configEntry;
     public final List<ExtensibleTextbox> textboxes = new ArrayList<>();
-    protected Function<String, Boolean> validator;
-    protected final int maxLength;
+    protected Function<String, BiTuple<Boolean, List<String>>> validator;
+    protected final MaxLength maxLength;
     private boolean isInUse = false;
 
-    protected BaseListScreenBuilder(ScreenBase parent, int maxLength, ConfigEntry<T[]> configEntry, Function<String, Boolean> validator) {
+    protected BaseListScreenBuilder(ScreenBase parent, MaxLength maxLength, ConfigEntry<T[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
         this.parent = parent;
         this.maxLength = maxLength;
         this.configEntry = configEntry;
@@ -42,8 +44,9 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     public void setValues(List<T> list) {
         textboxes.clear();
         list.forEach((value) -> {
-            ExtensibleTextbox textbox = new ExtensibleTextbox(textManager, validator);
-            textbox.setMaxLength(maxLength);
+            ExtensibleTextbox textbox = new ExtensibleTextbox(textManager);
+            textbox.setValidator(validator);
+            textbox.setMaxLength(maxLength.value());
             textbox.setText(String.valueOf(value));
             textboxes.add(textbox);
         });
@@ -117,6 +120,15 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
         ((Button) buttons.get(1)).render(minecraft, mouseX, mouseY);
         textManager.drawTextWithShadow(configEntry.name, (width / 2) - (textManager.getTextWidth(configEntry.name) / 2), 4, 16777215);
         textManager.drawTextWithShadow(configEntry.description, (width / 2) - (textManager.getTextWidth(configEntry.description) / 2), 18, 8421504);
+
+        if (configEntry.parentField.isAnnotationPresent(MaxLength.class)) {
+            MaxLength maxLength = configEntry.parentField.getAnnotation(MaxLength.class);
+            if ((!maxLength.fixedArray() && maxLength.arrayValue() < textboxes.size()) || (maxLength.fixedArray() && maxLength.arrayValue() != textboxes.size())) {
+                String text = "Array is not the right size!";
+                textManager.drawTextWithShadow(text, (width / 2) - (textManager.getTextWidth(text) / 2), 34, CharacterUtils.getIntFromColour(Color.RED));
+            }
+        }
+
         List<String> tooltip = ((ScreenBaseAccessor) this).getMouseTooltip(mouseX, mouseY, textboxes);
         if (tooltip != null) {
             CharacterUtils.renderTooltip(textManager, tooltip, mouseX, mouseY, this);
@@ -144,7 +156,8 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
             minecraft.openScreen(parent);
         }
         else if (button.id == 1) {
-            ExtensibleTextbox textbox = new ExtensibleTextbox(textManager, validator);
+            ExtensibleTextbox textbox = new ExtensibleTextbox(textManager);
+            textbox.setValidator(validator);
             textbox.setText("");
             textboxes.add(textbox);
             //noinspection unchecked

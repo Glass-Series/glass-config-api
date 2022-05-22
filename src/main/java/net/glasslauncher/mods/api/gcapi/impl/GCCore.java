@@ -29,16 +29,12 @@ import org.apache.logging.log4j.core.config.Configurator;
 import uk.co.benjiweber.expressions.function.OctFunction;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
+import java.io.*;
+import java.lang.annotation.*;
+import java.lang.reflect.*;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+import java.util.function.*;
 
 /**
  * Do not use this class directly in your code.
@@ -51,6 +47,28 @@ public class GCCore implements PreLaunchEntrypoint {
     public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
+
+    private static final Supplier<MaxLength> MAX_LENGTH_SUPPLIER = () -> new MaxLength() {
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return MaxLength.class;
+        }
+
+        @Override
+        public int value() {
+            return 32;
+        }
+
+        @Override
+        public int arrayValue() {
+            return -1;
+        }
+
+        @Override
+        public boolean fixedArray() {
+            return false;
+        }
+    };
 
     static {
         Configurator.setLevel("GCAPI", Level.INFO);
@@ -100,7 +118,7 @@ public class GCCore implements PreLaunchEntrypoint {
 
         List<EntrypointContainer<ConfigFactoryProvider>> containers = FabricLoader.getInstance().getEntrypointContainers("gcapi:factory_provider", ConfigFactoryProvider.class);
 
-        ImmutableMap.Builder<Type, OctFunction<String, String, String, Field, Object, Boolean, Object, Integer, ConfigEntry<?>>> loadImmutableBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<Type, OctFunction<String, String, String, Field, Object, Boolean, Object, MaxLength, ConfigEntry<?>>> loadImmutableBuilder = ImmutableMap.builder();
         containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideLoadFactories(loadImmutableBuilder)));
         ConfigFactories.loadFactories = loadImmutableBuilder.build();
         log(ConfigFactories.loadFactories.size() + " config load factories loaded.");
@@ -178,12 +196,12 @@ public class GCCore implements PreLaunchEntrypoint {
                     if (!field.isAnnotationPresent(ConfigName.class)) {
                         throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
                     }
-                    OctFunction<String, String, String, Field, Object, Boolean, Object, Integer, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
+                    OctFunction<String, String, String, Field, Object, Boolean, Object, MaxLength, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
                     if (function == null) {
                         throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
                     }
                     field.setAccessible(true);
-                    ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class).value() : 32);
+                    ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
                     //noinspection ConstantConditions uh, no.
                     configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced && !forceNotMultiplayer;
                     configCategory.values.put(field.getType(), configEntry);
@@ -224,12 +242,12 @@ public class GCCore implements PreLaunchEntrypoint {
                 if (!field.isAnnotationPresent(ConfigName.class)) {
                     throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
                 }
-                OctFunction<String, String, String, Field, Object, Boolean, Object, Integer, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
+                OctFunction<String, String, String, Field, Object, Boolean, Object, MaxLength, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
                 if (function == null) {
                     throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
                 }
                 field.setAccessible(true);
-                ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class).value() : 32);
+                ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
                 configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced && !forceNotMultiplayer;
                 category.values.put(field.getType(), configEntry);
                 field.set(objField, configEntry.value);

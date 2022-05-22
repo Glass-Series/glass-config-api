@@ -5,8 +5,7 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.PostConfigLoadedListener;
 import net.glasslauncher.mods.api.gcapi.api.PreConfigSavedListener;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class EventStorage {
     public static final Map<String, EntrypointContainer<PreConfigSavedListener>> PRE_SAVE_LISTENERS = new HashMap<>();

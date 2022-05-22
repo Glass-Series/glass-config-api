@@ -12,11 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
+import java.util.*;
+import java.util.concurrent.atomic.*;
+import java.util.stream.*;
 
 @Mixin(ScreenBase.class)
 public class MixinScreenBase extends DrawableHelper implements ScreenBaseAccessor {

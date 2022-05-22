@@ -8,9 +8,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
+import java.util.*;
+import java.util.function.*;
 
 public class RootScreenBuilder extends ScreenBuilder {
 

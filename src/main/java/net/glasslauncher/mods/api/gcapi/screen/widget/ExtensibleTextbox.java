@@ -8,11 +8,11 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.awt.*;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.*;
 
 /**
  * Basically a modified Textbox from r1.2.5, but modified for gcapi's use case.
@@ -42,11 +42,10 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     public int errorBorderColour = CharacterUtils.getIntFromColour(new Color(200, 50, 50));
 
     private boolean doRenderUpdate = true;
-    private final Function<String, Boolean> contentsValidator;
+    private Function<String, BiTuple<Boolean, List<String>>> contentsValidator;
 
-    public ExtensibleTextbox(TextRenderer textRenderer, Function<String, Boolean> contentsValidator) {
+    public ExtensibleTextbox(TextRenderer textRenderer) {
         this.textRenderer = textRenderer;
-        this.contentsValidator = contentsValidator;
         this.x = 0;
         this.y = 0;
         this.width = 0;
@@ -54,7 +53,10 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     }
 
     public boolean isValueValid() {
-        return contentsValidator.apply(getText());
+        if (contentsValidator != null) {
+            return contentsValidator.apply(getText()).one();
+        }
+        return true;
     }
 
     @Override
@@ -328,7 +330,10 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
 
     @Override
     public List<String> getTooltip() {
-        return Collections.singletonList(isValueValid()? enabled? "Value is valid" : "Server synced, you cannot change this value" : "Value is invalid. Check the description of this entry");
+        if (contentsValidator != null) {
+            return contentsValidator.apply(getText()).two();
+        }
+        return null;
     }
 
     @Override
@@ -511,5 +516,13 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
 
     public void setEnabled(boolean flag) {
         this.enabled = flag;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setValidator(Function<String, BiTuple<Boolean, List<String>>> contentsValidator) {
+        this.contentsValidator = contentsValidator;
     }
 }

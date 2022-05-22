@@ -5,9 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import uk.co.benjiweber.expressions.function.OctFunction;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.function.Function;
+import java.lang.reflect.*;
+import java.util.function.*;
 
 public interface ConfigFactoryProvider {
 
@@ -16,7 +15,7 @@ public interface ConfigFactoryProvider {
      * @param immutableBuilder Arguments for the OctFunction are: id, name, description, field, parentObject, value, multiplayerSynced, maxLength.
      *                         Should return a class returning a config entry for your custom config type.
      */
-    void provideLoadFactories(ImmutableMap.Builder<Type, OctFunction<String, String, String, Field, Object, Boolean, Object, Integer, ConfigEntry<?>>> immutableBuilder);
+    void provideLoadFactories(ImmutableMap.Builder<Type, OctFunction<String, String, String, Field, Object, Boolean, Object, MaxLength, ConfigEntry<?>>> immutableBuilder);
 
     /**
      * Return custom factories for certain config class types.

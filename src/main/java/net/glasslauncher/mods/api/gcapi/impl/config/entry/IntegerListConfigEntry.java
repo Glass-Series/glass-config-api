@@ -1,79 +1,34 @@
 package net.glasslauncher.mods.api.gcapi.impl.config.entry;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
-import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
-import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
+import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
+import net.glasslauncher.mods.api.gcapi.api.MaxLength;
+import net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.IntegerListScreenBuilder;
-import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
-import net.glasslauncher.mods.api.gcapi.screen.widget.Icon;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.render.TextRenderer;
-import org.jetbrains.annotations.NotNull;
+import uk.co.benjiweber.expressions.tuple.BiTuple;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.*;
+import java.util.*;
 
-public class IntegerListConfigEntry extends ConfigEntry<Integer[]> implements ConfigEntryWithButton {
-    private IntegerListScreenBuilder listScreen;
-    @Environment(EnvType.CLIENT)
-    private FancyButton button;
-    private final int maxLength;
-    private List<HasDrawable> drawableList;
+public class IntegerListConfigEntry extends BaseListConfigEntry<Integer> {
 
-    public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Integer[] value, int maxLength) {
-        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value);
-        this.maxLength = maxLength;
-    }
-
-    @Override
-    public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new FancyButton(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
-        drawableList = new ArrayList<>() {{
-            add(button);
-        }};
-        if (multiplayerSynced) {
-            drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
-        }
-        listScreen = new IntegerListScreenBuilder(parent, maxLength, this);
-        listScreen.setValues(value);
-        button.active = !multiplayerLoaded;
-    }
-
-    @Override
-    public Integer[] getDrawableValue() {
-        if (listScreen == null) {
-            return null;
-        }
-        List<Integer> list = new ArrayList<>();
-        listScreen.textboxes.forEach((val) -> list.add(Integer.parseInt(val.getText())));
-        return list.toArray(new Integer[0]);
-    }
-
-    @Override
-    public void setDrawableValue(Integer[] value) {
-        listScreen.setValues(value);
+    public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Integer[] value, MaxLength maxLength) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, maxLength);
     }
 
     @Override
     public boolean isValueValid() {
-        return true;
+        return false;
     }
 
     @Override
-    public @NotNull List<HasDrawable> getDrawables() {
-        return drawableList;
+    public BaseListScreenBuilder<Integer> createListScreen() {
+        BaseListScreenBuilder<Integer> listScreen = new IntegerListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(CharacterUtils.isInteger(str) && Integer.parseInt(str) <= maxLength.value(), multiplayerLoaded? Collections.singletonList("Server synced, you cannot change this value") : CharacterUtils.isFloat(str)? Float.parseFloat(str) > maxLength.value()? Collections.singletonList("Value is too high") : null : Collections.singletonList("Value is not a whole number")));
+        listScreen.setValues(value);
+        return listScreen;
     }
 
-    @Environment(EnvType.CLIENT)
     @Override
-    public void onClick() {
-        //noinspection deprecation
-        ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);
+    public Integer strToVal(String str) {
+        return Integer.parseInt(str);
     }
 }
-

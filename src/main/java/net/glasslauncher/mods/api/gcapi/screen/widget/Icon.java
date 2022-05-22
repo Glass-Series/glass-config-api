@@ -7,8 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Tessellator;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Icon implements HasDrawable, HasToolTip {
 
