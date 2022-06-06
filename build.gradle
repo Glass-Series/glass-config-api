@@ -3,6 +3,7 @@ plugins {
 	id 'babric-loom' version '0.12-SNAPSHOT'
 }
 
+//noinspection GroovyUnusedAssignment
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
@@ -94,7 +95,7 @@ tasks.withType(JavaCompile) {
 }
 
 task javadocJar(type: Jar) {
-	classifier = 'javadoc'
+	archiveClassifier.set('javadoc')
 	from javadoc
 }
 

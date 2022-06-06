@@ -91,7 +91,7 @@ public class CharacterUtils {
 
     /**
      * Susceptible to overflows, but honestly, I am not too concerned.
-     * https://stackoverflow.com/a/237204
+     * <a href="https://stackoverflow.com/a/237204">StackOverflow Source</a>
      */
     public static boolean isInteger(String str) {
         if (str == null) {
@@ -119,7 +119,7 @@ public class CharacterUtils {
 
     /**
      * Susceptible to overflows, but honestly, I am not too concerned. Modified to look for floats instead.
-     * https://stackoverflow.com/a/237204
+     * <a href="https://stackoverflow.com/a/237204">StackOverflow Source</a>
      */
     public static boolean isFloat(String str) {
         if (str == null) {

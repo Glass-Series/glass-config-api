@@ -21,6 +21,7 @@ public class RootScreenBuilder extends ScreenBuilder {
 
     public RootScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
+        //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
             if (key.modID.toString().equals(mod.getProvider().getMetadata().getId())) {
                 otherRoots.add((parent1, mod2) -> value.two().getConfigScreen(parent1, mod2));
@@ -32,6 +33,7 @@ public class RootScreenBuilder extends ScreenBuilder {
     public void onClose() {
         super.onClose();
         if (doSave) {
+            //noinspection deprecation
             GCCore.saveConfig(mod, baseCategory);
         }
     }
