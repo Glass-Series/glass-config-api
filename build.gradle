@@ -122,6 +122,13 @@ jar {
 publishing {
 	repositories {
 		mavenLocal()
+		maven {
+			url = "https://maven.glass-launcher.net/releases"
+			credentials {
+				username "${project.glass_maven_username}"
+				password "${project.glass_maven_password}"
+			}
+		}
 	}
 
 	publications {
@@ -132,12 +139,7 @@ publishing {
 				builtBy remapJar
 			}
 
-			artifact ("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}-dev.jar") {
-				classifier 'dev'
-				builtBy remapJar
-			}
-
-			artifact ("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}-dev.jar") {
+			artifact ("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}-javadoc.jar") {
 				classifier 'javadoc'
 				builtBy javadocJar
 			}
