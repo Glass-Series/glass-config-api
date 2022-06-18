@@ -13,7 +13,7 @@ Optional requirement, though heavily recommended as like 90% of GCAPI's user-fac
 
 ## Usage Inside a Mod
 
-See the [wiki](wiki).
+See the [wiki](https://github.com/calmilamsy/glass-config-api/wiki).
 
 ## Common Workspace Issues
 
