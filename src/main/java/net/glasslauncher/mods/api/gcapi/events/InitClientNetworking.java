@@ -13,6 +13,7 @@ import net.modificationstation.stationapi.api.packet.Message;
 import net.modificationstation.stationapi.api.packet.PacketHelper;
 import net.modificationstation.stationapi.api.registry.Identifier;
 import net.modificationstation.stationapi.api.registry.ModID;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.util.Null;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 
@@ -28,13 +29,13 @@ public class InitClientNetworking {
 
     @EventListener
     private void registerNetworkShit(MessageListenerRegistryEvent event) {
-        event.registry.register(Identifier.of(modID, "config_sync"), (playerBase, message) -> {
+        Registry.register(event.registry, Identifier.of(modID, "config_sync"), (playerBase, message) -> {
             GCCore.log("Got config from server!");
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.bytes);
             CompoundTag compoundTag = NBTIO.readGzipped(byteArrayInputStream);
             new ArrayList<>(GCCore.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(compoundTag::containsKey).forEach(modID -> GCCore.loadServerConfig(modID, compoundTag.getString(modID))); // oneliner go brrrrrrr
         });
-        event.registry.register(Identifier.of(modID, "ping"), ((playerBase, message) -> PacketHelper.send(new Message(Identifier.of(modID, "ping")))));
+        Registry.register(event.registry, Identifier.of(modID, "ping"), ((playerBase, message) -> PacketHelper.send(new Message(Identifier.of(modID, "ping")))));
     }
 
     @EventListener
