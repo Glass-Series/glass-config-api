@@ -12,6 +12,7 @@ import net.modificationstation.stationapi.api.packet.Message;
 import net.modificationstation.stationapi.api.packet.PacketHelper;
 import net.modificationstation.stationapi.api.registry.Identifier;
 import net.modificationstation.stationapi.api.registry.ModID;
+import net.modificationstation.stationapi.api.registry.Registry;
 import net.modificationstation.stationapi.api.server.event.network.PlayerLoginEvent;
 import net.modificationstation.stationapi.api.util.Null;
 
@@ -28,7 +29,7 @@ public class InitServerNetworking {
 
     @EventListener
     private void registerNetworkShit(MessageListenerRegistryEvent event) {
-        event.registry.register(Identifier.of(modID, "ping"), (playerBase, message) -> {
+        Registry.register(event.registry, Identifier.of(modID, "ping"), (playerBase, message) -> {
             GCCore.log("Ping successful! Sending config to " + playerBase.name);
             GCAPI_PLAYERS.put(playerBase, true);
             Message configSync = new Message(Identifier.of(modID, "config_sync"));

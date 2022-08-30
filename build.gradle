@@ -1,6 +1,6 @@
 plugins {
 	id 'maven-publish'
-	id 'babric-loom' version '0.12-SNAPSHOT'
+	id 'babric-loom' version '1.0.1'
 }
 
 //noinspection GroovyUnusedAssignment
@@ -122,13 +122,13 @@ jar {
 publishing {
 	repositories {
 		mavenLocal()
-		maven {
-			url = "https://maven.glass-launcher.net/releases"
-			credentials {
-				username "${project.glass_maven_username}"
-				password "${project.glass_maven_password}"
-			}
-		}
+//		maven {
+//			url = "https://maven.glass-launcher.net/releases"
+//			credentials {
+//				username "${project.glass_maven_username}"
+//				password "${project.glass_maven_password}"
+//			}
+//		}
 	}
 
 	publications {
