@@ -122,13 +122,13 @@ jar {
 publishing {
 	repositories {
 		mavenLocal()
-//		maven {
-//			url = "https://maven.glass-launcher.net/releases"
-//			credentials {
-//				username "${project.glass_maven_username}"
-//				password "${project.glass_maven_password}"
-//			}
-//		}
+		maven {
+			url = "https://maven.glass-launcher.net/releases"
+			credentials {
+				username "${project.glass_maven_username}"
+				password "${project.glass_maven_password}"
+			}
+		}
 	}
 
 	publications {
