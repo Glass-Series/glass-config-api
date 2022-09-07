@@ -77,6 +77,8 @@ dependencies {
 	modImplementation("com.github.calmilamsy:ModMenu:${project.modmenu_version}") {
 		transitive false
 	}
+
+	include("blue.endless:jankson:1.2.1")
 }
 
 processResources {
