@@ -10,9 +10,6 @@ import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
 import net.glasslauncher.mods.api.gcapi.screen.widget.Icon;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.render.TextRenderer;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
@@ -29,7 +26,7 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     }
 
     @Override
-    public void init(ScreenBase parent, TextRenderer textRenderer) {
+    public void init(net.minecraft.client.gui.screen.ScreenBase parent, net.minecraft.client.render.TextRenderer textRenderer) {
         button = new FancyButton(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         drawableList = new ArrayList<>() {{
             add(button);
@@ -74,7 +71,7 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     @Override
     public void onClick() {
         //noinspection deprecation
-        ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);
+        ((net.minecraft.client.Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);
     }
 }
 
