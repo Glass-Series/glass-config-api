@@ -6,13 +6,6 @@ import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
 import net.glasslauncher.mods.api.gcapi.screen.widget.ExtensibleTextbox;
 import net.glasslauncher.mods.api.gcapi.screen.widget.TexturedButton;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ParticleRenderer;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.gui.widgets.Button;
-import net.minecraft.client.gui.widgets.ScrollableBase;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
@@ -22,10 +15,10 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
-public abstract class BaseListScreenBuilder<T> extends ScreenBase {
+public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.screen.ScreenBase {
 
     protected ScreenScrollList scrollList;
-    protected final ScreenBase parent;
+    protected final net.minecraft.client.gui.screen.ScreenBase parent;
     protected int mouseX = -1;
     protected int mouseY = -1;
     protected ConfigEntry<T[]> configEntry;
@@ -34,7 +27,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     protected final MaxLength maxLength;
     private boolean isInUse = false;
 
-    protected BaseListScreenBuilder(ScreenBase parent, MaxLength maxLength, ConfigEntry<T[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
+    protected BaseListScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, MaxLength maxLength, ConfigEntry<T[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
         this.parent = parent;
         this.maxLength = maxLength;
         this.configEntry = configEntry;
@@ -57,8 +50,8 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     }
 
     @Override
-    public void init(Minecraft minecraft, int width, int height) {
-        this.smokeRenderer = new ParticleRenderer(minecraft);
+    public void init(net.minecraft.client.Minecraft minecraft, int width, int height) {
+        this.smokeRenderer = new net.minecraft.client.gui.ParticleRenderer(minecraft);
         this.minecraft = minecraft;
         this.textManager = minecraft.textRenderer;
         this.width = width;
@@ -70,10 +63,10 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     public void init() {
         if (isInUse) {
             scrollList = new ScreenScrollList();
-            Button button = ((Button)buttons.get(0));
+            net.minecraft.client.gui.widgets.Button button = ((net.minecraft.client.gui.widgets.Button)buttons.get(0));
             button.x = width/2-75;
             button.y = height-26;
-            button = ((Button)buttons.get(1));
+            button = ((net.minecraft.client.gui.widgets.Button)buttons.get(1));
             button.x = ((width/3)*2)-75;
             button.y = height-48;
             return;
@@ -82,7 +75,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
         buttons.clear();
         this.scrollList = new ScreenScrollList();
         //noinspection unchecked
-        buttons.add(new Button(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel")));
+        buttons.add(new net.minecraft.client.gui.widgets.Button(0,width/2-75, height-26, 150, 20, net.minecraft.client.resource.language.TranslationStorage.getInstance().translate("gui.cancel")));
         //noinspection unchecked
         buttons.add(new TexturedButton(1,((width/3)*2)-75, height-48, 20, 20, 0, 0, "assets/gcapi/add_button.png", 32, 64, "Add a new entry at the end"));
         AtomicInteger id = new AtomicInteger(1);
@@ -116,8 +109,8 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
         scrollList.render(mouseX, mouseY, delta);
         // Breaks rendering of category buttons.
         //super.render(mouseX, mouseY, delta);
-        ((Button) buttons.get(0)).render(minecraft, mouseX, mouseY);
-        ((Button) buttons.get(1)).render(minecraft, mouseX, mouseY);
+        ((net.minecraft.client.gui.widgets.Button) buttons.get(0)).render(minecraft, mouseX, mouseY);
+        ((net.minecraft.client.gui.widgets.Button) buttons.get(1)).render(minecraft, mouseX, mouseY);
         textManager.drawTextWithShadow(configEntry.name, (width / 2) - (textManager.getTextWidth(configEntry.name) / 2), 4, 16777215);
         textManager.drawTextWithShadow(configEntry.description, (width / 2) - (textManager.getTextWidth(configEntry.description) / 2), 18, 8421504);
 
@@ -150,7 +143,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
     }
 
     @Override
-    protected void buttonClicked(Button button) {
+    protected void buttonClicked(net.minecraft.client.gui.widgets.Button button) {
         if (button.id == 0) {
             isInUse = false;
             minecraft.openScreen(parent);
@@ -167,7 +160,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
             textboxes.remove(button.id-2);
             buttons.remove(button.id);
             for (int i = 1; i<buttons.size(); i++) {
-                ((Button) buttons.get(i)).id = i;
+                ((net.minecraft.client.gui.widgets.Button) buttons.get(i)).id = i;
             }
         }
     }
@@ -193,7 +186,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
         }
     }
 
-    class ScreenScrollList extends ScrollableBase {
+    class ScreenScrollList extends net.minecraft.client.gui.widgets.ScrollableBase {
         public ScreenScrollList() {
             super(BaseListScreenBuilder.this.minecraft, BaseListScreenBuilder.this.width, BaseListScreenBuilder.this.height, 32, BaseListScreenBuilder.this.height - 64, 24);
 
@@ -224,7 +217,7 @@ public abstract class BaseListScreenBuilder<T> extends ScreenBase {
         }
 
         @Override
-        protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
+        protected void renderEntry(int itemId, int x, int y, int i1, net.minecraft.client.render.Tessellator arg) {
             if (itemId+2 >= buttons.size()) {
                 return;
             }

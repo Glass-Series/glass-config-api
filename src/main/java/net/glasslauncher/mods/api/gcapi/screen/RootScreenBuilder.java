@@ -5,7 +5,6 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 
 import java.util.*;
@@ -13,13 +12,13 @@ import java.util.function.*;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
-    private final ArrayList<BiFunction<ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
+    private final ArrayList<BiFunction<net.minecraft.client.gui.screen.ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
     private final List<Integer> switchButtons = new ArrayList<>();
     public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
 
     boolean doSave = true;
 
-    public RootScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
+    public RootScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {

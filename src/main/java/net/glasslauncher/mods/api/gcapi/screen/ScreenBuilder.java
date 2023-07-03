@@ -10,7 +10,6 @@ import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.ScreenBase;
 import net.minecraft.client.gui.widgets.Button;
 import net.minecraft.client.gui.widgets.ScrollableBase;
 import net.minecraft.client.render.Tessellator;
@@ -19,13 +18,13 @@ import org.lwjgl.input.Mouse;
 
 import java.util.*;
 
-public class ScreenBuilder extends ScreenBase {
+public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
 
     protected ScreenScrollList scrollList;
     protected HashMap<Integer, ConfigBase> buttonToEntry;
     protected final ConfigCategory baseCategory;
     protected int selectedIndex = -1;
-    protected final ScreenBase parent;
+    protected final net.minecraft.client.gui.screen.ScreenBase parent;
     protected final EntrypointContainer<Object> mod;
     protected int mouseX = -1;
     protected int mouseY = -1;
@@ -33,7 +32,7 @@ public class ScreenBuilder extends ScreenBase {
     protected int backButtonID;
     protected List<Button> screenButtons = new ArrayList<>();
 
-    public ScreenBuilder(ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
+    public ScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         this.parent = parent;
         this.mod = mod;
         this.baseCategory = baseCategory;

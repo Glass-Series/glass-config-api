@@ -10,7 +10,7 @@ import java.util.function.*;
 
 public class IntegerListScreenBuilder extends BaseListScreenBuilder<Integer> {
 
-    public IntegerListScreenBuilder(ScreenBase parent, MaxLength maxLength, ConfigEntry<Integer[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
+    public IntegerListScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, MaxLength maxLength, ConfigEntry<Integer[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
         super(parent, maxLength, configEntry, validator);
     }
 

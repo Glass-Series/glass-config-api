@@ -1,9 +1,9 @@
 package net.glasslauncher.mods.api.gcapi.impl.config.entry;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
-import net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder;
-import net.glasslauncher.mods.api.gcapi.screen.IntegerListScreenBuilder;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.lang.reflect.*;
@@ -21,8 +21,9 @@ public class IntegerListConfigEntry extends BaseListConfigEntry<Integer> {
     }
 
     @Override
-    public BaseListScreenBuilder<Integer> createListScreen() {
-        BaseListScreenBuilder<Integer> listScreen = new IntegerListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(CharacterUtils.isInteger(str) && Integer.parseInt(str) <= maxLength.value(), multiplayerLoaded? Collections.singletonList("Server synced, you cannot change this value") : CharacterUtils.isFloat(str)? Float.parseFloat(str) > maxLength.value()? Collections.singletonList("Value is too high") : null : Collections.singletonList("Value is not a whole number")));
+    @Environment(EnvType.CLIENT)
+    public net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<Integer> createListScreen() {
+        net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<Integer> listScreen = new net.glasslauncher.mods.api.gcapi.screen.IntegerListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(CharacterUtils.isInteger(str) && Integer.parseInt(str) <= maxLength.value(), multiplayerLoaded? Collections.singletonList("Server synced, you cannot change this value") : CharacterUtils.isFloat(str)? Float.parseFloat(str) > maxLength.value()? Collections.singletonList("Value is too high") : null : Collections.singletonList("Value is not a whole number")));
         listScreen.setValues(value);
         return listScreen;
     }

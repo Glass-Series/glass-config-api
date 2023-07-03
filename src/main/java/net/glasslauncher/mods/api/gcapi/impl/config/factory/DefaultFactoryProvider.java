@@ -38,13 +38,13 @@ public class DefaultFactoryProvider implements ConfigFactoryProvider {
         immutableBuilder.put(Integer.class, JsonPrimitive::new);
         immutableBuilder.put(Float.class, JsonPrimitive::new);
         immutableBuilder.put(Boolean.class, JsonPrimitive::new);
-        immutableBuilder.put(String[].class, this::generateArray);
-        immutableBuilder.put(Integer[].class, this::generateArray);
-        immutableBuilder.put(Float[].class, this::generateArray);
+        immutableBuilder.put(String[].class, this::serializeArray);
+        immutableBuilder.put(Integer[].class, this::serializeArray);
+        immutableBuilder.put(Float[].class, this::serializeArray);
     }
 
     // CURSED AS ALWAYS
-    private <T>JsonElement generateArray(Object object) {
+    private <T>JsonElement serializeArray(Object object) {
         JsonArray array = new JsonArray();
         //noinspection unchecked
         for (T value : (T[]) object) {

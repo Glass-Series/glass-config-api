@@ -10,8 +10,6 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     public T value;
     @Environment(EnvType.CLIENT)
     protected net.minecraft.client.gui.screen.ScreenBase parent;
-    @Environment(EnvType.CLIENT)
-    protected net.minecraft.client.render.TextRenderer textRenderer;
     public boolean multiplayerLoaded = false;
     protected MaxLength maxLength;
 
