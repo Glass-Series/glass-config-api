@@ -8,7 +8,7 @@ This follows the [semver](https://semver.org/) summary, which means any mods mad
 
 ## Installation
 
-[See the Minecraft Cursed Legacy Website.](https://minecraft-cursed-legacy.github.io/)  
+[See the Babric Website.](https://babric.github.io/)  
 Optional requirement, though heavily recommended as like 90% of GCAPI's user-facing functionality uses this: [ModMenu](https://github.com/calmilamsy/ModMenu).  
 
 ## Usage Inside a Mod
