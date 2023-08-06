@@ -165,9 +165,6 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
             }
         });
         super.onClose();
-        if (parent instanceof RootScreenBuilder) {
-            ((RootScreenBuilder) parent).doSave = false;
-        }
     }
 
     class ScreenScrollList extends ScrollableBase {

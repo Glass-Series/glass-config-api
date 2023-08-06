@@ -181,9 +181,6 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
         //noinspection unchecked
         configEntry.value = (T[]) list.toArray();
         super.onClose();
-        if (parent instanceof RootScreenBuilder) {
-            ((RootScreenBuilder) parent).doSave = false;
-        }
     }
 
     class ScreenScrollList extends net.minecraft.client.gui.widgets.ScrollableBase {

@@ -16,8 +16,6 @@ public class RootScreenBuilder extends ScreenBuilder {
     private final List<Integer> switchButtons = new ArrayList<>();
     public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
 
-    boolean doSave = true;
-
     public RootScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
         //noinspection deprecation
@@ -31,16 +29,11 @@ public class RootScreenBuilder extends ScreenBuilder {
     @Override
     public void onClose() {
         super.onClose();
-        if (doSave) {
-            //noinspection deprecation
-            GCCore.saveConfig(mod, baseCategory);
-        }
     }
 
     @Override
     public void init() {
         super.init();
-        doSave = true;
         switchButtons.clear();
         Button button = new Button(buttons.size(), 2, 0, 20, 20, "<");
         //noinspection unchecked
@@ -56,8 +49,9 @@ public class RootScreenBuilder extends ScreenBuilder {
 
     @Override
     protected void buttonClicked(Button button) {
-        if (button.id != backButtonID) {
-            doSave = false;
+        if (button.id == backButtonID) {
+            //noinspection deprecation Intentional use of GCCore internals.
+            GCCore.saveConfig(mod, baseCategory);
         }
         if (switchButtons.contains(button.id)) {
             int index = switchButtons.get(0) == button.id? -1 : 1;
