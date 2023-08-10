@@ -9,7 +9,8 @@ This follows the [semver](https://semver.org/) summary, which means any mods mad
 ## Installation
 
 [See the Babric Website.](https://babric.github.io/)  
-Optional requirement, though heavily recommended as like 90% of GCAPI's user-facing functionality uses this: [ModMenu](https://github.com/calmilamsy/ModMenu).  
+Download GlassConfigAPI from [here (stable)](https://maven.glass-launcher.net/#/releases/net/glasslauncher/mods/GlassConfigAPI) or [here (unstable)](https://jenkins.glass-launcher.net/job/Glass-Config-API/).  
+Optional, though required if you want to edit your configs in-game: [ModMenu](https://github.com/calmilamsy/ModMenu).  
 
 ## Usage Inside a Mod
 
