@@ -4,16 +4,16 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.mine_diver.unsafeevents.listener.EventListener;
-import net.minecraft.util.io.CompoundTag;
-import net.minecraft.util.io.NBTIO;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIo;
 import net.modificationstation.stationapi.api.client.event.network.MultiplayerLogoutEvent;
 import net.modificationstation.stationapi.api.event.registry.MessageListenerRegistryEvent;
 import net.modificationstation.stationapi.api.mod.entrypoint.Entrypoint;
-import net.modificationstation.stationapi.api.packet.Message;
-import net.modificationstation.stationapi.api.packet.PacketHelper;
-import net.modificationstation.stationapi.api.registry.Identifier;
-import net.modificationstation.stationapi.api.registry.ModID;
+import net.modificationstation.stationapi.api.network.packet.MessagePacket;
+import net.modificationstation.stationapi.api.network.packet.PacketHelper;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.registry.Registry;
+import net.modificationstation.stationapi.api.util.Namespace;
 import net.modificationstation.stationapi.api.util.Null;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 
@@ -24,24 +24,24 @@ import java.util.*;
 @SuppressWarnings("deprecation")
 public class InitClientNetworking {
 
-    @Entrypoint.ModID
-    private final ModID modID = Null.get();
+    @Entrypoint.Namespace
+    private final Namespace namespace = Null.get();
 
     @EventListener
     private void registerNetworkShit(MessageListenerRegistryEvent event) {
-        Registry.register(event.registry, Identifier.of(modID, "config_sync"), (playerBase, message) -> {
+        Registry.register(event.registry, Identifier.of(namespace, "config_sync"), (playerBase, message) -> {
             GCCore.log("Got config from server!");
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.bytes);
-            CompoundTag compoundTag = NBTIO.readGzipped(byteArrayInputStream);
-            new ArrayList<>(GCCore.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(compoundTag::containsKey).forEach(modID -> GCCore.loadServerConfig(modID, compoundTag.getString(modID))); // oneliner go brrrrrrr
+            NbtCompound nbtCompound = NbtIo.readCompressed(byteArrayInputStream);
+            new ArrayList<>(GCCore.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(nbtCompound::contains).forEach(namespace -> GCCore.loadServerConfig(namespace, nbtCompound.getString(namespace))); // oneliner go brrrrrrr
         });
-        Registry.register(event.registry, Identifier.of(modID, "ping"), ((playerBase, message) -> PacketHelper.send(new Message(Identifier.of(modID, "ping")))));
+        Registry.register(event.registry, Identifier.of(namespace, "ping"), ((playerBase, message) -> PacketHelper.send(new MessagePacket(Identifier.of(namespace, "ping")))));
     }
 
     @EventListener
     private void onClientDisconnect(MultiplayerLogoutEvent event) {
         GCCore.log("Unloading server synced config!");
-        FabricLoader.getInstance().getEntrypointContainers(GCCore.MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
+        FabricLoader.getInstance().getEntrypointContainers(GCCore.NAMESPACE.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
                     Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(GConfig.class).value());

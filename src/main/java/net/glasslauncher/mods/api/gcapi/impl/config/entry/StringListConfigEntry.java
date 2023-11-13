@@ -3,6 +3,7 @@ package net.glasslauncher.mods.api.gcapi.impl.config.entry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
+import net.glasslauncher.mods.api.gcapi.screen.StringListScreenBuilder;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.lang.reflect.*;
@@ -21,7 +22,7 @@ public class StringListConfigEntry extends BaseListConfigEntry<String> {
     @Override
     @Environment(EnvType.CLIENT)
     public net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<String> createListScreen() {
-        net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<String> listScreen = new net.glasslauncher.mods.api.gcapi.screen.StringListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(true, null));
+        net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<String> listScreen = new StringListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(true, null));
         listScreen.setValues(value);
         return listScreen;
     }

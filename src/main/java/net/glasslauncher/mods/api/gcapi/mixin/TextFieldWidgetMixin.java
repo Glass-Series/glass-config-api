@@ -1,15 +1,15 @@
 package net.glasslauncher.mods.api.gcapi.mixin;
 
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.widgets.Textbox;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(Textbox.class)
-public abstract class MixinTextbox extends DrawableHelper implements HasDrawable {
+@Mixin(TextFieldWidget.class)
+public abstract class TextFieldWidgetMixin extends DrawContext implements HasDrawable {
     @Mutable
     @Shadow @Final private int x;
 

@@ -7,8 +7,8 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.screen.RootScreenBuilder;
 import net.glasslauncher.mods.api.gcapi.screen.ScreenBuilder;
-import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
-import net.minecraft.client.gui.screen.ScreenBase;
+import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
+import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
@@ -32,14 +32,14 @@ public class ConfigCategory extends ConfigBase {
      * @return ScreenBuilder
      */
     @Environment(EnvType.CLIENT)
-    public @NotNull ScreenBuilder getConfigScreen(ScreenBase parent, EntrypointContainer<Object> mod) {
+    public @NotNull ScreenBuilder getConfigScreen(Screen parent, EntrypointContainer<Object> mod) {
         return isRoot ? new RootScreenBuilder(parent, mod, this) : new ScreenBuilder(parent, mod, this);
     }
 
     @Override
     public @NotNull List<HasDrawable> getDrawables() {
         if (button == null) {
-            button = Collections.singletonList(new FancyButton(0, 0, 0, "Open"));
+            button = Collections.singletonList(new FancyButtonWidget(0, 0, 0, "Open"));
         }
         return button;
     }

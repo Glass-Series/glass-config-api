@@ -2,10 +2,10 @@ package net.glasslauncher.mods.api.gcapi.mixin;
 
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.HasToolTip;
-import net.glasslauncher.mods.api.gcapi.screen.ScreenBaseAccessor;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.render.TextRenderer;
+import net.glasslauncher.mods.api.gcapi.screen.ScreenAccessor;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,10 +16,10 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.stream.*;
 
-@Mixin(ScreenBase.class)
-public class MixinScreenBase extends DrawableHelper implements ScreenBaseAccessor {
+@Mixin(Screen.class)
+public class ScreenMixin extends DrawContext implements ScreenAccessor {
 
-    @Shadow protected TextRenderer textManager;
+    @Shadow protected TextRenderer textRenderer;
 
     @SuppressWarnings("rawtypes")
     @Shadow protected List buttons;
@@ -28,7 +28,7 @@ public class MixinScreenBase extends DrawableHelper implements ScreenBaseAccesso
     public void drawTooltipStuff(int mouseX, int mouseY, float delta, CallbackInfo ci) {
         List<String> tooltip = getMouseTooltip(mouseX, mouseY, new ArrayList<>());
         if (tooltip != null) {
-            CharacterUtils.renderTooltip(textManager, tooltip, mouseX, mouseY, (ScreenBase) (Object) this);
+            CharacterUtils.renderTooltip(textRenderer, tooltip, mouseX, mouseY, (Screen) (Object) this);
         }
     }
 

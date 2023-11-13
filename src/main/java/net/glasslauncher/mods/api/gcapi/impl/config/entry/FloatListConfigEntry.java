@@ -4,6 +4,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
+import net.glasslauncher.mods.api.gcapi.screen.FloatListScreenBuilder;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.lang.reflect.*;
@@ -23,7 +24,7 @@ public class FloatListConfigEntry extends BaseListConfigEntry<Float> {
     @Override
     @Environment(EnvType.CLIENT)
     public net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<Float> createListScreen() {
-        net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<Float> listScreen = new net.glasslauncher.mods.api.gcapi.screen.FloatListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(CharacterUtils.isFloat(str) && Float.parseFloat(str) <= maxLength.value(), multiplayerLoaded? Collections.singletonList("Server synced, you cannot change this value") : CharacterUtils.isFloat(str)? Float.parseFloat(str) > maxLength.value()? Collections.singletonList("Value is too high") : null : Collections.singletonList("Value is not a decimal number")));
+        net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<Float> listScreen = new FloatListScreenBuilder(parent, maxLength, this, str -> BiTuple.of(CharacterUtils.isFloat(str) && Float.parseFloat(str) <= maxLength.value(), multiplayerLoaded? Collections.singletonList("Server synced, you cannot change this value") : CharacterUtils.isFloat(str)? Float.parseFloat(str) > maxLength.value()? Collections.singletonList("Value is too high") : null : Collections.singletonList("Value is not a decimal number")));
         listScreen.setValues(value);
         return listScreen;
     }

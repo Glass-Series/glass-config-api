@@ -19,8 +19,8 @@ import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
-import net.minecraft.util.io.CompoundTag;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.minecraft.nbt.NbtCompound;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +43,7 @@ import java.util.function.*;
 @SuppressWarnings("DeprecatedIsStillUsed") // shush, I just don't want others using this class without getting yelled at.
 @Deprecated
 public class GCCore implements PreLaunchEntrypoint {
-    public static final ModContainer MOD_ID = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
+    public static final ModContainer NAMESPACE = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
     public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
@@ -88,10 +88,10 @@ public class GCCore implements PreLaunchEntrypoint {
         }
     }
 
-    public static void exportConfigsForServer(CompoundTag compoundTag) {
+    public static void exportConfigsForServer(NbtCompound nbtCompound) {
         for (Identifier modContainer : MOD_CONFIGS.keySet()) {
             BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory> entry = MOD_CONFIGS.get(modContainer);
-            compoundTag.put(modContainer.toString(), saveConfig(entry.one(), entry.two()));
+            nbtCompound.putString(modContainer.toString(), saveConfig(entry.one(), entry.two()));
         }
     }
 
@@ -132,7 +132,7 @@ public class GCCore implements PreLaunchEntrypoint {
         EventStorage.loadListeners();
         log("Loaded config event listeners.");
 
-        FabricLoader.getInstance().getEntrypointContainers(MOD_ID.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
+        FabricLoader.getInstance().getEntrypointContainers(NAMESPACE.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
                 for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), GConfig.class)) {
                     Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(GConfig.class).value());

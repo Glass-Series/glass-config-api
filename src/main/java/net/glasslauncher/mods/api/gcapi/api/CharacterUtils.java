@@ -1,9 +1,9 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
 import com.google.common.base.CharMatcher;
-import net.glasslauncher.mods.api.gcapi.impl.DrawableHelperAccessor;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.render.TextRenderer;
+import net.glasslauncher.mods.api.gcapi.impl.DrawContextAccessor;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -12,7 +12,7 @@ import java.awt.datatransfer.*;
 import java.util.List;
 
 /**
- * Some utility methods copied over from r1.2.5 for use in ExtensibleTextbox.
+ * Some utility methods copied over from r1.2.5 for use in ExtensibleTextFieldWidget.
  * This should be useful for other things.
  */
 public class CharacterUtils {
@@ -24,9 +24,9 @@ public class CharacterUtils {
      * @param tooltip the tooltip to render. Can be multiline using multiple elements on the list.
      * @param x the X position where the tooltip should be. Typically mouseX.
      * @param y the Y position where the tooltip should be. Typically mouseY.
-     * @param screenBase the screen where the tooltip is being rendered.
+     * @param screen the screen where the tooltip is being rendered.
      */
-    public static void renderTooltip(TextRenderer textRenderer, List<String> tooltip, int x, int y, ScreenBase screenBase) {
+    public static void renderTooltip(TextRenderer textRenderer, List<String> tooltip, int x, int y, Screen screen) {
         if (!tooltip.isEmpty()) {
 
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
@@ -34,7 +34,7 @@ public class CharacterUtils {
             int k = 0;
 
             for (String string : tooltip) {
-                int l = textRenderer.getTextWidth(string);
+                int l = textRenderer.getWidth(string);
                 if (l > k) {
                     k = l;
                 }
@@ -47,17 +47,17 @@ public class CharacterUtils {
                 p += 2 + (tooltip.size() - 1) * 10;
             }
 
-            if (m + k > screenBase.width) {
+            if (m + k > screen.width) {
                 m -= 28 + k;
             }
 
-            if (n + p + 6 > screenBase.height) {
-                n = screenBase.height - p - 6;
+            if (n + p + 6 > screen.height) {
+                n = screen.height - p - 6;
             }
 
             int transparentGrey = -1073741824;
             int margin = 3;
-            ((DrawableHelperAccessor) screenBase).invokeFill(m - margin, n - margin, m + k + margin,
+            ((DrawContextAccessor) screen).invokeFill(m - margin, n - margin, m + k + margin,
                     n + p + margin, transparentGrey);
             GL11.glPushMatrix();
             GL11.glTranslatef(0, 0, 300);
@@ -65,7 +65,7 @@ public class CharacterUtils {
             for(int t = 0; t < tooltip.size(); ++t) {
                 String string2 = tooltip.get(t);
                 if (string2 != null) {
-                    textRenderer.drawText(string2, m, n, 0xffffff);
+                    textRenderer.draw(string2, m, n, 0xffffff);
                 }
 
                 if (t == 0) {
@@ -148,7 +148,7 @@ public class CharacterUtils {
     // 1.2.5 methods. Most of these I have no real explanation for.
 
     public static boolean isCharacterValid(char c) {
-        return c != 167 && (net.minecraft.util.CharacterUtils.validCharacters.indexOf(c) >= 0 || c > ' ');
+        return c != 167 && (net.minecraft.util.CharacterUtils.VALID_CHARACTERS.indexOf(c) >= 0 || c > ' ');
     }
 
     public static String stripInvalidChars(String string) {
@@ -206,7 +206,7 @@ public class CharacterUtils {
 
         for(int var10 = var6; var10 >= 0 && var10 < string.length() && currentPixelWidth < maxPixelWidth; var10 += var7) {
             char var11 = string.charAt(var10);
-            int var12 = textRenderer.getTextWidth(Character.toString(var11));
+            int var12 = textRenderer.getWidth(Character.toString(var11));
             if (var8) {
                 var8 = false;
                 if (var11 != 'l' && var11 != 'L') {

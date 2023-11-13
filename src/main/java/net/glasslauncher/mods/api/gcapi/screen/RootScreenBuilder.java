@@ -5,42 +5,43 @@ import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widgets.Button;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 
 import java.util.*;
 import java.util.function.*;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
-    private final ArrayList<BiFunction<net.minecraft.client.gui.screen.ScreenBase, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
+    private final ArrayList<BiFunction<Screen, EntrypointContainer<Object>, ScreenBuilder>> otherRoots = new ArrayList<>();
     private final List<Integer> switchButtons = new ArrayList<>();
     public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
 
-    public RootScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
+    public RootScreenBuilder(Screen parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         super(parent, mod, baseCategory);
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
-            if (key.modID.toString().equals(mod.getProvider().getMetadata().getId())) {
+            if (key.namespace.toString().equals(mod.getProvider().getMetadata().getId())) {
                 otherRoots.add((parent1, mod2) -> value.two().getConfigScreen(parent1, mod2));
             }
         });
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void removed() {
+        super.removed();
     }
 
     @Override
     public void init() {
         super.init();
         switchButtons.clear();
-        Button button = new Button(buttons.size(), 2, 0, 20, 20, "<");
+        ButtonWidget button = new ButtonWidget(buttons.size(), 2, 0, 20, 20, "<");
         //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
         switchButtons.add(button.id);
-        button = new Button(buttons.size(), 24, 0, 20, 20, ">");
+        button = new ButtonWidget(buttons.size(), 24, 0, 20, 20, ">");
         //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
@@ -48,7 +49,7 @@ public class RootScreenBuilder extends ScreenBuilder {
     }
 
     @Override
-    protected void buttonClicked(Button button) {
+    protected void buttonClicked(ButtonWidget button) {
         if (button.id == backButtonID) {
             //noinspection deprecation Intentional use of GCCore internals.
             GCCore.saveConfig(mod, baseCategory);
@@ -65,7 +66,7 @@ public class RootScreenBuilder extends ScreenBuilder {
             RootScreenBuilder builder = (RootScreenBuilder) otherRoots.get(index).apply(parent, mod);
             builder.currentIndex = index;
             //noinspection deprecation
-            ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(builder);
+            ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(builder);
         }
         super.buttonClicked(button);
     }
