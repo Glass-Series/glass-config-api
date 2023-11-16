@@ -6,6 +6,8 @@ Think a far more simple version of [Cloth Config](https://www.curseforge.com/min
 
 This follows the [semver](https://semver.org/) summary, which means any mods made with 1.x.x will work with any version of GCAPI that is equal or higher than the version said mod was made with, and 2.x.x will require 1.x.x mods to update. 
 
+Version 1.2 updated to a version of StAPI based on other mappings. Your mod should be unaffected beyond what StAPI itself did.
+
 ## Installation
 
 [See the Babric Website.](https://babric.github.io/)  
