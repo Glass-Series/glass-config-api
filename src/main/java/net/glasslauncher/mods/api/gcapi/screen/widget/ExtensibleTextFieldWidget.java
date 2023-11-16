@@ -3,9 +3,9 @@ package net.glasslauncher.mods.api.gcapi.screen.widget;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.api.HasToolTip;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.TextRenderer;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
@@ -17,7 +17,7 @@ import java.util.function.*;
 /**
  * Basically a modified Textbox from r1.2.5, but modified for gcapi's use case.
  */
-public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, HasToolTip {
+public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawable, HasToolTip {
 
     private static final int serverSyncedBorder = CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255));
     private static final int serverSyncedText = CharacterUtils.getIntFromColour(new Color(170, 139, 21, 255));
@@ -44,7 +44,7 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
     private boolean doRenderUpdate = true;
     private Function<String, BiTuple<Boolean, List<String>>> contentsValidator;
 
-    public ExtensibleTextbox(TextRenderer textRenderer) {
+    public ExtensibleTextFieldWidget(TextRenderer textRenderer) {
         this.textRenderer = textRenderer;
         this.x = 0;
         this.y = 0;
@@ -367,8 +367,8 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
 
         if (var4.length() > 0) {
             String firstString = var5 ? var4.substring(0, var2) : var4;
-            this.textRenderer.drawTextWithShadow(firstString, firstStringPos, textY, var1);
-            secondStringPos += textRenderer.getTextWidth(firstString);
+            this.textRenderer.drawWithShadow(firstString, firstStringPos, textY, var1);
+            secondStringPos += textRenderer.getWidth(firstString);
             secondStringPos++;
         }
 
@@ -381,19 +381,19 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
         }
 
         if (var4.length() > 0 && var5 && var2 < var4.length()) {
-            this.textRenderer.drawTextWithShadow(var4.substring(var2), secondStringPos, textY, var1);
+            this.textRenderer.drawWithShadow(var4.substring(var2), secondStringPos, textY, var1);
         }
 
         if (var6) {
             if (var13) {
                 fill(selectStart, textY - 1, selectStart + 1, textY + (this.height /2) - 2, -3092272);
             } else {
-                this.textRenderer.drawTextWithShadow("_", selectStart, textY, var1);
+                this.textRenderer.drawWithShadow("_", selectStart, textY, var1);
             }
         }
 
         if (var3 != var2) {
-            int var12 = firstStringPos + this.textRenderer.getTextWidth(var4.substring(0, var3));
+            int var12 = firstStringPos + this.textRenderer.getWidth(var4.substring(0, var3));
             this.drawHighlightOverlay(selectStart, textY - 1, var12 - 1, textY + (this.height /2));
         }
 
@@ -418,11 +418,11 @@ public class ExtensibleTextbox extends DrawableHelper implements HasDrawable, Ha
         GL11.glDisable(3553);
         GL11.glEnable(3058);
         GL11.glLogicOp(5387);
-        var6.start();
-        var6.addVertex(x, height, 0.0D);
-        var6.addVertex(width, height, 0.0D);
-        var6.addVertex(width, y, 0.0D);
-        var6.addVertex(x, y, 0.0D);
+        var6.startQuads();
+        var6.vertex(x, height, 0.0D);
+        var6.vertex(width, height, 0.0D);
+        var6.vertex(width, y, 0.0D);
+        var6.vertex(x, y, 0.0D);
         var6.draw();
         GL11.glDisable(3058);
         GL11.glEnable(3553);

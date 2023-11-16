@@ -1,12 +1,12 @@
 package net.glasslauncher.mods.api.gcapi.mixin;
 
-import net.glasslauncher.mods.api.gcapi.impl.DrawableHelperAccessor;
-import net.minecraft.client.gui.DrawableHelper;
+import net.glasslauncher.mods.api.gcapi.impl.DrawContextAccessor;
+import net.minecraft.client.gui.DrawContext;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(DrawableHelper.class)
-public abstract class MixinDrawableHelper implements DrawableHelperAccessor {
+@Mixin(DrawContext.class)
+public abstract class DrawContextMixin implements DrawContextAccessor {
 
 
     @Shadow protected abstract void fill(int x1, int y1, int x2, int y2, int colour);

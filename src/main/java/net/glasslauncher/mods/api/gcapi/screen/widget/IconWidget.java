@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
-public class Icon implements HasDrawable, HasToolTip {
+public class IconWidget implements HasDrawable, HasToolTip {
 
     public int x;
     public int y;
@@ -17,7 +17,7 @@ public class Icon implements HasDrawable, HasToolTip {
     public int height;
     public String icon;
 
-    public Icon(int x, int y, int width, int height, String icon) {
+    public IconWidget(int x, int y, int width, int height, String icon) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -32,7 +32,7 @@ public class Icon implements HasDrawable, HasToolTip {
         GL11.glBindTexture(3553, minecraft.textureManager.getTextureId(icon));
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         Tessellator tess = Tessellator.INSTANCE;
-        tess.start();
+        tess.startQuads();
         float uScale = 1f / width;
         float vScale = 1f / height;
         tess.vertex(x, y + height, 0, (float) width * uScale, (float)(height + height) * vScale);

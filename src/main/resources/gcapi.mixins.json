@@ -8,11 +8,11 @@
   "server": [
   ],
   "client": [
-    "MixinDrawableHelper",
-    "MixinModMenu",
-    "MixinScreenBase",
-    "MixinTextbox",
-    "ScrollableBaseAccessor"
+    "DrawContextMixin",
+    "ModMenuMixin",
+    "ScreenMixin",
+    "TextFieldWidgetMixin",
+    "EntryListWidgetAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

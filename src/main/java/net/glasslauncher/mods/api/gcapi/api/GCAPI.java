@@ -3,7 +3,7 @@ package net.glasslauncher.mods.api.gcapi.api;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
-import net.modificationstation.stationapi.api.registry.Identifier;
+import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 

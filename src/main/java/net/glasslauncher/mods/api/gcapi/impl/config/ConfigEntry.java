@@ -3,13 +3,15 @@ package net.glasslauncher.mods.api.gcapi.impl.config;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.lang.reflect.*;
 
 public abstract class ConfigEntry<T> extends ConfigBase {
     public T value;
     @Environment(EnvType.CLIENT)
-    protected net.minecraft.client.gui.screen.ScreenBase parent;
+    protected Screen parent;
     public boolean multiplayerLoaded = false;
     protected MaxLength maxLength;
 
@@ -20,7 +22,7 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     }
 
     @Environment(EnvType.CLIENT)
-    public abstract void init(net.minecraft.client.gui.screen.ScreenBase parent, net.minecraft.client.render.TextRenderer textRenderer);
+    public abstract void init(Screen parent, TextRenderer textRenderer);
 
     public abstract T getDrawableValue();
     public abstract void setDrawableValue(T value);

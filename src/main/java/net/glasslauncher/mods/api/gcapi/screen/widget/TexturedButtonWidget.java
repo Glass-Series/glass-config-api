@@ -2,7 +2,7 @@ package net.glasslauncher.mods.api.gcapi.screen.widget;
 
 import net.glasslauncher.mods.api.gcapi.api.HasToolTip;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widgets.Button;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.Tessellator;
 import org.lwjgl.opengl.GL11;
 
@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * Copied from ModMenu
  */
-public class TexturedButton extends Button implements HasToolTip {
+public class TexturedButtonWidget extends ButtonWidget implements HasToolTip {
 	private final String texture;
 	private final int u;
 	private final int v;
@@ -19,11 +19,11 @@ public class TexturedButton extends Button implements HasToolTip {
 	private final int vHeight;
 
 	@SuppressWarnings("unused")
-	public TexturedButton(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight) {
+	public TexturedButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight) {
 		this(buttonId, x, y, width, height, u, v, texture, uWidth, vHeight, "");
 	}
 
-	public TexturedButton(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight, String message) {
+	public TexturedButtonWidget(int buttonId, int x, int y, int width, int height, int u, int v, String texture, int uWidth, int vHeight, String message) {
 		super(buttonId, x, y, width, height, message);
 		this.uWidth = uWidth;
 		this.vHeight = vHeight;
@@ -57,14 +57,14 @@ public class TexturedButton extends Button implements HasToolTip {
 			float uScale = 1f / uWidth;
 			float vScale = 1f / vHeight;
 			Tessellator tess = Tessellator.INSTANCE;
-			tess.start();
+			tess.startQuads();
 			tess.vertex(x, y + height, this.zOffset, (float) u * uScale, (float)(adjustedV + height) * vScale);
 			tess.vertex(x + width, y + height, this.zOffset, ((float)(u + width) * uScale), (float)(adjustedV + height) * vScale);
 			tess.vertex(x + width, y, this.zOffset, (float)(u + width) * uScale, (float)adjustedV * vScale);
 			tess.vertex(x, y, this.zOffset, (float) u * uScale, (float) adjustedV * vScale);
 			tess.draw();
 
-			this.postRender(mc, mouseX, mouseY);
+			this.method_1188(mc, mouseX, mouseY);
 		}
 	}
 

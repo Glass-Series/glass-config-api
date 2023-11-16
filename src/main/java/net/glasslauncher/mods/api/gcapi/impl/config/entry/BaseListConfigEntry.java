@@ -6,8 +6,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
-import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
+import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
+import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.*;
@@ -17,7 +20,7 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     @Environment(EnvType.CLIENT)
     private net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<T> listScreen;
     @Environment(EnvType.CLIENT)
-    private net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton button;
+    private FancyButtonWidget button;
     private List<HasDrawable> drawableList;
 
     public BaseListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, T[] value, MaxLength maxLength) {
@@ -25,13 +28,13 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     }
 
     @Override
-    public void init(net.minecraft.client.gui.screen.ScreenBase parent, net.minecraft.client.render.TextRenderer textRenderer) {
-        button = new net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
+    public void init(Screen parent, TextRenderer textRenderer) {
+        button = new FancyButtonWidget(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
         drawableList = new ArrayList<>() {{
             add(button);
         }};
         if (multiplayerSynced) {
-            drawableList.add(new net.glasslauncher.mods.api.gcapi.screen.widget.Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
+            drawableList.add(new IconWidget(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
         }
         listScreen = createListScreen();
         button.active = !multiplayerLoaded;
@@ -48,7 +51,7 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
             return null;
         }
         List<T> list = new ArrayList<>();
-        listScreen.textboxes.forEach((val) -> {
+        listScreen.textFieldWidgets.forEach((val) -> {
             if (val.isValueValid()) {
                 list.add(strToVal(val.getText()));
             }
@@ -71,7 +74,7 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     @Override
     public void onClick() {
         //noinspection deprecation
-        ((net.minecraft.client.Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(listScreen);
+        ((net.minecraft.client.Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(listScreen);
     }
 }
 

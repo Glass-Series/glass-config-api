@@ -8,31 +8,32 @@ import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
-import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
+import net.glasslauncher.mods.api.gcapi.mixin.EntryListWidgetAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widgets.Button;
-import net.minecraft.client.gui.widgets.ScrollableBase;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
 import java.util.*;
 
-public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
+public class ScreenBuilder extends Screen {
 
     protected ScreenScrollList scrollList;
     protected HashMap<Integer, ConfigBase> buttonToEntry;
     protected final ConfigCategory baseCategory;
     protected int selectedIndex = -1;
-    protected final net.minecraft.client.gui.screen.ScreenBase parent;
+    protected final Screen parent;
     protected final EntrypointContainer<Object> mod;
     protected int mouseX = -1;
     protected int mouseY = -1;
     protected List<ConfigBase> configBases = new ArrayList<>();
     protected int backButtonID;
-    protected List<Button> screenButtons = new ArrayList<>();
+    protected List<ButtonWidget> screenButtons = new ArrayList<>();
 
-    public ScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
+    public ScreenBuilder(Screen parent, EntrypointContainer<Object> mod, ConfigCategory baseCategory) {
         this.parent = parent;
         this.mod = mod;
         this.baseCategory = baseCategory;
@@ -60,16 +61,16 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
         screenButtons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToEntry = new HashMap<>();
-        Button button = new Button(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().translate("gui.cancel"));
+        ButtonWidget button = new ButtonWidget(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().get("gui.cancel"));
         //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry) {
-                ((ConfigEntry<?>) value).init(this, textManager);
+                ((ConfigEntry<?>) value).init(this, textRenderer);
             }
             value.getDrawables().forEach(val -> {
-                if (val instanceof Button) {
+                if (val instanceof ButtonWidget) {
                     val.setID(buttons.size());
                     buttonToEntry.put(buttons.size(), value);
                     //noinspection unchecked
@@ -107,15 +108,15 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
         scrollList.render(mouseX, mouseY, delta);
         // Breaks rendering of category buttons.
         //super.render(mouseX, mouseY, delta);
-        //((Button) buttons.get(backButtonID)).render(minecraft, mouseX, mouseY);
+        //((ButtonWidget) buttons.get(backButtonID)).render(minecraft, mouseX, mouseY);
         screenButtons.forEach(button -> button.render(minecraft, mouseX, mouseY));
-        textManager.drawTextWithShadow(baseCategory.name, (width/2) - (textManager.getTextWidth(baseCategory.name)/2), 4, 16777215);
-        textManager.drawTextWithShadow(baseCategory.description, (width/2) - (textManager.getTextWidth(baseCategory.description)/2), 18, 8421504);
+        textRenderer.drawWithShadow(baseCategory.name, (width/2) - (textRenderer.getWidth(baseCategory.name)/2), 4, 16777215);
+        textRenderer.drawWithShadow(baseCategory.description, (width/2) - (textRenderer.getWidth(baseCategory.description)/2), 18, 8421504);
         ArrayList<HasDrawable> drawables = new ArrayList<>();
         configBases.forEach((configBase -> drawables.addAll(configBase.getDrawables())));
-        List<String> tooltip = ((ScreenBaseAccessor) this).getMouseTooltip(mouseX, mouseY, drawables);
+        List<String> tooltip = ((ScreenAccessor) this).getMouseTooltip(mouseX, mouseY, drawables);
         if (tooltip != null) {
-            CharacterUtils.renderTooltip(textManager, tooltip, mouseX, mouseY, this);
+            CharacterUtils.renderTooltip(textRenderer, tooltip, mouseX, mouseY, this);
         }
     }
 
@@ -136,21 +137,21 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
     }
 
     @Override
-    protected void buttonClicked(Button button) {
+    protected void buttonClicked(ButtonWidget button) {
         if (button.id == backButtonID) {
-            minecraft.openScreen(parent);
+            minecraft.setScreen(parent);
         }
         else if (buttonToEntry.get(button.id) instanceof ConfigEntryWithButton) {
             ((ConfigEntryWithButton) buttonToEntry.get(button.id)).onClick();
         }
         else if (buttonToEntry.get(button.id) instanceof ConfigCategory) {
             //noinspection deprecation
-            ((Minecraft) FabricLoader.getInstance().getGameInstance()).openScreen(((ConfigCategory) buttonToEntry.get(button.id)).getConfigScreen(this, mod));
+            ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(((ConfigCategory) buttonToEntry.get(button.id)).getConfigScreen(this, mod));
         }
     }
 
     @Override
-    public void onClose() {
+    public void removed() {
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry<?>) {
                 //noinspection rawtypes
@@ -164,22 +165,22 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
                 }
             }
         });
-        super.onClose();
+        super.removed();
     }
 
-    class ScreenScrollList extends ScrollableBase {
+    class ScreenScrollList extends EntryListWidget {
         public ScreenScrollList() {
             super(ScreenBuilder.this.minecraft, ScreenBuilder.this.width, ScreenBuilder.this.height, 32, ScreenBuilder.this.height - 32, 48);
-            setDrawingSelectionBackground(false);
+            this.method_1260(false);
         }
 
         public void scroll(float value) {
-            ScrollableBaseAccessor baseAccessor = ((ScrollableBaseAccessor) this);
+            EntryListWidgetAccessor baseAccessor = ((EntryListWidgetAccessor) this);
             baseAccessor.setScrollAmount(baseAccessor.getScrollAmount() + value);
         }
 
         @Override
-        protected int getSize() {
+        protected int getEntryCount() {
             return configBases.size();
         }
 
@@ -189,7 +190,7 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
         }
 
         @Override
-        protected boolean isEntrySelected(int i) {
+        protected boolean isSelectedEntry(int i) {
             return i == selectedIndex;
         }
 
@@ -201,10 +202,10 @@ public class ScreenBuilder extends net.minecraft.client.gui.screen.ScreenBase {
         @Override
         protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
             ConfigBase configBase = configBases.get(itemId);
-            ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.name, x + 2, y + 1, 16777215);
+            ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configBase.name, x + 2, y + 1, 16777215);
             configBase.getDrawables().forEach(val -> val.setXYWH(x + 2, y + 12, 212, 20));
             configBase.getDrawables().forEach(val -> val.draw(mouseX, mouseY));
-            ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textManager, configBase.description, x + 2, y + 34, 8421504);
+            ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configBase.description, x + 2, y + 34, 8421504);
         }
     }
 }

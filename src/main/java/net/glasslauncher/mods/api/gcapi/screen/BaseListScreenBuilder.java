@@ -3,9 +3,15 @@ package net.glasslauncher.mods.api.gcapi.screen;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
-import net.glasslauncher.mods.api.gcapi.mixin.ScrollableBaseAccessor;
-import net.glasslauncher.mods.api.gcapi.screen.widget.ExtensibleTextbox;
-import net.glasslauncher.mods.api.gcapi.screen.widget.TexturedButton;
+import net.glasslauncher.mods.api.gcapi.mixin.EntryListWidgetAccessor;
+import net.glasslauncher.mods.api.gcapi.screen.widget.ExtensibleTextFieldWidget;
+import net.glasslauncher.mods.api.gcapi.screen.widget.TexturedButtonWidget;
+import net.minecraft.class_35;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
@@ -15,19 +21,19 @@ import java.util.*;
 import java.util.concurrent.atomic.*;
 import java.util.function.*;
 
-public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.screen.ScreenBase {
+public abstract class BaseListScreenBuilder<T> extends Screen {
 
     protected ScreenScrollList scrollList;
-    protected final net.minecraft.client.gui.screen.ScreenBase parent;
+    protected final Screen parent;
     protected int mouseX = -1;
     protected int mouseY = -1;
     protected ConfigEntry<T[]> configEntry;
-    public final List<ExtensibleTextbox> textboxes = new ArrayList<>();
+    public final List<ExtensibleTextFieldWidget> textFieldWidgets = new ArrayList<>();
     protected Function<String, BiTuple<Boolean, List<String>>> validator;
     protected final MaxLength maxLength;
     private boolean isInUse = false;
 
-    protected BaseListScreenBuilder(net.minecraft.client.gui.screen.ScreenBase parent, MaxLength maxLength, ConfigEntry<T[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
+    protected BaseListScreenBuilder(Screen parent, MaxLength maxLength, ConfigEntry<T[]> configEntry, Function<String, BiTuple<Boolean, List<String>>> validator) {
         this.parent = parent;
         this.maxLength = maxLength;
         this.configEntry = configEntry;
@@ -35,13 +41,13 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     }
 
     public void setValues(List<T> list) {
-        textboxes.clear();
+        textFieldWidgets.clear();
         list.forEach((value) -> {
-            ExtensibleTextbox textbox = new ExtensibleTextbox(textManager);
+            ExtensibleTextFieldWidget textbox = new ExtensibleTextFieldWidget(textRenderer);
             textbox.setValidator(validator);
             textbox.setMaxLength(maxLength.value());
             textbox.setText(String.valueOf(value));
-            textboxes.add(textbox);
+            textFieldWidgets.add(textbox);
         });
     }
 
@@ -50,10 +56,10 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     }
 
     @Override
-    public void init(net.minecraft.client.Minecraft minecraft, int width, int height) {
-        this.smokeRenderer = new net.minecraft.client.gui.ParticleRenderer(minecraft);
+    public void init(Minecraft minecraft, int width, int height) {
+        this.field_157 = new class_35(minecraft);
         this.minecraft = minecraft;
-        this.textManager = minecraft.textRenderer;
+        this.textRenderer = minecraft.textRenderer;
         this.width = width;
         this.height = height;
         init();
@@ -63,10 +69,10 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     public void init() {
         if (isInUse) {
             scrollList = new ScreenScrollList();
-            net.minecraft.client.gui.widgets.Button button = ((net.minecraft.client.gui.widgets.Button)buttons.get(0));
+            ButtonWidget button = ((ButtonWidget)buttons.get(0));
             button.x = width/2-75;
             button.y = height-26;
-            button = ((net.minecraft.client.gui.widgets.Button)buttons.get(1));
+            button = ((ButtonWidget)buttons.get(1));
             button.x = ((width/3)*2)-75;
             button.y = height-48;
             return;
@@ -75,13 +81,13 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
         buttons.clear();
         this.scrollList = new ScreenScrollList();
         //noinspection unchecked
-        buttons.add(new net.minecraft.client.gui.widgets.Button(0,width/2-75, height-26, 150, 20, net.minecraft.client.resource.language.TranslationStorage.getInstance().translate("gui.cancel")));
+        buttons.add(new ButtonWidget(0,width/2-75, height-26, 150, 20, TranslationStorage.getInstance().get("gui.cancel")));
         //noinspection unchecked
-        buttons.add(new TexturedButton(1,((width/3)*2)-75, height-48, 20, 20, 0, 0, "assets/gcapi/add_button.png", 32, 64, "Add a new entry at the end"));
+        buttons.add(new TexturedButtonWidget(1,((width/3)*2)-75, height-48, 20, 20, 0, 0, "assets/gcapi/add_button.png", 32, 64, "Add a new entry at the end"));
         AtomicInteger id = new AtomicInteger(1);
-        textboxes.forEach((te) -> {
+        textFieldWidgets.forEach((te) -> {
             //noinspection unchecked
-            buttons.add(new TexturedButton(id.incrementAndGet(),0, 0, 20, 20, 0, 0, "assets/gcapi/remove_button.png", 32, 64, "Remove the entry on this line"));
+            buttons.add(new TexturedButtonWidget(id.incrementAndGet(),0, 0, 20, 20, 0, 0, "assets/gcapi/remove_button.png", 32, 64, "Remove the entry on this line"));
         });
         isInUse = true;
     }
@@ -89,7 +95,7 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     @Override
     public void tick() {
         super.tick();
-        for (ExtensibleTextbox configBase : textboxes) {
+        for (ExtensibleTextFieldWidget configBase : textFieldWidgets) {
             configBase.tick();
         }
     }
@@ -97,7 +103,7 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     @Override
     protected void keyPressed(char character, int key) {
         super.keyPressed(character, key);
-        for (ExtensibleTextbox configBase : textboxes) {
+        for (ExtensibleTextFieldWidget configBase : textFieldWidgets) {
             configBase.keyPressed(character, key);
         }
     }
@@ -109,22 +115,22 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
         scrollList.render(mouseX, mouseY, delta);
         // Breaks rendering of category buttons.
         //super.render(mouseX, mouseY, delta);
-        ((net.minecraft.client.gui.widgets.Button) buttons.get(0)).render(minecraft, mouseX, mouseY);
-        ((net.minecraft.client.gui.widgets.Button) buttons.get(1)).render(minecraft, mouseX, mouseY);
-        textManager.drawTextWithShadow(configEntry.name, (width / 2) - (textManager.getTextWidth(configEntry.name) / 2), 4, 16777215);
-        textManager.drawTextWithShadow(configEntry.description, (width / 2) - (textManager.getTextWidth(configEntry.description) / 2), 18, 8421504);
+        ((ButtonWidget) buttons.get(0)).render(minecraft, mouseX, mouseY);
+        ((ButtonWidget) buttons.get(1)).render(minecraft, mouseX, mouseY);
+        textRenderer.drawWithShadow(configEntry.name, (width / 2) - (textRenderer.getWidth(configEntry.name) / 2), 4, 16777215);
+        textRenderer.drawWithShadow(configEntry.description, (width / 2) - (textRenderer.getWidth(configEntry.description) / 2), 18, 8421504);
 
         if (configEntry.parentField.isAnnotationPresent(MaxLength.class)) {
             MaxLength maxLength = configEntry.parentField.getAnnotation(MaxLength.class);
-            if ((!maxLength.fixedArray() && maxLength.arrayValue() < textboxes.size()) || (maxLength.fixedArray() && maxLength.arrayValue() != textboxes.size())) {
+            if ((!maxLength.fixedArray() && maxLength.arrayValue() < textFieldWidgets.size()) || (maxLength.fixedArray() && maxLength.arrayValue() != textFieldWidgets.size())) {
                 String text = "Array is not the right size!";
-                textManager.drawTextWithShadow(text, (width / 2) - (textManager.getTextWidth(text) / 2), 34, CharacterUtils.getIntFromColour(Color.RED));
+                textRenderer.drawWithShadow(text, (width / 2) - (textRenderer.getWidth(text) / 2), 34, CharacterUtils.getIntFromColour(Color.RED));
             }
         }
 
-        List<String> tooltip = ((ScreenBaseAccessor) this).getMouseTooltip(mouseX, mouseY, textboxes);
+        List<String> tooltip = ((ScreenAccessor) this).getMouseTooltip(mouseX, mouseY, textFieldWidgets);
         if (tooltip != null) {
-            CharacterUtils.renderTooltip(textManager, tooltip, mouseX, mouseY, this);
+            CharacterUtils.renderTooltip(textRenderer, tooltip, mouseX, mouseY, this);
         }
     }
 
@@ -133,7 +139,7 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
         super.onMouseEvent();
         float dWheel = Mouse.getDWheel();
         if (Mouse.isButtonDown(0)) {
-            for (ExtensibleTextbox configBase : textboxes) {
+            for (ExtensibleTextFieldWidget configBase : textFieldWidgets) {
                     configBase.mouseClicked(mouseX, mouseY, 0);
             }
         }
@@ -143,24 +149,24 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     }
 
     @Override
-    protected void buttonClicked(net.minecraft.client.gui.widgets.Button button) {
+    protected void buttonClicked(ButtonWidget button) {
         if (button.id == 0) {
             isInUse = false;
-            minecraft.openScreen(parent);
+            minecraft.setScreen(parent);
         }
         else if (button.id == 1) {
-            ExtensibleTextbox textbox = new ExtensibleTextbox(textManager);
+            ExtensibleTextFieldWidget textbox = new ExtensibleTextFieldWidget(textRenderer);
             textbox.setValidator(validator);
             textbox.setText("");
-            textboxes.add(textbox);
+            textFieldWidgets.add(textbox);
             //noinspection unchecked
-            buttons.add(new TexturedButton(buttons.size(),0, 0, 20, 20, 0, 0, "assets/gcapi/remove_button.png", 32, 64, "Remove the entry on this line"));
+            buttons.add(new TexturedButtonWidget(buttons.size(),0, 0, 20, 20, 0, 0, "assets/gcapi/remove_button.png", 32, 64, "Remove the entry on this line"));
         }
         else if (button.id > 1) {
-            textboxes.remove(button.id-2);
+            textFieldWidgets.remove(button.id-2);
             buttons.remove(button.id);
             for (int i = 1; i<buttons.size(); i++) {
-                ((net.minecraft.client.gui.widgets.Button) buttons.get(i)).id = i;
+                ((ButtonWidget) buttons.get(i)).id = i;
             }
         }
     }
@@ -168,35 +174,35 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
     abstract T convertStringToValue(String value);
 
     @Override
-    public void onClose() {
+    public void removed() {
         if (isInUse) {
             return;
         }
         List<T> list = new ArrayList<>();
-        textboxes.forEach((value) -> {
+        textFieldWidgets.forEach((value) -> {
             if (value.isValueValid()) {
                 list.add(convertStringToValue(value.getText()));
             }
         });
         //noinspection unchecked
         configEntry.value = (T[]) list.toArray();
-        super.onClose();
+        super.removed();
     }
 
-    class ScreenScrollList extends net.minecraft.client.gui.widgets.ScrollableBase {
+    class ScreenScrollList extends EntryListWidget {
         public ScreenScrollList() {
             super(BaseListScreenBuilder.this.minecraft, BaseListScreenBuilder.this.width, BaseListScreenBuilder.this.height, 32, BaseListScreenBuilder.this.height - 64, 24);
 
         }
 
         public void scroll(float value) {
-            ScrollableBaseAccessor baseAccessor = ((ScrollableBaseAccessor) this);
+            EntryListWidgetAccessor baseAccessor = ((EntryListWidgetAccessor) this);
             baseAccessor.setScrollAmount(baseAccessor.getScrollAmount() + value);
         }
 
         @Override
-        protected int getSize() {
-            return textboxes.size();
+        protected int getEntryCount() {
+            return textFieldWidgets.size();
         }
 
         @Override
@@ -204,7 +210,7 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
         }
 
         @Override
-        protected boolean isEntrySelected(int i) {
+        protected boolean isSelectedEntry(int i) {
             return false;
         }
 
@@ -218,10 +224,10 @@ public abstract class BaseListScreenBuilder<T> extends net.minecraft.client.gui.
             if (itemId+2 >= buttons.size()) {
                 return;
             }
-            ExtensibleTextbox configBase = textboxes.get(itemId);
-            BaseListScreenBuilder.this.drawTextWithShadow(textManager, String.valueOf(itemId), x - 2 - textManager.getTextWidth(String.valueOf(itemId)), y + 1, 16777215);
-            ((TexturedButton) buttons.get(itemId+2)).setPos(x + 214 + 34, y+2);
-            ((TexturedButton) buttons.get(itemId+2)).render(minecraft, mouseX, mouseY);
+            ExtensibleTextFieldWidget configBase = textFieldWidgets.get(itemId);
+            BaseListScreenBuilder.this.drawTextWithShadow(textRenderer, String.valueOf(itemId), x - 2 - textRenderer.getWidth(String.valueOf(itemId)), y + 1, 16777215);
+            ((TexturedButtonWidget) buttons.get(itemId+2)).setPos(x + 214 + 34, y+2);
+            ((TexturedButtonWidget) buttons.get(itemId+2)).render(minecraft, mouseX, mouseY);
             configBase.setXYWH(x + 2, y + 1, 212, 20);
             configBase.draw(mouseX, mouseY);
         }

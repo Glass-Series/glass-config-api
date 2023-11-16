@@ -13,6 +13,7 @@ group = project.maven_group
 loom {
 	gluedMinecraftJar()
 	customMinecraftManifest.set("https://babric.github.io/manifest-polyfill/${minecraft_version}.json")
+	intermediaryUrl.set("https://maven.glass-launcher.net/babric/babric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
 }
 
 idea {
@@ -49,11 +50,22 @@ repositories {
 		url "https://jitpack.io/"
 	}
 	mavenCentral()
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.glasslauncher:bin:${project.yarn_mappings}"
+	mappings "net.glasslauncher:biny:${project.yarn_mappings}:v2"
 	modImplementation "babric:fabric-loader:${project.loader_version}"
 
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.2'
@@ -78,7 +90,7 @@ dependencies {
 		transitive false
 	}
 
-	include("blue.endless:jankson:1.2.1")
+	implementation(include("blue.endless:jankson:1.2.1"))
 }
 
 processResources {

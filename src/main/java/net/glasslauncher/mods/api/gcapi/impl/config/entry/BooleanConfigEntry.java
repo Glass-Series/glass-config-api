@@ -6,10 +6,11 @@ import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
-import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButton;
-import net.glasslauncher.mods.api.gcapi.screen.widget.Icon;
-import net.minecraft.client.gui.screen.ScreenBase;
-import net.minecraft.client.render.TextRenderer;
+import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
+import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.*;
 
 public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEntryWithButton {
-    private FancyButton button;
+    private FancyButtonWidget button;
     private List<HasDrawable> drawableList;
 
     public BooleanConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Boolean value) {
@@ -26,13 +27,13 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     }
 
     @Override
-    public void init(ScreenBase parent, TextRenderer textRenderer) {
-        button = new FancyButton(10, 0, 0, 0, 0, value.toString(), CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255)));
+    public void init(Screen parent, TextRenderer textRenderer) {
+        button = new FancyButtonWidget(10, 0, 0, 0, 0, value.toString(), CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255)));
         drawableList = new ArrayList<>() {{
             add(button);
         }};
         if (multiplayerSynced) {
-            drawableList.add(new Icon(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
+            drawableList.add(new IconWidget(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
         }
         button.active = !multiplayerLoaded;
     }
