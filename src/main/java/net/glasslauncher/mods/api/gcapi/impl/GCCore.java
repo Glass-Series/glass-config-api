@@ -180,35 +180,7 @@ public class GCCore implements PreLaunchEntrypoint {
             }
             log(Arrays.toString(rootJsonObject.keySet().toArray()));
             net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory configCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(modContainer.getMetadata().getId(), configField.getAnnotation(GConfig.class).visibleName(), null, configField, objField, configField.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), true);
-            for (Field field : objField.getClass().getDeclaredFields()) {
-                Object childObjField = field.get(objField);
-                if (field.isAnnotationPresent(ConfigCategory.class)) {
-                    JsonObject jsonCategory = rootJsonObject.getObject(field.getName());
-                    if (jsonCategory == null) {
-                        jsonCategory = new JsonObject();
-                        rootJsonObject.put(field.getName(), jsonCategory);
-                    }
-                    net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory childCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(field.getName(), field.getAnnotation(ConfigCategory.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), false);
-                    configCategory.values.put(ConfigCategory.class, childCategory);
-                    readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories, isMultiplayer, forceNotMultiplayer);
-                }
-                else {
-                    if (!field.isAnnotationPresent(ConfigName.class)) {
-                        throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no ConfigName annotation!");
-                    }
-                    OctFunction<String, String, String, Field, Object, Boolean, Object, MaxLength, ConfigEntry<?>> function = ConfigFactories.loadFactories.get(field.getType());
-                    if (function == null) {
-                        throw new RuntimeException("Config value \"" + field.getType().getName() + ";" + field.getName() + "\" has no config loader for it's type!");
-                    }
-                    field.setAccessible(true);
-                    ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, configCategory.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
-                    //noinspection ConstantConditions uh, no.
-                    configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced && !forceNotMultiplayer;
-                    configCategory.values.put(field.getType(), configEntry);
-                    field.set(objField, configEntry.value);
-                    totalReadFields.getAndIncrement();
-                }
-            }
+            readDeeper(rootConfigObject, configField, rootJsonObject, configCategory, totalReadFields, totalReadCategories, isMultiplayer, forceNotMultiplayer);
             if (!loaded) {
                 MOD_CONFIGS.put(configID, BiTuple.of(MOD_CONFIGS.remove(configID).one(), configCategory));
             } else {
