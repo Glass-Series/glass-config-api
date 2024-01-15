@@ -19,7 +19,10 @@ import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 import org.apache.logging.log4j.Level;
@@ -84,7 +87,11 @@ public class GCCore implements PreLaunchEntrypoint {
         if (mod.get() != null) {
             BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory> category = MOD_CONFIGS.get(mod.get());
             saveConfig(category.one(), category.two());
-            loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), string);
+            try {
+                loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), Jankson.builder().build().load(string));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -147,7 +154,7 @@ public class GCCore implements PreLaunchEntrypoint {
         loaded = true;
     }
 
-    public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, Identifier configID, String jsonOverrideString) {
+    public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, Identifier configID, JsonObject jsonOverride) {
         log(rootConfigObject.getClass().getName());
         log(configField.getName());
         AtomicInteger totalReadCategories = new AtomicInteger();
@@ -159,7 +166,7 @@ public class GCCore implements PreLaunchEntrypoint {
             Object objField = configField.get(rootConfigObject);
             File modConfigFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), modContainer.getMetadata().getId() + "/" + configField.getAnnotation(GConfig.class).value() + ".json");
             JsonObject rootJsonObject;
-            if (jsonOverrideString == null) {
+            if (jsonOverride == null) {
                 if (modConfigFile.exists()) {
                     rootJsonObject = Jankson.builder().build().load(modConfigFile);
                 }
@@ -168,7 +175,7 @@ public class GCCore implements PreLaunchEntrypoint {
                 }
             }
             else {
-                rootJsonObject = Jankson.builder().build().load(jsonOverrideString);
+                rootJsonObject = jsonOverride;
                 forceNotMultiplayer = rootJsonObject.getBoolean("forceNotMultiplayer", false);
                 if (!forceNotMultiplayer) {
                     isMultiplayer = true;

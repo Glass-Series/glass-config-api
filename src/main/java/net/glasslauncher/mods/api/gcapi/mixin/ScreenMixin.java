@@ -6,6 +6,7 @@ import net.glasslauncher.mods.api.gcapi.screen.ScreenAccessor;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.ButtonWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,6 +24,8 @@ public class ScreenMixin extends DrawContext implements ScreenAccessor {
 
     @SuppressWarnings("rawtypes")
     @Shadow protected List buttons;
+
+    @Shadow private ButtonWidget selectedButton;
 
     @Inject(method = "render", at = @At(value = "TAIL"))
     public void drawTooltipStuff(int mouseX, int mouseY, float delta, CallbackInfo ci) {
@@ -42,6 +45,11 @@ public class ScreenMixin extends DrawContext implements ScreenAccessor {
             }
         });
         return tooltip.get();
+    }
+
+    @Override
+    public void setSelectedButton(ButtonWidget value) {
+        selectedButton = value;
     }
 
     public boolean isMouseInBounds(int[] xywh, int mouseX, int mouseY) {

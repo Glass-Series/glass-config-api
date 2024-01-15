@@ -17,7 +17,9 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ScreenBuilder extends Screen {
 
@@ -61,7 +63,7 @@ public class ScreenBuilder extends Screen {
         screenButtons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToEntry = new HashMap<>();
-        ButtonWidget button = new ButtonWidget(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().get("gui.cancel"));
+        ButtonWidget button = new ButtonWidget(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().get("gui.done"));
         //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
@@ -114,9 +116,38 @@ public class ScreenBuilder extends Screen {
         textRenderer.drawWithShadow(baseCategory.description, (width/2) - (textRenderer.getWidth(baseCategory.description)/2), 18, 8421504);
         ArrayList<HasDrawable> drawables = new ArrayList<>();
         configBases.forEach((configBase -> drawables.addAll(configBase.getDrawables())));
-        List<String> tooltip = ((ScreenAccessor) this).getMouseTooltip(mouseX, mouseY, drawables);
-        if (tooltip != null) {
-            CharacterUtils.renderTooltip(textRenderer, tooltip, mouseX, mouseY, this);
+        if(mouseY > 32 && mouseY < height - 33) {
+            List<String> tooltip = ((ScreenAccessor) this).getMouseTooltip(mouseX, mouseY, drawables);
+            if (tooltip != null) {
+                CharacterUtils.renderTooltip(textRenderer, tooltip, mouseX, mouseY, this);
+            }
+        }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int buttonID) {
+        if(mouseY < 32 || mouseY > height - 33) {
+            for (ButtonWidget button : screenButtons) {
+                if (button.isMouseOver(minecraft, mouseX, mouseY)) {
+                    ((ScreenAccessor) this).setSelectedButton(button);
+                    minecraft.soundManager.method_2009("random.click", 1.0F, 1.0F);
+                    buttonClicked(button);
+                }
+            }
+
+            return;
+        }
+        if (buttonID != 0) { // We only want left click
+            return;
+        }
+
+        for (Object buttonObj : buttons) {
+            ButtonWidget button = (ButtonWidget) buttonObj;
+            if (button.isMouseOver(minecraft, mouseX, mouseY)) {
+                ((ScreenAccessor) this).setSelectedButton(button);
+                minecraft.soundManager.method_2009("random.click", 1.0F, 1.0F);
+                buttonClicked(button);
+            }
         }
     }
 
@@ -124,7 +155,7 @@ public class ScreenBuilder extends Screen {
     public void onMouseEvent() {
         super.onMouseEvent();
         float dWheel = Mouse.getDWheel();
-        if (Mouse.isButtonDown(0)) {
+        if (Mouse.isButtonDown(0) && mouseY > 32 && mouseY < height - 33) {
             for (ConfigBase configBase : baseCategory.values.values()) {
                 if (configBase instanceof ConfigEntry) {
                     configBase.getDrawables().forEach(val -> val.mouseClicked(mouseX, mouseY, 0));
@@ -140,6 +171,9 @@ public class ScreenBuilder extends Screen {
     protected void buttonClicked(ButtonWidget button) {
         if (button.id == backButtonID) {
             minecraft.setScreen(parent);
+        }
+        else if (mouseY < 32 || mouseY > height - 33) {
+            // Do nothing
         }
         else if (buttonToEntry.get(button.id) instanceof ConfigEntryWithButton) {
             ((ConfigEntryWithButton) buttonToEntry.get(button.id)).onClick();

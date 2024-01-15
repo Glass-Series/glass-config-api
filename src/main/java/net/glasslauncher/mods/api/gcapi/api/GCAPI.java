@@ -1,9 +1,13 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
+import blue.endless.jankson.Jankson;
+import blue.endless.jankson.JsonObject;
+import blue.endless.jankson.api.SyntaxError;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
@@ -20,7 +24,17 @@ public class GCAPI {
      * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
     @SuppressWarnings("deprecation")
-    public static void reloadConfig(Identifier configID, @Nullable String overrideConfigJson) {
+    public static void reloadConfig(Identifier configID, @Nullable String overrideConfigJson) throws SyntaxError {
+        reloadConfig(configID, Jankson.builder().build().load(overrideConfigJson));
+    }
+
+    /**
+     * Force a config reload, or load your own config json! Can be partial.
+     * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
+     * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
+     */
+    @SuppressWarnings("deprecation")
+    public static void reloadConfig(Identifier configID, @Nullable JsonObject overrideConfigJson) {
         AtomicReference<Identifier> mod = new AtomicReference<>();
         GCCore.MOD_CONFIGS.keySet().forEach(modContainer -> {
             if (modContainer.toString().equals(configID.toString())) {
@@ -39,7 +53,7 @@ public class GCAPI {
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      */
     public static void reloadConfig(Identifier configID) {
-        reloadConfig(configID, null);
+        reloadConfig(configID, (JsonObject) null);
     }
 
 }
