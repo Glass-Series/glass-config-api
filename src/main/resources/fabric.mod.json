@@ -28,6 +28,12 @@
     "gcapi:factory_provider": [
       "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider"
     ],
+    "gcapi:postload": [
+      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleEntryPointListeners"
+    ],
+    "gcapi:presave": [
+      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleEntryPointListeners"
+    ],
     "stationapi:event_bus_server": [
       "net.glasslauncher.mods.api.gcapi.events.InitServerNetworking"
     ],
