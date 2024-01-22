@@ -150,6 +150,9 @@ public class GCCore implements PreLaunchEntrypoint {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
+            if (EventStorage.POST_LOAD_LISTENERS.containsKey(entrypointContainer.getProvider().getMetadata().getId())) {
+                EventStorage.POST_LOAD_LISTENERS.get(entrypointContainer.getProvider().getMetadata().getId()).getEntrypoint().PostConfigLoaded();
+            }
         }));
         loaded = true;
     }
