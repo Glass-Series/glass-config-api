@@ -48,6 +48,8 @@ import java.util.function.*;
 public class GCCore implements PreLaunchEntrypoint {
     public static final ModContainer NAMESPACE = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
     public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> MOD_CONFIGS = new HashMap<>();
+
+    public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
 
@@ -158,8 +160,6 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, Identifier configID, JsonObject jsonOverride) {
-        log(rootConfigObject.getClass().getName());
-        log(configField.getName());
         AtomicInteger totalReadCategories = new AtomicInteger();
         AtomicInteger totalReadFields = new AtomicInteger();
         boolean isMultiplayer = false;
@@ -188,7 +188,6 @@ public class GCCore implements PreLaunchEntrypoint {
                     log("Loading forced mod config for " + modContainer.getMetadata().getId() + "!");
                 }
             }
-            log(Arrays.toString(rootJsonObject.keySet().toArray()));
             net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory configCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(modContainer.getMetadata().getId(), configField.getAnnotation(GConfig.class).visibleName(), null, configField, objField, configField.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), true);
             readDeeper(rootConfigObject, configField, rootJsonObject, configCategory, totalReadFields, totalReadCategories, isMultiplayer, forceNotMultiplayer);
             if (!loaded) {
@@ -254,8 +253,6 @@ public class GCCore implements PreLaunchEntrypoint {
 
             for (ConfigBase entry : category.values.values()) {
                 if (entry instanceof net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) {
-                    log(entry.parentField.getDeclaringClass().getName());
-                    log(container.getEntrypoint().getClass().getName());
                     BiTuple<JsonObject, JsonObject> values = saveDeeper((net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) entry, entry.parentField, readValues, readCategories);
                     newValues.put(entry.id, values.one());
                     serverExported.put(entry.id, values.two());
