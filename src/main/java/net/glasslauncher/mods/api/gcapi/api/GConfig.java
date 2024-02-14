@@ -13,7 +13,7 @@ public @interface GConfig {
     String value();
 
     /**
-     * This is what's shown on the top of the screen when opened. Less than 100 characters recommended.
+     * This is what's shown at the top of the screen when opened. Less than 100 characters recommended.
      */
     String visibleName();
 
