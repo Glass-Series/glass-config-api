@@ -16,25 +16,20 @@ import java.util.*;
 
 public class FloatConfigEntry extends ConfigEntry<Float> {
     private ExtensibleTextFieldWidget textbox;
-    private List<HasDrawable> drawableList;
 
-    public FloatConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean isMultiplayerSynced, Float value, MaxLength maxLength) {
-        super(id, name, description, parentField, parentObject, isMultiplayerSynced, value, maxLength);
+    public FloatConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Float value, Float defaultValue, MaxLength maxLength) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, defaultValue, maxLength);
     }
 
     @Override
     public void init(Screen parent, TextRenderer textRenderer) {
+        super.init(parent, textRenderer);
         textbox = new ExtensibleTextFieldWidget(textRenderer);
         textbox.setValidator(str -> BiTuple.of(CharacterUtils.isFloat(str) && Float.parseFloat(str) <= maxLength.value(), multiplayerLoaded? Collections.singletonList("Server synced, you cannot change this value") : CharacterUtils.isFloat(str)? Float.parseFloat(str) > maxLength.value()? Collections.singletonList("Value is too high") : null : Collections.singletonList("Value is not a decimal number")));
         textbox.setMaxLength(maxLength.value());
         textbox.setText(value.toString());
         textbox.setEnabled(!multiplayerLoaded);
-        drawableList = new ArrayList<>() {{
-            add(textbox);
-        }};
-        if (multiplayerSynced) {
-            drawableList.add(new IconWidget(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
-        }
+        drawableList.add(textbox);
     }
 
     @Override
@@ -55,5 +50,14 @@ public class FloatConfigEntry extends ConfigEntry<Float> {
     @Override
     public @NotNull List<HasDrawable> getDrawables() {
         return drawableList;
+    }
+
+    @Override
+    public void reset() throws IllegalAccessException {
+        if (!multiplayerLoaded) {
+            parentField.set(parentObject, defaultValue);
+            value = defaultValue;
+            setDrawableValue(defaultValue);
+        }
     }
 }

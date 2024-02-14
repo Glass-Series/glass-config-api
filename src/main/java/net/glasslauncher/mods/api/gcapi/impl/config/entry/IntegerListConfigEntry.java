@@ -11,9 +11,8 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class IntegerListConfigEntry extends BaseListConfigEntry<Integer> {
-
-    public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Integer[] value, MaxLength maxLength) {
-        super(id, name, description, parentField, parentObject, multiplayerSynced, value, maxLength);
+    public IntegerListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Integer[] value, Integer[] defaultValue, MaxLength maxLength) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, defaultValue, maxLength);
     }
 
     @Override

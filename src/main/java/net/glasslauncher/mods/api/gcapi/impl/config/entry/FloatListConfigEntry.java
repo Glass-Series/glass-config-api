@@ -11,9 +11,8 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class FloatListConfigEntry extends BaseListConfigEntry<Float> {
-
-    public FloatListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Float[] value, MaxLength maxLength) {
-        super(id, name, description, parentField, parentObject, multiplayerSynced, value, maxLength);
+    public FloatListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Float[] value, Float[] defaultValue, MaxLength maxLength) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, defaultValue, maxLength);
     }
 
     @Override

@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
+import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
 import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
@@ -20,21 +21,16 @@ import java.util.*;
 
 public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEntryWithButton {
     private FancyButtonWidget button;
-    private List<HasDrawable> drawableList;
 
-    public BooleanConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Boolean value) {
-        super(id, name, description, parentField, parentObject, multiplayerSynced, value, null);
+    public BooleanConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Boolean value, Boolean defaultValue) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, defaultValue, null);
     }
 
     @Override
     public void init(Screen parent, TextRenderer textRenderer) {
+        super.init(parent, textRenderer);
         button = new FancyButtonWidget(10, 0, 0, 0, 0, value.toString(), CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255)));
-        drawableList = new ArrayList<>() {{
-            add(button);
-        }};
-        if (multiplayerSynced) {
-            drawableList.add(new IconWidget(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
-        }
+        drawableList.add(button);
         button.active = !multiplayerLoaded;
     }
 
@@ -64,5 +60,14 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     public void onClick() {
         value = !value;
         button.text = value.toString();
+    }
+
+    @Override
+    public void reset() throws IllegalAccessException {
+        if (!multiplayerLoaded) {
+            parentField.set(parentObject, defaultValue);
+            value = defaultValue;
+            setDrawableValue(defaultValue);
+        }
     }
 }

@@ -1,0 +1,38 @@
+package net.glasslauncher.mods.api.gcapi.screen.widget;
+
+import net.glasslauncher.mods.api.gcapi.impl.GCCore;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
+
+import java.util.*;
+
+public class ResetConfigWidget extends IconWidget {
+    private final ConfigEntry<?> configEntry;
+
+    public ResetConfigWidget(int x, int y, int width, int height, ConfigEntry<?> configEntry) {
+        super(x, y, width, height, "/assets/gcapi/reset.png");
+        this.configEntry = configEntry;
+    }
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int button) {
+        if (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height) {
+            try {
+                configEntry.reset();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void setXYWH(int x, int y, int width, int height) {
+        super.setXYWH(x, y, width, height);
+        this.y -= 10;
+    }
+
+    @Override
+    public List<String> getTooltip() {
+        return Collections.singletonList("Reset this config to default.");
+    }
+
+}

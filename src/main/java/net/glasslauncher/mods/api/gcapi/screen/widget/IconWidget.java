@@ -49,8 +49,8 @@ public class IconWidget implements HasDrawable, HasToolTip {
 
     @Override
     public void setXYWH(int x, int y, int width, int height) {
-        this.x = x + width + 1;
-        this.y = y + height/2-4;
+        this.x = x + width + 2;
+        this.y = y + height/2+1;
         this.width = 8;
         this.height = 8;
     }

@@ -11,6 +11,6 @@ import java.util.function.*;
 
 public class ConfigFactories {
 
-    public static ImmutableMap<Type, OctFunction<String, String, String, Field, Object, Boolean, Object, MaxLength, ConfigEntry<?>>> loadFactories = null;
+    public static ImmutableMap<Type, NonFunction<String, String, String, Field, Object, Boolean, Object, Object, MaxLength, ConfigEntry<?>>> loadFactories = null;
     public static ImmutableMap<Type, Function<Object, JsonElement>> saveFactories = null;
 }

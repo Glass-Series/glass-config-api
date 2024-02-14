@@ -9,6 +9,7 @@ import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
 import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
+import net.glasslauncher.mods.api.gcapi.screen.widget.ResetConfigWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
@@ -21,21 +22,16 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     private net.glasslauncher.mods.api.gcapi.screen.BaseListScreenBuilder<T> listScreen;
     @Environment(EnvType.CLIENT)
     private FancyButtonWidget button;
-    private List<HasDrawable> drawableList;
 
-    public BaseListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, T[] value, MaxLength maxLength) {
-        super(id, name, description, parentField, parentObject, multiplayerSynced, value, maxLength);
+    public BaseListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, T[] value, T[] defaultValue, MaxLength maxLength) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, defaultValue, maxLength);
     }
 
     @Override
     public void init(Screen parent, TextRenderer textRenderer) {
+        super.init(parent, textRenderer);
         button = new FancyButtonWidget(10, 0, 0, 0, 0, "Open List... (" + value.length + " values)");
-        drawableList = new ArrayList<>() {{
-            add(button);
-        }};
-        if (multiplayerSynced) {
-            drawableList.add(new IconWidget(10, 0, 0, 0, "/assets/gcapi/server_synced.png"));
-        }
+        drawableList.add(button);
         listScreen = createListScreen();
         button.active = !multiplayerLoaded;
     }
@@ -75,6 +71,14 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     public void onClick() {
         //noinspection deprecation
         ((net.minecraft.client.Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(listScreen);
+    }
+
+    @Override
+    public void reset() throws IllegalAccessException { // !!OVERRIDE THIS AND DO A DEEP CLONE IF YOU'RE USING SOMETHING THAT ISN'T A PRIMITIVE!!
+        if (!multiplayerLoaded) {
+            parentField.set(parentObject, defaultValue);
+            value = defaultValue.clone();
+        }
     }
 }
 

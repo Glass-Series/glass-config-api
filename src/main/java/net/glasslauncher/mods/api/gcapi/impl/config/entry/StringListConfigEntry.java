@@ -9,9 +9,8 @@ import uk.co.benjiweber.expressions.tuple.BiTuple;
 import java.lang.reflect.*;
 
 public class StringListConfigEntry extends BaseListConfigEntry<String> {
-
-    public StringListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, String[] value, MaxLength maxLength) {
-        super(id, name, description, parentField, parentObject, multiplayerSynced, value, maxLength);
+    public StringListConfigEntry(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, String[] value, String[] defaultValue, MaxLength maxLength) {
+        super(id, name, description, parentField, parentObject, multiplayerSynced, value, defaultValue, maxLength);
     }
 
     @Override
