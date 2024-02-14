@@ -170,6 +170,7 @@ public class ScreenBuilder extends Screen {
     @Override
     protected void buttonClicked(ButtonWidget button) {
         if (button.id == backButtonID) {
+            saveToEntries();
             minecraft.setScreen(parent);
         }
         else if (mouseY >= 32 && mouseY <= height - 33) {
@@ -183,8 +184,7 @@ public class ScreenBuilder extends Screen {
         }
     }
 
-    @Override
-    public void removed() {
+    public void saveToEntries() {
         baseCategory.values.values().forEach((value) -> {
             if (value instanceof ConfigEntry<?>) {
                 //noinspection rawtypes
@@ -198,7 +198,6 @@ public class ScreenBuilder extends Screen {
                 }
             }
         });
-        super.removed();
     }
 
     class ScreenScrollList extends EntryListWidget {

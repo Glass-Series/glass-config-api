@@ -29,11 +29,6 @@ public class RootScreenBuilder extends ScreenBuilder {
     }
 
     @Override
-    public void removed() {
-        super.removed();
-    }
-
-    @Override
     public void init() {
         super.init();
         switchButtons.clear();
@@ -51,6 +46,7 @@ public class RootScreenBuilder extends ScreenBuilder {
 
     @Override
     protected void buttonClicked(ButtonWidget button) {
+        super.buttonClicked(button);
         if (button.id == backButtonID) {
             //noinspection deprecation Intentional use of GCCore internals.
             GCCore.saveConfig(mod, baseCategory, EventStorage.EventSource.USER_SAVE);
@@ -69,6 +65,5 @@ public class RootScreenBuilder extends ScreenBuilder {
             //noinspection deprecation
             ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(builder);
         }
-        super.buttonClicked(button);
     }
 }
