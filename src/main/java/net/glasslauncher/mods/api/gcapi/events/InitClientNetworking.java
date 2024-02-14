@@ -2,6 +2,7 @@ package net.glasslauncher.mods.api.gcapi.events;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
+import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.nbt.NbtCompound;
@@ -34,6 +35,11 @@ public class InitClientNetworking {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(message.bytes);
             NbtCompound nbtCompound = NbtIo.readCompressed(byteArrayInputStream);
             new ArrayList<>(GCCore.MOD_CONFIGS.keySet()).stream().map(Identifier::toString).filter(nbtCompound::contains).forEach(namespace -> GCCore.loadServerConfig(namespace, nbtCompound.getString(namespace))); // oneliner go brrrrrrr
+
+            FabricLoader.getInstance().getEntrypointContainers(GCCore.NAMESPACE.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
+            if (EventStorage.POST_LOAD_LISTENERS.containsKey(entrypointContainer.getProvider().getMetadata().getId())) {
+                EventStorage.POST_LOAD_LISTENERS.get(entrypointContainer.getProvider().getMetadata().getId()).getEntrypoint().PostConfigLoaded(EventStorage.EventSource.SERVER_JOIN | EventStorage.EventSource.MODDED_SERVER_JOIN);
+            }}));
         });
         Registry.register(event.registry, Identifier.of(namespace, "ping"), ((playerBase, message) -> PacketHelper.send(new MessagePacket(Identifier.of(namespace, "ping")))));
     }
