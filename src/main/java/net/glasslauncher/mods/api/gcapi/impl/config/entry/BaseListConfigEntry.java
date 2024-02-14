@@ -74,10 +74,11 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     }
 
     @Override
-    public void reset() throws IllegalAccessException { // !!OVERRIDE THIS AND DO A DEEP CLONE IF YOU'RE USING SOMETHING THAT ISN'T A PRIMITIVE!!
+    public void reset(Object defaultValue) throws IllegalAccessException { // !!OVERRIDE THIS AND DO A DEEP CLONE IF YOU'RE USING SOMETHING THAT ISN'T A PRIMITIVE!!
         if (!multiplayerLoaded) {
             parentField.set(parentObject, defaultValue);
-            value = defaultValue.clone();
+            //noinspection unchecked
+            value = ((T[]) defaultValue).clone();
         }
     }
 }

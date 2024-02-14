@@ -17,7 +17,7 @@ public class ResetConfigWidget extends IconWidget {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height) {
             try {
-                configEntry.reset();
+                configEntry.reset(configEntry.defaultValue);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }

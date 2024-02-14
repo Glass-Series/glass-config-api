@@ -1,9 +1,12 @@
 package net.glasslauncher.mods.api.gcapi.events;
 
+import blue.endless.jankson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
 import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
+import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtIo;
@@ -11,6 +14,7 @@ import net.modificationstation.stationapi.api.client.event.network.MultiplayerLo
 import net.modificationstation.stationapi.api.client.event.network.ServerLoginSuccessEvent;
 import net.modificationstation.stationapi.api.event.registry.MessageListenerRegistryEvent;
 import net.modificationstation.stationapi.api.mod.entrypoint.Entrypoint;
+import net.modificationstation.stationapi.api.network.ModdedPacketHandler;
 import net.modificationstation.stationapi.api.network.packet.MessagePacket;
 import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 import net.modificationstation.stationapi.api.server.event.network.PlayerLoginEvent;
@@ -59,5 +63,24 @@ public class InitClientNetworking {
                 throw new RuntimeException(e);
             }
         }));
+    }
+
+
+    @EventListener
+    private void onClientDisconnect(ServerLoginSuccessEvent event) {
+        if(!((ModdedPacketHandler) event.clientNetworkHandler).isModded()) {
+            GCCore.MOD_CONFIGS.forEach((identifier, entrypointContainerConfigCategoryBiTuple) -> recursiveTriggerVanillaBehavior(entrypointContainerConfigCategoryBiTuple.two()));
+        }
+    }
+
+    private void recursiveTriggerVanillaBehavior(ConfigCategory configCategory) {
+        configCategory.values.forEach((aClass, configBase) -> {
+            if(aClass == ConfigCategory.class) {
+                recursiveTriggerVanillaBehavior((ConfigCategory) configBase);
+            }
+            else {
+                ((ConfigEntry<?>) configBase).vanillaServerBehavior();
+            }
+        });
     }
 }

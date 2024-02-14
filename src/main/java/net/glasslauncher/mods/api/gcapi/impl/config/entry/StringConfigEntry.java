@@ -51,11 +51,11 @@ public class StringConfigEntry extends ConfigEntry<String> {
     }
 
     @Override
-    public void reset() throws IllegalAccessException {
+    public void reset(Object defaultValue) throws IllegalAccessException {
         if (!multiplayerLoaded) {
             parentField.set(parentObject, defaultValue);
-            value = defaultValue;
-            setDrawableValue(defaultValue);
+            value = (String) defaultValue;
+            setDrawableValue((String) defaultValue);
         }
     }
 }

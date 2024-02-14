@@ -7,6 +7,7 @@ import blue.endless.jankson.JsonElement;
 import blue.endless.jankson.JsonObject;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -52,6 +53,7 @@ public class GCCore implements PreLaunchEntrypoint {
 
     public static final HashMap<Identifier, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
+    public static boolean isMultiplayer = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
 
     private static final Supplier<MaxLength> MAX_LENGTH_SUPPLIER = () -> new MaxLength() {
@@ -163,8 +165,6 @@ public class GCCore implements PreLaunchEntrypoint {
     public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, Identifier configID, JsonObject jsonOverride) {
         AtomicInteger totalReadCategories = new AtomicInteger();
         AtomicInteger totalReadFields = new AtomicInteger();
-        boolean isMultiplayer = false;
-        boolean forceNotMultiplayer = false;
         try {
             configField.setAccessible(true);
             Object objField = configField.get(rootConfigObject);
@@ -180,9 +180,12 @@ public class GCCore implements PreLaunchEntrypoint {
             }
             else {
                 rootJsonObject = jsonOverride;
-                forceNotMultiplayer = rootJsonObject.getBoolean("forceNotMultiplayer", false);
-                if (!forceNotMultiplayer) {
-                    isMultiplayer = true;
+                isMultiplayer = rootJsonObject.getBoolean("multiplayer", false);
+                // Try to catch mods reloading configs while on a server.
+                if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && !isMultiplayer) {
+                    isMultiplayer = ((Minecraft) FabricLoader.getInstance()).world.isRemote;
+                }
+                if (isMultiplayer) {
                     log("Loading server config for " + modContainer.getMetadata().getId() + "!");
                 }
                 else {
@@ -198,7 +201,7 @@ public class GCCore implements PreLaunchEntrypoint {
                 defaultEntry = DEFAULT_MOD_CONFIGS.get(configID);
             }
             net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory configCategory = new net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory(modContainer.getMetadata().getId(), configField.getAnnotation(GConfig.class).visibleName(), null, configField, objField, configField.isAnnotationPresent(MultiplayerSynced.class), HashMultimap.create(), true);
-            readDeeper(rootConfigObject, configField, rootJsonObject, configCategory, totalReadFields, totalReadCategories, isMultiplayer, forceNotMultiplayer, defaultEntry);
+            readDeeper(rootConfigObject, configField, rootJsonObject, configCategory, totalReadFields, totalReadCategories, isMultiplayer, defaultEntry);
             if (!loaded) {
                 MOD_CONFIGS.put(configID, BiTuple.of(MOD_CONFIGS.remove(configID).one(), configCategory));
             } else {
@@ -211,7 +214,7 @@ public class GCCore implements PreLaunchEntrypoint {
         log("Successfully read \"" + modContainer.getMetadata().getId() + "\"'s mod configs, reading " + totalReadCategories.get() + " categories, and " + totalReadFields.get() + " values.");
     }
 
-    private static void readDeeper(Object rootConfigObject, Field configField, JsonObject rootJsonObject, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, AtomicInteger totalReadFields, AtomicInteger totalReadCategories, boolean isMultiplayer, boolean forceNotMultiplayer, HashMap<String, Object> defaultConfig) throws IllegalAccessException {
+    private static void readDeeper(Object rootConfigObject, Field configField, JsonObject rootJsonObject, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, AtomicInteger totalReadFields, AtomicInteger totalReadCategories, boolean isMultiplayer, HashMap<String, Object> defaultConfig) throws IllegalAccessException {
         totalReadCategories.getAndIncrement();
         configField.setAccessible(true);
         Object objField = configField.get(rootConfigObject);
@@ -235,7 +238,7 @@ public class GCCore implements PreLaunchEntrypoint {
                     //noinspection unchecked
                     childDefaultConfig = (HashMap<String, Object>) defaultConfig.get(childCategory.id);
                 }
-                readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories, isMultiplayer, forceNotMultiplayer, childDefaultConfig);
+                readDeeper(objField, field, jsonCategory, childCategory, totalReadFields, totalReadCategories, isMultiplayer, childDefaultConfig);
             }
             else {
                 if (!field.isAnnotationPresent(ConfigName.class)) {
@@ -250,7 +253,7 @@ public class GCCore implements PreLaunchEntrypoint {
                     defaultConfig.put(field.getName(), field.get(objField));
                 }
                 ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, defaultConfig.get(field.getName()), field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
-                configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced && !forceNotMultiplayer;
+                configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced;
                 category.values.put(field.getType(), configEntry);
                 field.set(objField, configEntry.value);
                 totalReadFields.getAndIncrement();
