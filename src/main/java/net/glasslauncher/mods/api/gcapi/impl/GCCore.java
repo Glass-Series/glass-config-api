@@ -49,7 +49,7 @@ public class GCCore implements PreLaunchEntrypoint {
     public static final ModContainer NAMESPACE = FabricLoader.getInstance().getModContainer("gcapi").orElseThrow(RuntimeException::new);
     public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> MOD_CONFIGS = new HashMap<>();
 
-    public static final HashMap<Identifier, BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory>> DEFAULT_MOD_CONFIGS = new HashMap<>();
+    public static final HashMap<Identifier, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI");
 
@@ -88,7 +88,7 @@ public class GCCore implements PreLaunchEntrypoint {
         });
         if (mod.get() != null) {
             BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory> category = MOD_CONFIGS.get(mod.get());
-            saveConfig(category.one(), category.two());
+            saveConfig(category.one(), category.two(), EventStorage.EventSource.SERVER_JOIN | EventStorage.EventSource.MODDED_SERVER_JOIN);
             try {
                 loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), Jankson.builder().build().load(string));
             } catch (Exception e) {
@@ -100,7 +100,7 @@ public class GCCore implements PreLaunchEntrypoint {
     public static void exportConfigsForServer(NbtCompound nbtCompound) {
         for (Identifier modContainer : MOD_CONFIGS.keySet()) {
             BiTuple<EntrypointContainer<Object>, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory> entry = MOD_CONFIGS.get(modContainer);
-            nbtCompound.putString(modContainer.toString(), saveConfig(entry.one(), entry.two()));
+            nbtCompound.putString(modContainer.toString(), saveConfig(entry.one(), entry.two(), EventStorage.EventSource.SERVER_EXPORT));
         }
     }
 
@@ -147,13 +147,13 @@ public class GCCore implements PreLaunchEntrypoint {
                     Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(GConfig.class).value());
                     MOD_CONFIGS.put(configID, BiTuple.of(entrypointContainer, null));
                     loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, configID, null);
-                    saveConfig(entrypointContainer, MOD_CONFIGS.get(configID).two());
+                    saveConfig(entrypointContainer, MOD_CONFIGS.get(configID).two(), EventStorage.EventSource.GAME_LOAD);
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             if (EventStorage.POST_LOAD_LISTENERS.containsKey(entrypointContainer.getProvider().getMetadata().getId())) {
-                EventStorage.POST_LOAD_LISTENERS.get(entrypointContainer.getProvider().getMetadata().getId()).getEntrypoint().PostConfigLoaded();
+                EventStorage.POST_LOAD_LISTENERS.get(entrypointContainer.getProvider().getMetadata().getId()).getEntrypoint().PostConfigLoaded(EventStorage.EventSource.GAME_LOAD);
             }
         }));
         loaded = true;
@@ -237,7 +237,7 @@ public class GCCore implements PreLaunchEntrypoint {
         }
     }
 
-    public static String saveConfig(EntrypointContainer<Object> container, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category) {
+    public static String saveConfig(EntrypointContainer<Object> container, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, int source) {
         try {
             AtomicInteger readValues = new AtomicInteger();
             AtomicInteger readCategories = new AtomicInteger();
@@ -251,34 +251,10 @@ public class GCCore implements PreLaunchEntrypoint {
             }
             JsonObject serverExported = new JsonObject();
 
-            for (ConfigBase entry : category.values.values()) {
-                if (entry instanceof net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) {
-                    BiTuple<JsonObject, JsonObject> values = saveDeeper((net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) entry, entry.parentField, readValues, readCategories);
-                    newValues.put(entry.id, values.one());
-                    serverExported.put(entry.id, values.two());
-                    readCategories.getAndIncrement();
-                } else if (entry instanceof ConfigEntry) {
-                    Function<Object, JsonElement> configFactory = ConfigFactories.saveFactories.get(((ConfigEntry<?>) entry).value.getClass());
-                    if (configFactory == null) {
-                        throw new RuntimeException("Config value \"" + entry.parentObject.getClass().getName() + ";" + entry.id + "\" has no config saver for it's type!");
-                    }
-                    JsonElement jsonElement = configFactory.apply(((ConfigEntry<?>) entry).value);
-                    if (!((ConfigEntry<?>) entry).multiplayerLoaded) {
-                        newValues.put(entry.id, jsonElement, entry.description);
-                    }
-                    if (entry.multiplayerSynced) {
-                        serverExported.put(entry.id, jsonElement, entry.description);
-                    }
-                    entry.parentField.setAccessible(true);
-                    ((ConfigEntry<?>) entry).saveToField();
-                    readValues.getAndIncrement();
-                } else {
-                    throw new RuntimeException("What?! Config contains a non-serializable entry!");
-                }
-            }
+            saveDeeper(category, category.parentField, readValues, readCategories);
 
             if (EventStorage.PRE_SAVE_LISTENERS.containsKey(container.getProvider().getMetadata().getId())) {
-                EventStorage.PRE_SAVE_LISTENERS.get(container.getProvider().getMetadata().getId()).getEntrypoint().onPreConfigSaved(configFile.exists() ? Jankson.builder().build().load(configFile) : new JsonObject(), newValues);
+                EventStorage.PRE_SAVE_LISTENERS.get(container.getProvider().getMetadata().getId()).getEntrypoint().onPreConfigSaved(source, configFile.exists() ? Jankson.builder().build().load(configFile) : new JsonObject(), newValues);
             }
 
             if (!configFile.exists()) {

@@ -1,6 +1,7 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
 import blue.endless.jankson.JsonObject;
+import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
 
 public interface PreConfigSavedListener {
 
@@ -11,6 +12,7 @@ public interface PreConfigSavedListener {
      * This entrypoint is called once for just your mod. Do not use to modify other mod's configs.
      * @param oldValues the values that were in the config file BEFORE the new values were applied. !!May be incomplete or empty!!
      * @param newValues the values that are about to be saved to the config file.
+     * @see net.glasslauncher.mods.api.gcapi.impl.EventStorage.EventSource
      */
-    void onPreConfigSaved(JsonObject oldValues, JsonObject newValues);
+    void onPreConfigSaved(int source, JsonObject oldValues, JsonObject newValues);
 }

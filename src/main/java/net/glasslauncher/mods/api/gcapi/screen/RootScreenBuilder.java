@@ -2,6 +2,7 @@ package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.minecraft.client.Minecraft;
@@ -52,7 +53,7 @@ public class RootScreenBuilder extends ScreenBuilder {
     protected void buttonClicked(ButtonWidget button) {
         if (button.id == backButtonID) {
             //noinspection deprecation Intentional use of GCCore internals.
-            GCCore.saveConfig(mod, baseCategory);
+            GCCore.saveConfig(mod, baseCategory, EventStorage.EventSource.USER_SAVE);
         }
         if (switchButtons.contains(button.id)) {
             int index = switchButtons.get(0) == button.id? -1 : 1;

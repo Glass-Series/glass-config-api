@@ -1,9 +1,12 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
+import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
+
 public interface PostConfigLoadedListener {
 
     /**
-     * Not sure why someone would need this, because of config factories existing, but this would be useful for config post-processing on edge cases.
+     * Mostly useful for config post-processing on edge cases.
+     * @see net.glasslauncher.mods.api.gcapi.impl.EventStorage.EventSource
      */
-    void PostConfigLoaded();
+    void PostConfigLoaded(int source);
 }

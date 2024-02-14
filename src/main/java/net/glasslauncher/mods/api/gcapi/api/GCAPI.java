@@ -4,6 +4,7 @@ import blue.endless.jankson.Jankson;
 import blue.endless.jankson.JsonObject;
 import blue.endless.jankson.api.SyntaxError;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory;
 import net.modificationstation.stationapi.api.util.Identifier;
@@ -23,7 +24,6 @@ public class GCAPI {
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
-    @SuppressWarnings("deprecation")
     public static void reloadConfig(Identifier configID, @Nullable String overrideConfigJson) throws SyntaxError {
         reloadConfig(configID, Jankson.builder().build().load(overrideConfigJson));
     }
@@ -44,7 +44,7 @@ public class GCAPI {
         if (mod.get() != null) {
             BiTuple<EntrypointContainer<Object>, ConfigCategory> category = GCCore.MOD_CONFIGS.get(mod.get());
             GCCore.loadModConfig(category.one().getEntrypoint(), category.one().getProvider(), category.two().parentField, mod.get(), overrideConfigJson);
-            GCCore.saveConfig(category.one(), category.two());
+            GCCore.saveConfig(category.one(), category.two(), EventStorage.EventSource.MOD_SAVE);
         }
     }
 
