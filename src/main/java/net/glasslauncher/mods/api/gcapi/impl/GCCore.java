@@ -251,7 +251,7 @@ public class GCCore implements PreLaunchEntrypoint {
             }
             JsonObject serverExported = new JsonObject();
 
-            saveDeeper(category, category.parentField, readValues, readCategories);
+            JsonObject exported = saveDeeper(newValues, category, category.parentField, readValues, readCategories);
 
             if (EventStorage.PRE_SAVE_LISTENERS.containsKey(container.getProvider().getMetadata().getId())) {
                 EventStorage.PRE_SAVE_LISTENERS.get(container.getProvider().getMetadata().getId()).getEntrypoint().onPreConfigSaved(source, configFile.exists() ? Jankson.builder().build().load(configFile) : new JsonObject(), newValues);
@@ -276,16 +276,16 @@ public class GCCore implements PreLaunchEntrypoint {
         }
     }
 
-    private static BiTuple<JsonObject, JsonObject> saveDeeper(net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, Field childField, AtomicInteger readValues, AtomicInteger readCategories) throws IllegalAccessException {
-        JsonObject newValues = new JsonObject();
+    private static JsonObject saveDeeper(JsonObject newValues, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, Field childField, AtomicInteger readValues, AtomicInteger readCategories) throws IllegalAccessException {
         JsonObject serverExported = new JsonObject();
 
         for (ConfigBase entry : category.values.values()) {
             childField.setAccessible(true);
             if (entry instanceof net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) {
-                BiTuple<JsonObject, JsonObject> values = saveDeeper((net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) entry, entry.parentField, readValues, readCategories);
-                newValues.put(entry.id, values.one());
-                serverExported.put(entry.id, values.two());
+                JsonObject childCategory = new JsonObject();
+                newValues.put(entry.id, childCategory);
+                JsonObject returnedServerExported = saveDeeper(childCategory, (net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory) entry, entry.parentField, readValues, readCategories);
+                serverExported.put(entry.id, returnedServerExported);
                 readCategories.getAndIncrement();
             }
             else if (entry instanceof ConfigEntry) {
@@ -307,6 +307,6 @@ public class GCCore implements PreLaunchEntrypoint {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
             }
         }
-        return BiTuple.of(newValues, serverExported);
+        return serverExported;
     }
 }
