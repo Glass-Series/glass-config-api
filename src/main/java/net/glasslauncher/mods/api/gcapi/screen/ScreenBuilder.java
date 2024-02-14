@@ -172,15 +172,14 @@ public class ScreenBuilder extends Screen {
         if (button.id == backButtonID) {
             minecraft.setScreen(parent);
         }
-        else if (mouseY < 32 || mouseY > height - 33) {
-            // Do nothing
-        }
-        else if (buttonToEntry.get(button.id) instanceof ConfigEntryWithButton) {
-            ((ConfigEntryWithButton) buttonToEntry.get(button.id)).onClick();
-        }
-        else if (buttonToEntry.get(button.id) instanceof ConfigCategory) {
-            //noinspection deprecation
-            ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(((ConfigCategory) buttonToEntry.get(button.id)).getConfigScreen(this, mod));
+        else if (mouseY >= 32 && mouseY <= height - 33) {
+            if (buttonToEntry.get(button.id) instanceof ConfigEntryWithButton) {
+                ((ConfigEntryWithButton) buttonToEntry.get(button.id)).onClick();
+            }
+            else if (buttonToEntry.get(button.id) instanceof ConfigCategory) {
+                //noinspection deprecation
+                ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(((ConfigCategory) buttonToEntry.get(button.id)).getConfigScreen(this, mod));
+            }
         }
     }
 
