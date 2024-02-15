@@ -16,5 +16,6 @@ public @interface ValueOnVanillaServer {
     String stringValue() default "";
     int integerValue() default 0;
     float floatValue() default 0;
-    boolean booleanValue() default false;
+    TriBoolean booleanValue() default TriBoolean.DEFAULT;
 }
+

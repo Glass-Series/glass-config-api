@@ -4,6 +4,7 @@ import blue.endless.jankson.Comment;
 import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
+import net.glasslauncher.mods.api.gcapi.api.TriBoolean;
 import net.glasslauncher.mods.api.gcapi.api.ValueOnVanillaServer;
 
 /**
@@ -27,7 +28,7 @@ public class ExampleConfigClass {
 
     @ConfigName("MP Synced Boolean")
     @MultiplayerSynced
-    @ValueOnVanillaServer(booleanValue = true)
+    @ValueOnVanillaServer(booleanValue = TriBoolean.TRUE)
     public Boolean mpBool = false;
 
     /**

@@ -78,8 +78,8 @@ public abstract class ConfigEntry<T> extends ConfigBase {
                 if (!valueOnVanillaServer.stringValue().equals("")) {
                     reset(valueOnVanillaServer.stringValue(), true);
                 }
-                else if (valueOnVanillaServer.booleanValue()) {
-                    reset(true, true);
+                else if (valueOnVanillaServer.booleanValue() != TriBoolean.DEFAULT) {
+                    reset(valueOnVanillaServer.booleanValue().value, true);
                 }
                 else if (valueOnVanillaServer.integerValue() != 0) {
                     reset(valueOnVanillaServer.integerValue(), true);
