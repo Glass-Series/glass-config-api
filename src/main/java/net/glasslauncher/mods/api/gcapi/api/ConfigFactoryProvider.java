@@ -4,7 +4,6 @@ import blue.endless.jankson.JsonElement;
 import com.google.common.collect.ImmutableMap;
 import net.glasslauncher.mods.api.gcapi.impl.NonFunction;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
-import uk.co.benjiweber.expressions.function.OctFunction;
 
 import java.lang.reflect.*;
 import java.util.function.*;
@@ -24,4 +23,13 @@ public interface ConfigFactoryProvider {
      *                         Should return a JsonElement containing the serialized value for your custom config type.
      */
     void provideSaveFactories(ImmutableMap.Builder<Type, Function<Object, JsonElement>> immutableBuilder);
+
+    /**
+     * Return custom factories for certain config class types.
+     * @param immutableBuilder Arguments for the Function are: value.
+     *                         Should return the class of the value used inside the ConfigEntry.
+     */
+    default void provideLoadTypeAdapterFactories(@SuppressWarnings("rawtypes") ImmutableMap.Builder<Type, Supplier<Class>> immutableBuilder) {
+
+    }
 }

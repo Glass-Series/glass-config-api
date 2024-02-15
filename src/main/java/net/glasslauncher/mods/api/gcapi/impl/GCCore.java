@@ -21,17 +21,13 @@ import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.DisconnectedScreen;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
-import org.jetbrains.annotations.NotNull;
-import uk.co.benjiweber.expressions.function.OctFunction;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.io.*;
@@ -139,6 +135,12 @@ public class GCCore implements PreLaunchEntrypoint {
         containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideSaveFactories(saveImmutableBuilder)));
         ConfigFactories.saveFactories = saveImmutableBuilder.build();
         log(ConfigFactories.saveFactories.size() + " config save factories loaded.");
+
+        //noinspection rawtypes
+        ImmutableMap.Builder<Type, Supplier<Class>> loadTypeAdapterImmutableBuilder = ImmutableMap.builder();
+        containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideLoadTypeAdapterFactories(loadTypeAdapterImmutableBuilder)));
+        ConfigFactories.loadTypeAdapterFactories = loadTypeAdapterImmutableBuilder.build();
+        log(ConfigFactories.loadTypeAdapterFactories.size() + " config load transformer factories loaded.");
 
         log("Loading config event listeners.");
         EventStorage.loadListeners();
@@ -252,10 +254,14 @@ public class GCCore implements PreLaunchEntrypoint {
                 if(!loaded) {
                     defaultConfig.put(field.getName(), field.get(objField));
                 }
-                ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(field.getType(), field.getName()) != null? rootJsonObject.get(field.getType(), field.getName()) : childObjField, defaultConfig.get(field.getName()), field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
+                //noinspection rawtypes
+                Supplier<Class> typeTransformer = ConfigFactories.loadTypeAdapterFactories.get(field.getType());
+                Class fieldType = typeTransformer != null ? typeTransformer.get() : field.getType();
+                //noinspection unchecked
+                ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(fieldType, field.getName()) != null? rootJsonObject.get(fieldType, field.getName()) : childObjField, defaultConfig.get(field.getName()), field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
                 configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced;
                 category.values.put(field.getType(), configEntry);
-                field.set(objField, configEntry.value);
+                configEntry.saveToField();
                 totalReadFields.getAndIncrement();
             }
         }

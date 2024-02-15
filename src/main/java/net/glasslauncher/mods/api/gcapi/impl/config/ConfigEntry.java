@@ -5,6 +5,7 @@ import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.DefaultOnVanillaServer;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
+import net.glasslauncher.mods.api.gcapi.api.TriBoolean;
 import net.glasslauncher.mods.api.gcapi.api.ValueOnVanillaServer;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
@@ -46,9 +47,7 @@ public abstract class ConfigEntry<T> extends ConfigBase {
     public abstract boolean isValueValid();
 
     public void saveToField() throws IllegalAccessException {
-        if (!multiplayerLoaded) {
-            parentField.set(parentObject, value);
-        }
+        parentField.set(parentObject, value);
     }
 
     public MaxLength getMaxLength() {

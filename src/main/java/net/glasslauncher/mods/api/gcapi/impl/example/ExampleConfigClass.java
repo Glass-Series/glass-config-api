@@ -31,6 +31,9 @@ public class ExampleConfigClass {
     @ValueOnVanillaServer(booleanValue = TriBoolean.TRUE)
     public Boolean mpBool = false;
 
+    @ConfigName("Test Enum")
+    public ExampleConfigEnum enumTest = ExampleConfigEnum.YAY;
+
     /**
      * A config category, you can put other categories inside a category too.
      * See the ExampleConfigCategory class for more details.

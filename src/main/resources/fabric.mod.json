@@ -26,7 +26,8 @@
       "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfig"
     ],
     "gcapi:factory_provider": [
-      "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider"
+      "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider",
+      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfigEnumFactories"
     ],
     "gcapi:postload": [
       "net.glasslauncher.mods.api.gcapi.impl.example.ExampleEntryPointListeners"
