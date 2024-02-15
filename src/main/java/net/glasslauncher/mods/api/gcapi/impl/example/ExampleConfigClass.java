@@ -4,6 +4,7 @@ import blue.endless.jankson.Comment;
 import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
+import net.glasslauncher.mods.api.gcapi.api.ValueOnVanillaServer;
 
 /**
  * An example config class, you can view this in-game inside modmenu's settings button for gcapi.
@@ -26,6 +27,7 @@ public class ExampleConfigClass {
 
     @ConfigName("MP Synced Boolean")
     @MultiplayerSynced
+    @ValueOnVanillaServer(booleanValue = true)
     public Boolean mpBool = false;
 
     /**

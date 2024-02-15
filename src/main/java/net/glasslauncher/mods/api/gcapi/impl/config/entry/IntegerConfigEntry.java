@@ -53,11 +53,11 @@ public class IntegerConfigEntry extends ConfigEntry<Integer> {
     }
 
     @Override
-    public void reset(Object defaultValue) throws IllegalAccessException {
-        if (!multiplayerLoaded) {
+    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
+        if (!dontSave) {
             parentField.set(parentObject, defaultValue);
-            value = (Integer) defaultValue;
-            setDrawableValue((Integer) defaultValue);
         }
+        value = (Integer) defaultValue;
+        setDrawableValue((Integer) defaultValue);
     }
 }

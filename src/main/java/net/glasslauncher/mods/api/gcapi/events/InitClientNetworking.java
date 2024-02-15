@@ -67,7 +67,7 @@ public class InitClientNetworking {
 
 
     @EventListener
-    private void onClientDisconnect(ServerLoginSuccessEvent event) {
+    private void onClientJoin(ServerLoginSuccessEvent event) {
         if(!((ModdedPacketHandler) event.clientNetworkHandler).isModded()) {
             GCCore.MOD_CONFIGS.forEach((identifier, entrypointContainerConfigCategoryBiTuple) -> recursiveTriggerVanillaBehavior(entrypointContainerConfigCategoryBiTuple.two()));
         }
@@ -75,7 +75,7 @@ public class InitClientNetworking {
 
     private void recursiveTriggerVanillaBehavior(ConfigCategory configCategory) {
         configCategory.values.forEach((aClass, configBase) -> {
-            if(aClass == ConfigCategory.class) {
+            if(configBase.getClass().isAssignableFrom(ConfigCategory.class)) {
                 recursiveTriggerVanillaBehavior((ConfigCategory) configBase);
             }
             else {

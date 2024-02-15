@@ -17,7 +17,9 @@ public class ResetConfigWidget extends IconWidget {
     public void mouseClicked(int mouseX, int mouseY, int button) {
         if (mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height) {
             try {
-                configEntry.reset(configEntry.defaultValue);
+                if(!configEntry.multiplayerLoaded) {
+                    configEntry.reset(configEntry.defaultValue, false);
+                }
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -32,7 +34,16 @@ public class ResetConfigWidget extends IconWidget {
 
     @Override
     public List<String> getTooltip() {
+        if(configEntry.multiplayerLoaded) {
+            return new ArrayList<>();
+        }
         return Collections.singletonList("Reset this config to default.");
     }
 
+    @Override
+    public void draw(int mouseX, int mouseY) {
+        if(!configEntry.multiplayerLoaded) {
+            super.draw(mouseX, mouseY);
+        }
+    }
 }

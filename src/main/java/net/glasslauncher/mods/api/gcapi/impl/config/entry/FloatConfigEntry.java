@@ -53,11 +53,11 @@ public class FloatConfigEntry extends ConfigEntry<Float> {
     }
 
     @Override
-    public void reset(Object defaultValue) throws IllegalAccessException {
-        if (!multiplayerLoaded) {
+    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
+        if (!dontSave) {
             parentField.set(parentObject, defaultValue);
-            value = (Float) defaultValue;
-            setDrawableValue((Float) defaultValue);
         }
+        value = (Float) defaultValue;
+        setDrawableValue((Float) defaultValue);
     }
 }

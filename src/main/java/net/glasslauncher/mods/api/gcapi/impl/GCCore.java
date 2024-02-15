@@ -183,7 +183,7 @@ public class GCCore implements PreLaunchEntrypoint {
                 isMultiplayer = rootJsonObject.getBoolean("multiplayer", false);
                 // Try to catch mods reloading configs while on a server.
                 if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && !isMultiplayer) {
-                    isMultiplayer = ((Minecraft) FabricLoader.getInstance()).world.isRemote;
+                    isMultiplayer = ((Minecraft) FabricLoader.getInstance().getGameInstance()).world.isRemote;
                 }
                 if (isMultiplayer) {
                     log("Loading server config for " + modContainer.getMetadata().getId() + "!");

@@ -63,11 +63,11 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     }
 
     @Override
-    public void reset(Object defaultValue) throws IllegalAccessException {
-        if (!multiplayerLoaded) {
+    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
+        if (!dontSave) {
             parentField.set(parentObject, defaultValue);
-            value = (Boolean) defaultValue;
-            setDrawableValue((Boolean) defaultValue);
         }
+        value = (Boolean) defaultValue;
+        setDrawableValue((Boolean) defaultValue);
     }
 }

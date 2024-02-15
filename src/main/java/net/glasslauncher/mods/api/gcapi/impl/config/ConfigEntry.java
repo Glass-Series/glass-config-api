@@ -60,28 +60,32 @@ public abstract class ConfigEntry<T> extends ConfigBase {
      * Yes, I'm making you write this part yourself, I don't know how your custom objects work and how to properly deep clone them.
      * @throws IllegalAccessException Reflection can be used inside here without try/catch.
      */
-    abstract public void reset(Object defaultValue) throws IllegalAccessException;
+    abstract public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException;
 
+    /**
+     * This is called on all ConfigEntry objects when joining a vanilla server.
+     * Things done in here probably shouldn't be saved, so make sure you set multiplayerLoaded to true if you do anything.
+     */
     public void vanillaServerBehavior() {
         try {
             if(parentField.getAnnotation(DefaultOnVanillaServer.class) != null) {
                 multiplayerLoaded = true;
-                    reset(defaultValue);
+                reset(defaultValue, true);
             }
             else if (parentField.getAnnotation(ValueOnVanillaServer.class) != null) {
                 ValueOnVanillaServer valueOnVanillaServer = parentField.getAnnotation(ValueOnVanillaServer.class);
                 multiplayerLoaded = true;
-                if (valueOnVanillaServer.stringValue() != null) {
-                    reset(valueOnVanillaServer.stringValue());
+                if (!valueOnVanillaServer.stringValue().equals("")) {
+                    reset(valueOnVanillaServer.stringValue(), true);
                 }
-                if (valueOnVanillaServer.booleanValue()) {
-                    reset(true);
+                else if (valueOnVanillaServer.booleanValue()) {
+                    reset(true, true);
                 }
-                if (valueOnVanillaServer.integerValue() != 0) {
-                    reset(valueOnVanillaServer.integerValue());
+                else if (valueOnVanillaServer.integerValue() != 0) {
+                    reset(valueOnVanillaServer.integerValue(), true);
                 }
-                if (valueOnVanillaServer.floatValue() != 0) {
-                    reset(valueOnVanillaServer.floatValue());
+                else if (valueOnVanillaServer.floatValue() != 0) {
+                    reset(valueOnVanillaServer.floatValue(), true);
                 }
             }
         } catch (IllegalAccessException e) {
