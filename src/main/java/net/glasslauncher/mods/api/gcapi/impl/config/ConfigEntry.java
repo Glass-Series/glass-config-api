@@ -58,7 +58,7 @@ public abstract class ConfigEntry<T> extends ConfigBase {
      * Yes, I'm making you write this part yourself, I don't know how your custom objects work and how to properly deep clone them.
      * @throws IllegalAccessException Reflection can be used inside here without try/catch.
      */
-    abstract public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException;
+    abstract public void reset(Object defaultValue) throws IllegalAccessException;
 
     /**
      * This is called on all ConfigEntry objects when joining a vanilla server.
@@ -68,22 +68,22 @@ public abstract class ConfigEntry<T> extends ConfigBase {
         try {
             if(parentField.getAnnotation(DefaultOnVanillaServer.class) != null) {
                 multiplayerLoaded = true;
-                reset(defaultValue, true);
+                reset(defaultValue);
             }
             else if (parentField.getAnnotation(ValueOnVanillaServer.class) != null) {
                 ValueOnVanillaServer valueOnVanillaServer = parentField.getAnnotation(ValueOnVanillaServer.class);
                 multiplayerLoaded = true;
                 if (!valueOnVanillaServer.stringValue().equals("")) {
-                    reset(valueOnVanillaServer.stringValue(), true);
+                    reset(valueOnVanillaServer.stringValue());
                 }
                 else if (valueOnVanillaServer.booleanValue() != TriBoolean.DEFAULT) {
-                    reset(valueOnVanillaServer.booleanValue().value, true);
+                    reset(valueOnVanillaServer.booleanValue().value);
                 }
                 else if (valueOnVanillaServer.integerValue() != 0) {
-                    reset(valueOnVanillaServer.integerValue(), true);
+                    reset(valueOnVanillaServer.integerValue());
                 }
                 else if (valueOnVanillaServer.floatValue() != 0) {
-                    reset(valueOnVanillaServer.floatValue(), true);
+                    reset(valueOnVanillaServer.floatValue());
                 }
             }
         } catch (IllegalAccessException e) {

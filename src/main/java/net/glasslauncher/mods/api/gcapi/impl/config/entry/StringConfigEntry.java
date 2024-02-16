@@ -50,11 +50,9 @@ public class StringConfigEntry extends ConfigEntry<String> {
     }
 
     @Override
-    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
-        if (!dontSave) {
-            parentField.set(parentObject, defaultValue);
-        }
+    public void reset(Object defaultValue) throws IllegalAccessException {
         value = (String) defaultValue;
         setDrawableValue((String) defaultValue);
+        saveToField();
     }
 }

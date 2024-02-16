@@ -72,12 +72,10 @@ public abstract class BaseListConfigEntry<T> extends ConfigEntry<T[]> implements
     }
 
     @Override
-    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException { // !!OVERRIDE THIS AND DO A DEEP CLONE IF YOU'RE USING SOMETHING THAT ISN'T A PRIMITIVE!!
-        if (!dontSave) {
-            parentField.set(parentObject, defaultValue);
-        }
+    public void reset(Object defaultValue) throws IllegalAccessException { // !!OVERRIDE THIS AND DO A DEEP CLONE IF YOU'RE USING SOMETHING THAT ISN'T A PRIMITIVE!!
         //noinspection unchecked
         value = ((T[]) defaultValue).clone();
+        saveToField();
     }
 }
 

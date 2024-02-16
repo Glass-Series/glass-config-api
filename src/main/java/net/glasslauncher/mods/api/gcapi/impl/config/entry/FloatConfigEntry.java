@@ -52,11 +52,9 @@ public class FloatConfigEntry extends ConfigEntry<Float> {
     }
 
     @Override
-    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
-        if (!dontSave) {
-            parentField.set(parentObject, defaultValue);
-        }
+    public void reset(Object defaultValue) throws IllegalAccessException {
         value = (Float) defaultValue;
         setDrawableValue((Float) defaultValue);
+        saveToField();
     }
 }

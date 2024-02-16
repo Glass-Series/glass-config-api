@@ -72,15 +72,13 @@ public class EnumConfigEntry<T extends Enum<?>> extends ConfigEntry<Integer> imp
     }
 
     @Override
-    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
+    public void reset(Object defaultValue) throws IllegalAccessException {
         if(defaultValue instanceof ExampleConfigEnum exampleConfigEnum) {
             defaultValue = exampleConfigEnum.ordinal();
         }
-        if (!dontSave) {
-            parentField.set(parentObject, defaultValue);
-        }
         value = (Integer) defaultValue;
         setDrawableValue((Integer) defaultValue);
+        saveToField();
     }
 
     @Override

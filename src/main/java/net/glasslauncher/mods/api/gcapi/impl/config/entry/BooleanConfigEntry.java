@@ -59,11 +59,9 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     }
 
     @Override
-    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
-        if (!dontSave) {
-            parentField.set(parentObject, defaultValue);
-        }
+    public void reset(Object defaultValue) throws IllegalAccessException {
         value = (Boolean) defaultValue;
         setDrawableValue((Boolean) defaultValue);
+        saveToField();
     }
 }

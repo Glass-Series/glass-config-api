@@ -52,11 +52,9 @@ public class IntegerConfigEntry extends ConfigEntry<Integer> {
     }
 
     @Override
-    public void reset(Object defaultValue, boolean dontSave) throws IllegalAccessException {
-        if (!dontSave) {
-            parentField.set(parentObject, defaultValue);
-        }
+    public void reset(Object defaultValue) throws IllegalAccessException {
         value = (Integer) defaultValue;
         setDrawableValue((Integer) defaultValue);
+        saveToField();
     }
 }
