@@ -29,7 +29,7 @@ public interface ConfigFactoryProvider {
      * @param immutableBuilder Arguments for the Function are: value.
      *                         Should return the class of the value used inside the ConfigEntry.
      */
-    default void provideLoadTypeAdapterFactories(@SuppressWarnings("rawtypes") ImmutableMap.Builder<Type, Supplier<Class>> immutableBuilder) {
+    default void provideLoadTypeAdapterFactories(@SuppressWarnings("rawtypes") ImmutableMap.Builder<Type, Class> immutableBuilder) {
 
     }
 }

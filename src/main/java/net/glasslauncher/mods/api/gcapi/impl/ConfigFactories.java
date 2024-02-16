@@ -14,5 +14,5 @@ public class ConfigFactories {
     public static ImmutableMap<Type, Function<Object, JsonElement>> saveFactories = null;
 
     @SuppressWarnings("rawtypes")
-    public static ImmutableMap<Type, Supplier<Class>> loadTypeAdapterFactories = null;
+    public static ImmutableMap<Type, Class> loadTypeAdapterFactories = null;
 }

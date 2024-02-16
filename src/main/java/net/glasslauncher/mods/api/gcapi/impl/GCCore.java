@@ -137,7 +137,7 @@ public class GCCore implements PreLaunchEntrypoint {
         log(ConfigFactories.saveFactories.size() + " config save factories loaded.");
 
         //noinspection rawtypes
-        ImmutableMap.Builder<Type, Supplier<Class>> loadTypeAdapterImmutableBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<Type, Class> loadTypeAdapterImmutableBuilder = ImmutableMap.builder();
         containers.forEach((customConfigFactoryProviderEntrypointContainer -> customConfigFactoryProviderEntrypointContainer.getEntrypoint().provideLoadTypeAdapterFactories(loadTypeAdapterImmutableBuilder)));
         ConfigFactories.loadTypeAdapterFactories = loadTypeAdapterImmutableBuilder.build();
         log(ConfigFactories.loadTypeAdapterFactories.size() + " config load transformer factories loaded.");
@@ -255,8 +255,8 @@ public class GCCore implements PreLaunchEntrypoint {
                     defaultConfig.put(field.getName(), field.get(objField));
                 }
                 //noinspection rawtypes
-                Supplier<Class> typeTransformer = ConfigFactories.loadTypeAdapterFactories.get(field.getType());
-                Class fieldType = typeTransformer != null ? typeTransformer.get() : field.getType();
+                Class fieldType = ConfigFactories.loadTypeAdapterFactories.get(field.getType());
+                fieldType = fieldType != null ? fieldType : field.getType();
                 //noinspection unchecked
                 ConfigEntry<?> configEntry = function.apply(field.getName(), field.getAnnotation(ConfigName.class).value(), field.isAnnotationPresent(Comment.class)? field.getAnnotation(Comment.class).value() : null, field, objField, category.multiplayerSynced || field.isAnnotationPresent(MultiplayerSynced.class), rootJsonObject.get(fieldType, field.getName()) != null? rootJsonObject.get(fieldType, field.getName()) : childObjField, defaultConfig.get(field.getName()), field.isAnnotationPresent(MaxLength.class)? field.getAnnotation(MaxLength.class) : MAX_LENGTH_SUPPLIER.get());
                 configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced;

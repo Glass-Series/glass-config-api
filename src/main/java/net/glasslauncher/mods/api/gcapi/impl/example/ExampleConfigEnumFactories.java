@@ -24,7 +24,7 @@ public class ExampleConfigEnumFactories implements ConfigFactoryProvider {
     }
 
     @Override
-    public void provideLoadTypeAdapterFactories(ImmutableMap.Builder<Type, Supplier<Class>> immutableBuilder) {
-        immutableBuilder.put(ExampleConfigEnum.class, () -> Integer.class);
+    public void provideLoadTypeAdapterFactories(@SuppressWarnings("rawtypes") ImmutableMap.Builder<Type, Class> immutableBuilder) {
+        immutableBuilder.put(ExampleConfigEnum.class, Integer.class);
     }
 }
