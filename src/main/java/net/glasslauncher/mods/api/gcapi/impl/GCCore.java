@@ -209,11 +209,11 @@ public class GCCore implements PreLaunchEntrypoint {
             } else {
                 MOD_CONFIGS.get(configID).two().values = configCategory.values;
             }
+            log("Successfully read \"" + configID + "\"'s mod configs, reading " + totalReadCategories.get() + " categories, and " + totalReadFields.get() + " values.");
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        log("Successfully read \"" + modContainer.getMetadata().getId() + "\"'s mod configs, reading " + totalReadCategories.get() + " categories, and " + totalReadFields.get() + " values.");
     }
 
     private static void readDeeper(Object rootConfigObject, Field configField, JsonObject rootJsonObject, net.glasslauncher.mods.api.gcapi.impl.config.ConfigCategory category, AtomicInteger totalReadFields, AtomicInteger totalReadCategories, boolean isMultiplayer, HashMap<String, Object> defaultConfig) throws IllegalAccessException {
