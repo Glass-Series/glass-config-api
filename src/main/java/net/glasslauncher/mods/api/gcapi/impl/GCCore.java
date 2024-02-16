@@ -16,6 +16,7 @@ import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.ConfigFactoryProvider;
 import net.glasslauncher.mods.api.gcapi.api.ConfigName;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
+import net.glasslauncher.mods.api.gcapi.api.GeneratedConfig;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.api.MultiplayerSynced;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigBase;
@@ -170,6 +171,11 @@ public class GCCore implements PreLaunchEntrypoint {
         try {
             configField.setAccessible(true);
             Object objField = configField.get(rootConfigObject);
+            if(objField instanceof GeneratedConfig generatedConfig) {
+                if(!generatedConfig.shouldLoad()) {
+                    return;
+                }
+            }
             File modConfigFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), modContainer.getMetadata().getId() + "/" + configField.getAnnotation(GConfig.class).value() + ".json");
             JsonObject rootJsonObject;
             if (jsonOverride == null) {
@@ -221,8 +227,21 @@ public class GCCore implements PreLaunchEntrypoint {
         configField.setAccessible(true);
         Object objField = configField.get(rootConfigObject);
 
-        for (Field field : objField.getClass().getDeclaredFields()) {
+        Field[] fields;
+        if(objField instanceof GeneratedConfig config) {
+            fields = config.getFields();
+        }
+        else {
+            fields = objField.getClass().getDeclaredFields();
+        }
+
+        for (Field field : fields) {
             Object childObjField = field.get(objField);
+            if(objField instanceof GeneratedConfig generatedConfig) {
+                if(!generatedConfig.shouldLoad()) {
+                    continue;
+                }
+            }
             if (field.isAnnotationPresent(ConfigCategory.class)) {
                 JsonObject jsonCategory = rootJsonObject.getObject(field.getName());
                 if (jsonCategory == null) {
