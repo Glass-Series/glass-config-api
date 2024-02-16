@@ -15,7 +15,6 @@ import net.glasslauncher.mods.api.gcapi.impl.config.entry.IntegerConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.IntegerListConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringListConfigEntry;
-import uk.co.benjiweber.expressions.function.OctFunction;
 
 import java.lang.reflect.*;
 import java.util.function.*;

@@ -11,7 +11,6 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import uk.co.benjiweber.expressions.tuple.BiTuple;
 
 import java.util.*;
-import java.util.function.*;
 
 public class RootScreenBuilder extends ScreenBuilder {
 

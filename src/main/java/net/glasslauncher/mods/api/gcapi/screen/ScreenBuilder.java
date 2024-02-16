@@ -17,9 +17,7 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
-import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class ScreenBuilder extends Screen {
 

@@ -1,6 +1,5 @@
 package net.glasslauncher.mods.api.gcapi.events;
 
-import blue.endless.jankson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
 import net.glasslauncher.mods.api.gcapi.api.GConfig;
 import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
@@ -17,9 +16,8 @@ import net.modificationstation.stationapi.api.mod.entrypoint.Entrypoint;
 import net.modificationstation.stationapi.api.network.ModdedPacketHandler;
 import net.modificationstation.stationapi.api.network.packet.MessagePacket;
 import net.modificationstation.stationapi.api.network.packet.PacketHelper;
-import net.modificationstation.stationapi.api.server.event.network.PlayerLoginEvent;
-import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.registry.Registry;
+import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.Namespace;
 import net.modificationstation.stationapi.api.util.Null;
 import net.modificationstation.stationapi.api.util.ReflectionHelper;

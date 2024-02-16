@@ -1,7 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
 import blue.endless.jankson.JsonObject;
-import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
 
 public interface PreConfigSavedListener {
 

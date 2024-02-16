@@ -5,19 +5,15 @@ import net.fabricmc.api.Environment;
 import net.glasslauncher.mods.api.gcapi.api.CharacterUtils;
 import net.glasslauncher.mods.api.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
-import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
-import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.*;
 import java.util.List;
-import java.util.*;
 
 public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEntryWithButton {
     private FancyButtonWidget button;

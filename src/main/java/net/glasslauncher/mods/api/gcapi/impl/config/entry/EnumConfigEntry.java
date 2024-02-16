@@ -15,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * This class is a bit of a crapshoot cause java's generic type handling is pitifully bad.

@@ -4,7 +4,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.glasslauncher.mods.api.gcapi.api.PostConfigLoadedListener;
 import net.glasslauncher.mods.api.gcapi.api.PreConfigSavedListener;
-import org.jetbrains.annotations.PropertyKey;
 
 import java.util.*;
 

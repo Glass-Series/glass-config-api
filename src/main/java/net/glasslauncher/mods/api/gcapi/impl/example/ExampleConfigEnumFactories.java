@@ -8,7 +8,6 @@ import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.NonFunction;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.impl.config.entry.EnumConfigEntry;
-import net.glasslauncher.mods.api.gcapi.impl.config.entry.StringConfigEntry;
 
 import java.lang.reflect.*;
 import java.util.function.*;

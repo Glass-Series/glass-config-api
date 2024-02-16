@@ -1,7 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.screen;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.*;
 

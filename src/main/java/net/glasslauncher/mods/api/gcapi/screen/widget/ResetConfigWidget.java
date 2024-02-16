@@ -1,6 +1,5 @@
 package net.glasslauncher.mods.api.gcapi.screen.widget;
 
-import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 
 import java.util.*;

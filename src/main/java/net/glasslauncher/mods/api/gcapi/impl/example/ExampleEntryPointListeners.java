@@ -1,7 +1,6 @@
 package net.glasslauncher.mods.api.gcapi.impl.example;
 
 import blue.endless.jankson.JsonObject;
-import net.glasslauncher.mods.api.gcapi.api.ConfigCategory;
 import net.glasslauncher.mods.api.gcapi.api.PostConfigLoadedListener;
 import net.glasslauncher.mods.api.gcapi.api.PreConfigSavedListener;
 import net.glasslauncher.mods.api.gcapi.impl.GCCore;

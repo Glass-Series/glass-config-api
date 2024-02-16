@@ -1,7 +1,5 @@
 package net.glasslauncher.mods.api.gcapi.api;
 
-import net.glasslauncher.mods.api.gcapi.impl.EventStorage;
-
 public interface PostConfigLoadedListener {
 
     /**

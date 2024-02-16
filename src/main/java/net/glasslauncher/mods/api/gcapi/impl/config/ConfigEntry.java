@@ -7,7 +7,6 @@ import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.api.TriBoolean;
 import net.glasslauncher.mods.api.gcapi.api.ValueOnVanillaServer;
-import net.glasslauncher.mods.api.gcapi.impl.GCCore;
 import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
 import net.glasslauncher.mods.api.gcapi.screen.widget.ResetConfigWidget;
 import net.minecraft.client.font.TextRenderer;

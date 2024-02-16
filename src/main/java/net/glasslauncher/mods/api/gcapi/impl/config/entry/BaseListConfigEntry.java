@@ -8,8 +8,6 @@ import net.glasslauncher.mods.api.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.api.gcapi.api.MaxLength;
 import net.glasslauncher.mods.api.gcapi.impl.config.ConfigEntry;
 import net.glasslauncher.mods.api.gcapi.screen.widget.FancyButtonWidget;
-import net.glasslauncher.mods.api.gcapi.screen.widget.IconWidget;
-import net.glasslauncher.mods.api.gcapi.screen.widget.ResetConfigWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
