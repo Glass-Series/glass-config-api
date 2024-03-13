@@ -38,7 +38,9 @@ public class BooleanConfigEntry extends ConfigEntry<Boolean> implements ConfigEn
     @Override
     public void setDrawableValue(Boolean value) {
         this.value = value;
-        button.text = value.toString();
+        if(button != null) {
+            button.text = value.toString();
+        }
     }
 
     @Override

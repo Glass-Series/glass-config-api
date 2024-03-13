@@ -48,7 +48,9 @@ public class EnumConfigEntry<T extends Enum<?>> extends ConfigEntry<Integer> imp
     @Override
     public void setDrawableValue(Integer value) {
         this.value = value;
-        button.text = getButtonText();
+        if(button != null) {
+            button.text = getButtonText();
+        }
     }
 
     @Override
