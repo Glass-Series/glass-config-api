@@ -91,6 +91,7 @@ dependencies {
 	}
 
 	implementation(include("blue.endless:jankson:1.2.1"))
+	include("com.google.guava:guava:31.1-jre")
 }
 
 processResources {
