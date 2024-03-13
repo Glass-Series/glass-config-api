@@ -14,7 +14,7 @@ import java.util.*;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
-    private final ArrayList<BiTuple<EntrypointContainer<Object>, ConfigCategory>> otherRoots = new ArrayList<>();
+    private final ArrayList<BiTuple<EntrypointContainer<Object>, ConfigCategory>> allRoots = new ArrayList<>();
     private final List<Integer> switchButtons = new ArrayList<>();
     public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
 
@@ -23,7 +23,7 @@ public class RootScreenBuilder extends ScreenBuilder {
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
             if (key.namespace.toString().equals(mod.getProvider().getMetadata().getId())) {
-                otherRoots.add(value);
+                allRoots.add(value);
             }
         });
     }
@@ -32,22 +32,22 @@ public class RootScreenBuilder extends ScreenBuilder {
     public void init() {
         super.init();
         switchButtons.clear();
-        if(otherRoots.size() > 0) {
+        if(allRoots.size() > 1) {
             int prevRoot = currentIndex - 1;
             if (prevRoot < 0) {
-                prevRoot = otherRoots.size()-1;
+                prevRoot = allRoots.size()-1;
             }
-            ButtonWidget button = new ButtonWidget(buttons.size(), 2, 0, 160, 20, "< " + otherRoots.get(prevRoot).two().name);
+            ButtonWidget button = new ButtonWidget(buttons.size(), 2, 0, 160, 20, "< " + allRoots.get(prevRoot).two().name);
             //noinspection unchecked
             buttons.add(button);
             screenButtons.add(button);
             switchButtons.add(button.id);
 
             int nextRoot = currentIndex + 1;
-            if (nextRoot > otherRoots.size()-1) {
+            if (nextRoot > allRoots.size()-1) {
                 nextRoot = 0;
             }
-            button = new ButtonWidget(buttons.size(), width - 162, 0, 160, 20,  otherRoots.get(nextRoot).two().name + " >");
+            button = new ButtonWidget(buttons.size(), width - 162, 0, 160, 20,  allRoots.get(nextRoot).two().name + " >");
             //noinspection unchecked
             buttons.add(button);
             screenButtons.add(button);
@@ -65,13 +65,13 @@ public class RootScreenBuilder extends ScreenBuilder {
         if (switchButtons.contains(button.id)) {
             int index = switchButtons.get(0) == button.id? -1 : 1;
             index += currentIndex;
-            if (index > otherRoots.size()-1) {
+            if (index > allRoots.size()-1) {
                 index = 0;
             }
             else if (index < 0) {
-                index = otherRoots.size()-1;
+                index = allRoots.size()-1;
             }
-            RootScreenBuilder builder = (RootScreenBuilder) otherRoots.get(index).two().getConfigScreen(parent, mod);
+            RootScreenBuilder builder = (RootScreenBuilder) allRoots.get(index).two().getConfigScreen(parent, mod);
             builder.currentIndex = index;
             //noinspection deprecation
             ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(builder);
