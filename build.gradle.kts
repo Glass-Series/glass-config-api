@@ -10,7 +10,7 @@ plugins {
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
 
-//archivesBaseName = project.properties["archives_base_name"]
+base.archivesName = project.properties["archives_base_name"] as String
 version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
 
@@ -115,6 +115,7 @@ publishing {
 
 	publications {
 		register("mavenJava", MavenPublication::class) {
+			artifactId = project.properties["archives_base_name"] as String
 			from(components["java"])
 		}
 	}
