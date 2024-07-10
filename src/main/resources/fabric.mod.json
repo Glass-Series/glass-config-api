@@ -20,26 +20,16 @@
   "environment": "*",
   "entrypoints": {
     "preLaunch": [
-      "net.glasslauncher.mods.api.gcapi.impl.GCCore"
-    ],
-    "gcapi": [
-      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfig"
+      "net.glasslauncher.mods.gcapi.impl.GCCore"
     ],
     "gcapi:factory_provider": [
-      "net.glasslauncher.mods.api.gcapi.impl.config.factory.DefaultFactoryProvider",
-      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleConfigEnumFactories"
-    ],
-    "gcapi:postload": [
-      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleEntryPointListeners"
-    ],
-    "gcapi:presave": [
-      "net.glasslauncher.mods.api.gcapi.impl.example.ExampleEntryPointListeners"
+      "net.glasslauncher.mods.gcapi.impl.factory.DefaultFactoryProvider"
     ],
     "stationapi:event_bus_server": [
-      "net.glasslauncher.mods.api.gcapi.events.InitServerNetworking"
+      "net.glasslauncher.mods.gcapi.impl.event.InitServerNetworking"
     ],
     "stationapi:event_bus_client": [
-      "net.glasslauncher.mods.api.gcapi.events.InitClientNetworking"
+      "net.glasslauncher.mods.gcapi.impl.event.InitClientNetworking"
     ]
   },
   "custom": {

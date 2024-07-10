@@ -15,6 +15,10 @@ version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
 
 loom {
+	@Suppress("UnstableApiUsage")
+	mixin {
+		useLegacyMixinAp = true
+	}
 	customMinecraftManifest.set("https://babric.github.io/manifest-polyfill/${project.properties["minecraft_version"]}.json")
 	intermediaryUrl.set("https://maven.glass-launcher.net/babric/babric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
 }
@@ -59,8 +63,12 @@ dependencies {
 	modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
 	}
 
-	implementation(include("blue.endless:jankson:1.2.1") as Dependency)
+	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
 	include("com.google.guava:guava:31.1-jre")
+}
+configurations.all {
+	exclude(group = "org.ow2.asm", module = "asm-debug-all")
+	exclude(group = "org.ow2.asm", module = "asm-all")
 }
 
 tasks.withType<ProcessResources> {
