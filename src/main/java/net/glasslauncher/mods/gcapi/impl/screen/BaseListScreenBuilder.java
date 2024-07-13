@@ -225,7 +225,7 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
             BaseListScreenBuilder.this.drawTextWithShadow(textRenderer, String.valueOf(itemId), x - 2 - textRenderer.getWidth(String.valueOf(itemId)), y + 1, 16777215);
             ((TexturedButtonWidget) buttons.get(itemId+2)).setPos(x + 214 + 34, y+2);
             ((TexturedButtonWidget) buttons.get(itemId+2)).render(minecraft, mouseX, mouseY);
-            configBase.glass_config_api$setXYWH(x + 2, y + 1, 212, 20);
+            configBase.setXYWH(x + 2, y + 1, 212, 20);
             configBase.draw(mouseX, mouseY);
         }
     }

@@ -24,10 +24,10 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
     private static final int serverSyncedBorder = CharacterUtils.getIntFromColour(new Color(255, 202, 0, 255));
     private static final int serverSyncedText = CharacterUtils.getIntFromColour(new Color(170, 139, 21, 255));
     private final TextRenderer textRenderer;
-    private int x;
-    private int y;
-    private int width;
-    private int height;
+    public int x;
+    public int y;
+    public int width;
+    public int height;
     @Getter private String text = "";
     @Getter private int maxLength = 32;
     private int focusedTicks;
@@ -319,7 +319,7 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
     }
 
     @Override
-    public void glass_config_api$setXYWH(int x, int y, int width, int height) {
+    public void setXYWH(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;

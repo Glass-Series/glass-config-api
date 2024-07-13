@@ -15,7 +15,7 @@ public interface HasDrawable {
     /**
      * Called when setting the drawable position. X and Y is the top left corner.
      */
-    void glass_config_api$setXYWH(int x, int y, int width, int height);
+    void setXYWH(int x, int y, int width, int height);
 
     /**
      * Called every frame.

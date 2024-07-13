@@ -23,7 +23,7 @@ public abstract class TextFieldWidgetMixin extends DrawContext implements HasDra
     @Shadow @Final private int height;
 
     @Override
-    public void glass_config_api$setXYWH(int x, int y, int width, int height) {
+    public void setXYWH(int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;

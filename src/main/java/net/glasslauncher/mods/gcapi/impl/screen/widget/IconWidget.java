@@ -49,7 +49,7 @@ public class IconWidget implements HasDrawable, HasToolTip {
     }
 
     @Override
-    public void glass_config_api$setXYWH(int x, int y, int width, int height) {
+    public void setXYWH(int x, int y, int width, int height) {
         this.x = x + width + 2;
         this.y = y + height/2+1;
         this.width = 8;

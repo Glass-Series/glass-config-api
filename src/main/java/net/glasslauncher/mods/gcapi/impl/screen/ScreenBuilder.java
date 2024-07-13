@@ -233,7 +233,7 @@ public class ScreenBuilder extends Screen {
         protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
             ConfigHandlerBase configHandlerBase = configHandlerBases.get(itemId);
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.name, x + 2, y + 1, 16777215);
-            configHandlerBase.getDrawables().forEach(val -> val.glass_config_api$setXYWH(x + 2, y + 12, 212, 20));
+            configHandlerBase.getDrawables().forEach(val -> val.setXYWH(x + 2, y + 12, 212, 20));
             configHandlerBase.getDrawables().forEach(val -> val.draw(mouseX, mouseY));
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.description, x + 2, y + 34, 8421504);
         }

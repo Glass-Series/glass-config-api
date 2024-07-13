@@ -26,8 +26,8 @@ public class ResetConfigWidget extends IconWidget {
     }
 
     @Override
-    public void glass_config_api$setXYWH(int x, int y, int width, int height) {
-        super.glass_config_api$setXYWH(x, y, width, height);
+    public void setXYWH(int x, int y, int width, int height) {
+        super.setXYWH(x, y, width, height);
         this.y -= 10;
     }
 
