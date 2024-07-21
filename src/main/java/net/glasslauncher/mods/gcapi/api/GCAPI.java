@@ -1,18 +1,24 @@
 package net.glasslauncher.mods.gcapi.api;
 
+import net.fabricmc.loader.api.ModContainer;
 import net.glasslauncher.mods.gcapi.impl.ConfigRootEntry;
 import net.glasslauncher.mods.gcapi.impl.EventStorage;
 import net.glasslauncher.mods.gcapi.impl.GCCore;
 import net.glasslauncher.mods.gcapi.impl.GlassYamlFile;
+import net.glasslauncher.mods.gcapi.impl.screen.RootScreenBuilder;
+import net.minecraft.client.gui.screen.Screen;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.management.*;
 import java.io.*;
 import java.util.concurrent.atomic.*;
 
 /**
  * Use this instead of GCCore!
  */
+@SuppressWarnings("deprecation")
 public class GCAPI {
 
     /**
@@ -29,16 +35,10 @@ public class GCAPI {
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
-    @SuppressWarnings("deprecation")
     public static void reloadConfig(Identifier configID, @Nullable GlassYamlFile overrideConfigJson) {
-        AtomicReference<Identifier> mod = new AtomicReference<>();
-        GCCore.MOD_CONFIGS.keySet().forEach(modContainer -> {
-            if (modContainer.equals(configID)) {
-                ConfigRootEntry category = GCCore.MOD_CONFIGS.get(mod.get());
-                GCCore.loadModConfig(category.configRoot(), category.modContainer(), category.configCategoryHandler().parentField, mod.get(), overrideConfigJson);
-                GCCore.saveConfig(category.modContainer(), category.configCategoryHandler(), EventStorage.EventSource.MOD_SAVE);
-            }
-        });
+        ConfigRootEntry category = GCCore.MOD_CONFIGS.get(configID);
+        GCCore.loadModConfig(category.configRoot(), category.modContainer(), category.configCategoryHandler().parentField, configID, overrideConfigJson);
+        GCCore.saveConfig(category.modContainer(), category.configCategoryHandler(), EventStorage.EventSource.MOD_SAVE);
     }
 
     /**
@@ -47,6 +47,16 @@ public class GCAPI {
      */
     public static void reloadConfig(Identifier configID) {
         reloadConfig(configID, (GlassYamlFile) null);
+    }
+
+    public static RootScreenBuilder getRootConfigScreen(@NotNull Identifier identifier, Screen parent) throws AttributeNotFoundException {
+        ConfigRootEntry configRootEntry = GCCore.MOD_CONFIGS.get(identifier);
+        if (configRootEntry != null) {
+            return new RootScreenBuilder(parent, configRootEntry.modContainer(), configRootEntry.configCategoryHandler());
+        }
+        else {
+            throw new AttributeNotFoundException(); // Probably the wrong error. Whatever.
+        }
     }
 
 }

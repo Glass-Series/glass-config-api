@@ -29,7 +29,8 @@
       "net.glasslauncher.mods.gcapi.impl.event.InitServerNetworking"
     ],
     "stationapi:event_bus_client": [
-      "net.glasslauncher.mods.gcapi.impl.event.InitClientNetworking"
+      "net.glasslauncher.mods.gcapi.impl.event.InitClientNetworking",
+      "net.glasslauncher.mods.gcapi.impl.event.TranslationHandler"
     ]
   },
   "custom": {
