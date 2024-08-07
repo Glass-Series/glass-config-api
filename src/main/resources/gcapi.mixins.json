@@ -9,10 +9,10 @@
   ],
   "client": [
     "client.DrawContextMixin",
+    "client.EntryListWidgetAccessor",
     "client.ModMenuMixin",
     "client.ScreenMixin",
-    "client.TextFieldWidgetMixin",
-    "client.EntryListWidgetAccessor"
+    "client.TextFieldWidgetMixin"
   ],
   "injectors": {
     "defaultRequire": 1

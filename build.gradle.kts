@@ -2,8 +2,8 @@ import java.net.URI
 
 plugins {
 	id("maven-publish")
-	id("fabric-loom") version "1.6.8"
-	id("babric-loom-extension") version "1.6.8"
+	id("fabric-loom") version "1.7.2"
+	id("babric-loom-extension") version "1.7.3"
 }
 
 //noinspection GroovyUnusedAssignment
@@ -15,12 +15,18 @@ version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
 
 loom {
-	@Suppress("UnstableApiUsage")
-	mixin {
-		useLegacyMixinAp = true
+//	accessWidenerPath = file("src/main/resources/gcapi.accesswidener")
+
+	runs {
+		register("testClient") {
+			source("test")
+			client()
+		}
+		register("testServer") {
+			source("test")
+			server()
+		}
 	}
-	customMinecraftManifest.set("https://babric.github.io/manifest-polyfill/${project.properties["minecraft_version"]}.json")
-	intermediaryUrl.set("https://maven.glass-launcher.net/babric/babric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
 }
 
 repositories {
@@ -64,7 +70,7 @@ dependencies {
 	}
 
 	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
-	include("com.google.guava:guava:31.1-jre")
+	include("com.google.guava:guava:33.2.1-jre")
 }
 configurations.all {
 	exclude(group = "org.ow2.asm", module = "asm-debug-all")
