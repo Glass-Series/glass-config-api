@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "gcapi3",
+  "id": "gcapi3test",
   "version": "${version}",
 
-  "name": "Glass Config API 3",
+  "name": "Glass Config API 3 Test",
   "description": "An actually pretty good config GUI with an API to match. Heavily hackable and extendable.",
   "authors": [
     "calmilamsy"
@@ -15,30 +15,23 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/gcapi3/icon.png",
+  "icon": "assets/gcapi3test/icon.png",
 
   "environment": "*",
   "entrypoints": {
-    "preLaunch": [
-      "net.glasslauncher.mods.gcapi3.impl.GCCore"
+    "gcapi3": [
+      "net.glasslauncher.mods.gcapi3test.impl.example.ExampleConfig"
     ],
     "gcapi3:factory_provider": [
-      "net.glasslauncher.mods.gcapi3.impl.factory.DefaultFactoryProvider"
+      "net.glasslauncher.mods.gcapi3test.impl.example.ExampleConfigEnumFactories"
     ],
-    "stationapi:event_bus_server": [
-      "net.glasslauncher.mods.gcapi3.impl.event.InitServerNetworking"
+    "gcapi3:presave": [
+      "net.glasslauncher.mods.gcapi3test.impl.example.ExampleEntryPointListeners"
     ],
-    "stationapi:event_bus_client": [
-      "net.glasslauncher.mods.gcapi3.impl.event.InitClientNetworking",
-      "net.glasslauncher.mods.gcapi3.impl.event.TranslationHandler"
+    "gcapi3:postload": [
+      "net.glasslauncher.mods.gcapi3test.impl.example.ExampleEntryPointListeners"
     ]
   },
-  "custom": {
-    "modmenu:api": true
-  },
-  "mixins": [
-    "gcapi3.mixins.json"
-  ],
 
   "depends": {
     "minecraft": "1.0.0-beta.7.3"

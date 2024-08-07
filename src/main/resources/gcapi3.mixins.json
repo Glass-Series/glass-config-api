@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.glasslauncher.mods.gcapi3.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "server": [
+  ],
+  "client": [
+    "client.DrawContextMixin",
+    "client.EntryListWidgetAccessor",
+    "client.ModMenuMixin",
+    "client.ScreenMixin",
+    "client.TextFieldWidgetMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "plugin": "net.glasslauncher.mods.gcapi3.impl.MixinConfig"
+}

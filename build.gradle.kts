@@ -67,6 +67,7 @@ dependencies {
 	modImplementation("net.modificationstation:StationAPI:${project.properties["stapi_version"]}")
 
 	modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
+		isTransitive = false
 	}
 
 	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
