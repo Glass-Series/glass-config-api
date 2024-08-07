@@ -20,6 +20,7 @@ import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
 import java.util.*;
+import java.util.stream.*;
 
 public class ScreenBuilder extends Screen {
 
@@ -40,6 +41,15 @@ public class ScreenBuilder extends Screen {
         this.mod = mod;
         this.baseCategory = baseCategory;
         configHandlerBases.addAll(baseCategory.values.values());
+        configHandlerBases = configHandlerBases.stream().filter(value -> {
+            if (value instanceof ConfigCategoryHandler) {
+                return !value.parentField.getAnnotation(ConfigCategory.class).hidden();
+            }
+            if (value instanceof ConfigEntryHandler) {
+                return !value.parentField.getAnnotation(ConfigEntry.class).hidden();
+            }
+            return false;
+        }).collect(Collectors.toCollection(ArrayList::new));
         configHandlerBases.sort((self, other) -> {
             if (other instanceof ConfigCategoryHandler) {
                 return 1;
@@ -50,23 +60,10 @@ public class ScreenBuilder extends Screen {
 
     @Override
     public void init() {
-        baseCategory.values.values().forEach((value) -> {
-            if (value instanceof ConfigCategoryHandler) {
-                if (value.parentField.getAnnotation(ConfigCategory.class).hidden()) {
-                    return;
-                }
-            }
+        configHandlerBases.forEach((value) -> {
             //noinspection rawtypes
-            if (value instanceof ConfigEntryHandler configEntry) {
-                if (configEntry.parentField.getAnnotation(ConfigEntry.class).hidden()) {
-                    return;
-                }
-                if (configEntry.parentField.getAnnotation(ConfigEntry.class).hidden()) {
-                    return;
-                }
-                if (configEntry.getDrawableValue() != null) {
-                    configEntry.value = configEntry.getDrawableValue();
-                }
+            if (value instanceof ConfigEntryHandler configEntry && configEntry.getDrawableValue() != null) {
+                configEntry.value = configEntry.getDrawableValue();
             }
         });
         buttons.clear();
@@ -77,17 +74,10 @@ public class ScreenBuilder extends Screen {
         //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
-        baseCategory.values.values().forEach((value) -> {
-            if (value instanceof ConfigCategoryHandler) {
-                if (value.parentField.getAnnotation(ConfigCategory.class).hidden()) {
-                    return;
-                }
-            }
-            if (value instanceof ConfigEntryHandler) {
-                if (value.parentField.getAnnotation(ConfigEntry.class).hidden()) {
-                    return;
-                }
-                ((ConfigEntryHandler<?>) value).init(this, textRenderer);
+
+        configHandlerBases.forEach((value) -> {
+            if (value instanceof ConfigEntryHandler<?> entryHandler) {
+                entryHandler.init(this, textRenderer);
             }
             value.getDrawables().forEach(val -> {
                 if (val instanceof ButtonWidget) {
@@ -103,37 +93,16 @@ public class ScreenBuilder extends Screen {
     @Override
     public void tick() {
         super.tick();
-        for (ConfigHandlerBase value : baseCategory.values.values()) {
-            if (value instanceof ConfigCategoryHandler) {
-                if (value.parentField.getAnnotation(ConfigCategory.class).hidden()) {
-                    return;
-                }
-            }
-            if (value instanceof ConfigEntryHandler) {
-                if (value.parentField.getAnnotation(ConfigEntry.class).hidden()) {
-                    return;
-                }
-                value.getDrawables().forEach(HasDrawable::tick);
-            }
-        }
+
+        configHandlerBases.forEach((value) -> value.getDrawables().forEach(HasDrawable::tick));
     }
 
     @Override
     protected void keyPressed(char character, int key) {
         super.keyPressed(character, key);
-        for (ConfigHandlerBase value : baseCategory.values.values()) {
-            if (value instanceof ConfigCategoryHandler) {
-                if (value.parentField.getAnnotation(ConfigCategory.class).hidden()) {
-                    return;
-                }
-            }
-            if (value instanceof ConfigEntryHandler) {
-                if (value.parentField.getAnnotation(ConfigEntry.class).hidden()) {
-                    return;
-                }
-                value.getDrawables().forEach(val -> val.keyPressed(character, key));
-            }
-        }
+        configHandlerBases.forEach((value) -> {
+            value.getDrawables().forEach(hasDrawable -> hasDrawable.keyPressed(character, key));
+        });
     }
 
     @SuppressWarnings("CommentedOutCode") // I want to show code differences.
@@ -190,10 +159,8 @@ public class ScreenBuilder extends Screen {
         super.onMouseEvent();
         float dWheel = Mouse.getDWheel();
         if (Mouse.isButtonDown(0) && mouseY > 32 && mouseY < height - 33) {
-            for (ConfigHandlerBase configHandlerBase : baseCategory.values.values()) {
-                if (configHandlerBase instanceof ConfigEntryHandler) {
-                    configHandlerBase.getDrawables().forEach(val -> val.mouseClicked(mouseX, mouseY, 0));
-                }
+            for (ConfigHandlerBase configHandlerBase : configHandlerBases) {
+                configHandlerBase.getDrawables().forEach(val -> val.mouseClicked(mouseX, mouseY, 0));
             }
         }
         else if (dWheel != 0) {
@@ -219,7 +186,7 @@ public class ScreenBuilder extends Screen {
     }
 
     public void saveToEntries() {
-        baseCategory.values.values().forEach((value) -> {
+        configHandlerBases.forEach((value) -> {
             if (value instanceof ConfigEntryHandler<?>) {
                 //noinspection rawtypes
                 ConfigEntryHandler configEntry = (ConfigEntryHandler<?>) value;

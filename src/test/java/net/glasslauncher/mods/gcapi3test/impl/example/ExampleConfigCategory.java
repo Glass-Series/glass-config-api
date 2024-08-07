@@ -19,4 +19,10 @@ public class ExampleConfigCategory {
 
     @ConfigCategory(name = "Fancy Config Category", comment = "Fancy values ahead!")
     public ExampleConfigCategoryTwo secondCategory = new ExampleConfigCategoryTwo();
+
+    @ConfigEntry(name = "I'm hidden!", hidden = true)
+    public String hiddenString = "Like a ninja";
+
+    @ConfigCategory(name = "Ninja Config Category", hidden = true)
+    public ExampleConfigCategoryTwo ninjaCategory = new ExampleConfigCategoryTwo();
 }
