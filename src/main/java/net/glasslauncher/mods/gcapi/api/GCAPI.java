@@ -1,6 +1,5 @@
 package net.glasslauncher.mods.gcapi.api;
 
-import net.fabricmc.loader.api.ModContainer;
 import net.glasslauncher.mods.gcapi.impl.ConfigRootEntry;
 import net.glasslauncher.mods.gcapi.impl.EventStorage;
 import net.glasslauncher.mods.gcapi.impl.GCCore;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.management.*;
 import java.io.*;
-import java.util.concurrent.atomic.*;
 
 /**
  * Use this instead of GCCore!

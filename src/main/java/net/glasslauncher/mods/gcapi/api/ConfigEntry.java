@@ -57,5 +57,11 @@ public @interface ConfigEntry {
     long maxArrayLength() default Byte.MAX_VALUE;
     long minArrayLength() default 0;
 
+    /**
+     * If true, hides this config entry from the user, and also skips all UI generation.
+     * This is a good idea to set on any lists that are destined to get abhorrently long.
+     */
+    boolean hidden() default false;
+
 
 }

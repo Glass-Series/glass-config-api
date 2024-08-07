@@ -5,7 +5,6 @@ import net.glasslauncher.mods.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.gcapi.api.HasToolTip;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Tessellator;
-
 import org.lwjgl.opengl.GL11;
 
 import java.util.*;

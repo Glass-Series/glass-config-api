@@ -3,6 +3,7 @@ package net.glasslauncher.mods.gcapi.impl.screen;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.glasslauncher.mods.gcapi.api.CharacterUtils;
+import net.glasslauncher.mods.gcapi.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.gcapi.api.HasDrawable;
 import net.glasslauncher.mods.gcapi.impl.object.ConfigCategoryHandler;
@@ -49,9 +50,11 @@ public class ScreenBuilder extends Screen {
     @Override
     public void init() {
         baseCategory.values.values().forEach((value) -> {
-            if (value instanceof ConfigEntryHandler<?>) {
-                //noinspection rawtypes
-                ConfigEntryHandler configEntry = (ConfigEntryHandler<?>) value;
+            //noinspection rawtypes
+            if (value instanceof ConfigEntryHandler configEntry) {
+                if (configEntry.parentField.getAnnotation(ConfigEntry.class).hidden()) {
+                    return;
+                }
                 if (configEntry.getDrawableValue() != null) {
                     configEntry.value = configEntry.getDrawableValue();
                 }
@@ -66,6 +69,9 @@ public class ScreenBuilder extends Screen {
         buttons.add(button);
         screenButtons.add(button);
         baseCategory.values.values().forEach((value) -> {
+            if (value.parentField.getAnnotation(ConfigEntry.class).hidden()) {
+                return;
+            }
             if (value instanceof ConfigEntryHandler) {
                 ((ConfigEntryHandler<?>) value).init(this, textRenderer);
             }
@@ -84,6 +90,9 @@ public class ScreenBuilder extends Screen {
     public void tick() {
         super.tick();
         for (ConfigHandlerBase configHandlerBase : baseCategory.values.values()) {
+            if (configHandlerBase.parentField.getAnnotation(ConfigEntry.class).hidden()) {
+                return;
+            }
             if (configHandlerBase instanceof ConfigEntryHandler) {
                 configHandlerBase.getDrawables().forEach(HasDrawable::tick);
             }
@@ -94,6 +103,9 @@ public class ScreenBuilder extends Screen {
     protected void keyPressed(char character, int key) {
         super.keyPressed(character, key);
         for (ConfigHandlerBase configHandlerBase : baseCategory.values.values()) {
+            if (configHandlerBase.parentField.getAnnotation(ConfigEntry.class).hidden()) {
+                return;
+            }
             if (configHandlerBase instanceof ConfigEntryHandler) {
                 configHandlerBase.getDrawables().forEach(val -> val.keyPressed(character, key));
             }

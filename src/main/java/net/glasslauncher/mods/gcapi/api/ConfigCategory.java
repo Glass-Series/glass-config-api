@@ -35,4 +35,9 @@ public @interface ConfigCategory {
      * Will also be able to be edited by ops in-game at a later date.
      */
     boolean multiplayerSynced() default false;
+
+    /**
+     * If true, hides this config category and all it's contents from the user, and also skips all UI generation.
+     */
+    boolean hidden() default false;
 }
