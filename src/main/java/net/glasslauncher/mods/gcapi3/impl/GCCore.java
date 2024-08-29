@@ -18,8 +18,6 @@ import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigHandlerBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
-import net.modificationstation.stationapi.api.util.Identifier;
-import net.modificationstation.stationapi.api.util.ReflectionHelper;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,9 +39,9 @@ import java.util.function.*;
 @Deprecated
 public class GCCore implements PreLaunchEntrypoint {
     public static final ModContainer NAMESPACE = FabricLoader.getInstance().getModContainer("gcapi3").orElseThrow(RuntimeException::new);
-    public static final HashMap<Identifier, ConfigRootEntry> MOD_CONFIGS = new HashMap<>();
+    public static final HashMap<String, ConfigRootEntry> MOD_CONFIGS = new HashMap<>();
 
-    public static final HashMap<Identifier, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
+    public static final HashMap<String, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     public static boolean isMultiplayer = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI3");
@@ -53,10 +51,10 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static void loadServerConfig(String modID, String string) {
-        AtomicReference<Identifier> mod = new AtomicReference<>();
-        MOD_CONFIGS.keySet().forEach(modContainer -> {
-            if (modContainer.toString().equals(modID)) {
-                mod.set(modContainer);
+        AtomicReference<String> mod = new AtomicReference<>();
+        MOD_CONFIGS.keySet().forEach(modId -> {
+            if (modId.equals(modID)) {
+                mod.set(modId);
             }
         });
         if (mod.get() != null) {
@@ -71,9 +69,9 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static void exportConfigsForServer(NbtCompound nbtCompound) {
-        for (Identifier modContainer : MOD_CONFIGS.keySet()) {
+        for (String modContainer : MOD_CONFIGS.keySet()) {
             ConfigRootEntry entry = MOD_CONFIGS.get(modContainer);
-            nbtCompound.putString(modContainer.toString(), saveConfig(entry.modContainer(), entry.configCategoryHandler(), EventStorage.EventSource.SERVER_EXPORT));
+            nbtCompound.putString(modContainer, saveConfig(entry.modContainer(), entry.configCategoryHandler(), EventStorage.EventSource.SERVER_EXPORT));
         }
     }
 
@@ -92,8 +90,7 @@ public class GCCore implements PreLaunchEntrypoint {
 
     private static void loadConfigs() {
         if (loaded) {
-            log(Level.WARN, "Tried to load configs a second time! Printing stacktrace and aborting!");
-            new Exception("Stacktrace for duplicate loadConfigs call!").printStackTrace();
+            LOGGER.error(new Exception("Tried to load configs a second time! Printing stacktrace and aborting!"));
             return;
         }
         log("Loading config factories.");
@@ -122,8 +119,11 @@ public class GCCore implements PreLaunchEntrypoint {
 
         FabricLoader.getInstance().getEntrypointContainers(NAMESPACE.getMetadata().getId(), Object.class).forEach((entrypointContainer -> {
             try {
-                for (Field field : ReflectionHelper.getFieldsWithAnnotation(entrypointContainer.getEntrypoint().getClass(), ConfigRoot.class)) {
-                    Identifier configID = Identifier.of(entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(ConfigRoot.class).value());
+                for (Field field : entrypointContainer.getEntrypoint().getClass().getDeclaredFields()) {
+                    if (field.getAnnotation(ConfigRoot.class) == null) {
+                        continue;
+                    }
+                    String configID = entrypointContainer.getProvider().getMetadata().getId() + ":" + field.getAnnotation(ConfigRoot.class).value();
                     MOD_CONFIGS.put(configID, new ConfigRootEntry(entrypointContainer.getProvider(), field.getAnnotation(ConfigRoot.class), entrypointContainer.getEntrypoint(), null));
                     loadModConfig(entrypointContainer.getEntrypoint(), entrypointContainer.getProvider(), field, configID, null);
                     saveConfig(entrypointContainer.getProvider(), MOD_CONFIGS.get(configID).configCategoryHandler(), EventStorage.EventSource.GAME_LOAD);
@@ -138,7 +138,7 @@ public class GCCore implements PreLaunchEntrypoint {
         loaded = true;
     }
 
-    public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, Identifier configID, GlassYamlFile jsonOverride) {
+    public static void loadModConfig(Object rootConfigObject, ModContainer modContainer, Field configField, String configID, GlassYamlFile jsonOverride) {
         AtomicInteger totalReadCategories = new AtomicInteger();
         AtomicInteger totalReadFields = new AtomicInteger();
         try {
@@ -176,7 +176,7 @@ public class GCCore implements PreLaunchEntrypoint {
                 defaultEntry = DEFAULT_MOD_CONFIGS.get(configID);
             }
             ConfigRoot rootConfigAnnotation = configField.getAnnotation(ConfigRoot.class);
-            ConfigCategoryHandler configCategory = new ConfigCategoryHandler(modContainer.getMetadata().getId(), rootConfigAnnotation.visibleName(), null, configField, objField, rootConfigAnnotation.multiplayerSynced(), HashMultimap.create(), true);
+            ConfigCategoryHandler configCategory = new ConfigCategoryHandler(modContainer.getMetadata().getId(), rootConfigAnnotation.visibleName(), rootConfigAnnotation.nameKey(), null, null, configField, objField, rootConfigAnnotation.multiplayerSynced(), HashMultimap.create(), true);
             readDeeper(rootConfigObject, configField, modConfigFile.path(), configCategory, totalReadFields, totalReadCategories, isMultiplayer, defaultEntry);
             if (!loaded) {
                 ConfigRootEntry oldEntry = MOD_CONFIGS.remove(configID);
@@ -217,7 +217,9 @@ public class GCCore implements PreLaunchEntrypoint {
                 ConfigCategoryHandler childCategory = new ConfigCategoryHandler(
                         field.getName(),
                         configCategoryAnnotation.name(),
+                        configCategoryAnnotation.nameKey(),
                         configCategoryAnnotation.description(),
+                        configCategoryAnnotation.descriptionKey(),
                         field,
                         objField,
                         category.multiplayerSynced || configCategoryAnnotation.multiplayerSynced(),

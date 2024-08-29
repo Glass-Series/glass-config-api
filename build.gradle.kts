@@ -3,7 +3,7 @@ import java.net.URI
 plugins {
 	id("maven-publish")
 	id("fabric-loom") version "1.7.2"
-	id("babric-loom-extension") version "1.7.3"
+	id("babric-loom-extension") version "1.7.4"
 }
 
 //noinspection GroovyUnusedAssignment
@@ -64,14 +64,17 @@ dependencies {
 	// adds some useful annotations for miscellaneous uses. does not add any dependencies, though people without the lib will be missing some useful context hints.
 	implementation("org.jetbrains:annotations:23.0.0")
 
-	modImplementation("net.modificationstation:StationAPI:${project.properties["stapi_version"]}")
-
 	modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
 		isTransitive = false
 	}
 
+	modImplementation("net.glasslauncher.mods:glass-networking:1.0.1")
+
+	implementation("com.google.code.gson:gson:2.9.0")
+
 	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
-	include("com.google.guava:guava:33.2.1-jre")
+	implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency)
+	implementation(include("com.github.mineLdiver:expressions:f676bbe") as Dependency)
 }
 configurations.all {
 	exclude(group = "org.ow2.asm", module = "asm-debug-all")

@@ -22,8 +22,8 @@ public class ConfigCategoryHandler extends ConfigHandlerBase {
 
     private List<HasDrawable> button;
 
-    public ConfigCategoryHandler(String id, String name, String description, Field parentField, Object parentObject, boolean multiplayerSynced, Multimap<Class<?>, ConfigHandlerBase> values, boolean isRoot) {
-        super(id, name, description, parentField, parentObject, multiplayerSynced);
+    public ConfigCategoryHandler(String id, String name, String nameKey, String description, String descriptionKey, Field parentField, Object parentObject, boolean multiplayerSynced, Multimap<Class<?>, ConfigHandlerBase> values, boolean isRoot) {
+        super(id, name, nameKey, description, descriptionKey, parentField, parentObject, multiplayerSynced);
         this.values = values;
         this.isRoot = isRoot;
     }

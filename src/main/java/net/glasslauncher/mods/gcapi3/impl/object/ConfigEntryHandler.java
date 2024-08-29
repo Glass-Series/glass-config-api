@@ -29,7 +29,7 @@ public abstract class ConfigEntryHandler<T> extends ConfigHandlerBase {
     protected Function<String, List<String>> textValidator;
 
     public ConfigEntryHandler(String id, ConfigEntry configEntry, Field parentField, Object parentObject, boolean multiplayerSynced, T value, T defaultValue) {
-        super(id, configEntry.name(), configEntry.description(), parentField, parentObject, multiplayerSynced);
+        super(id, configEntry.name(), configEntry.nameKey(), configEntry.description(), configEntry.descriptionKey(), parentField, parentObject, multiplayerSynced);
         this.configEntry = configEntry;
         this.value = value;
         this.defaultValue = defaultValue;

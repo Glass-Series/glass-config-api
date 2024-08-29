@@ -117,7 +117,9 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
         ((ButtonWidget) buttons.get(0)).render(minecraft, mouseX, mouseY);
         ((ButtonWidget) buttons.get(1)).render(minecraft, mouseX, mouseY);
         textRenderer.drawWithShadow(configEntry.name, (width / 2) - (textRenderer.getWidth(configEntry.name) / 2), 4, 16777215);
-        textRenderer.drawWithShadow(configEntry.description, (width / 2) - (textRenderer.getWidth(configEntry.description) / 2), 18, 8421504);
+        if (configEntry.description != null) {
+            textRenderer.drawWithShadow(configEntry.description, (width / 2) - (textRenderer.getWidth(configEntry.description) / 2), 18, 8421504);
+        }
 
         ConfigEntry maxLength = configEntry.parentField.getAnnotation(ConfigEntry.class);
         if (textFieldWidgets.size() < maxLength.minArrayLength() || textFieldWidgets.size() > maxLength.maxArrayLength()) {

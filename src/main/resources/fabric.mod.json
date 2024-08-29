@@ -25,12 +25,8 @@
     "gcapi3:factory_provider": [
       "net.glasslauncher.mods.gcapi3.impl.factory.DefaultFactoryProvider"
     ],
-    "stationapi:event_bus_server": [
-      "net.glasslauncher.mods.gcapi3.impl.event.InitServerNetworking"
-    ],
-    "stationapi:event_bus_client": [
-      "net.glasslauncher.mods.gcapi3.impl.event.InitClientNetworking",
-      "net.glasslauncher.mods.gcapi3.impl.event.TranslationHandler"
+    "glassnetworking": [
+      "net.glasslauncher.mods.gcapi3.impl.event.PacketInit"
     ]
   },
   "custom": {

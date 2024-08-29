@@ -18,6 +18,13 @@ public @interface ConfigRoot {
     String visibleName();
 
     /**
+     * If this is set, GCAPI will attempt to use the translation key, if it has a translation entry.
+     * Requires something that handles translations, like StationAPI.
+     * Falls back to visibleName.
+     */
+    String nameKey() default "";
+
+    /**
      * The index this page uses. Those without a specified index will be added last.
      */
     int index() default Integer.MAX_VALUE;

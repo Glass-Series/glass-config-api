@@ -14,10 +14,24 @@ public @interface ConfigEntry {
     String name();
 
     /**
+     * If this is set, GCAPI will attempt to use the translation key, if it has a translation entry.
+     * Requires something that handles translations, like StationAPI.
+     * Falls back to name.
+     */
+    String nameKey() default "";
+
+    /**
      * The description shown to users in the scroll menu. ~30 chars max is recommended. Supports translation keys.
      * @return a string, supports colour codes.
      */
     String description() default "";
+
+    /**
+     * If this is set, GCAPI will attempt to use the translation key, if it has a translation entry.
+     * Requires something that handles translations, like StationAPI.
+     * Falls back to description.
+     */
+    String descriptionKey() default "";
 
     /**
      * The comment shown inside config files. Can be as long as you want, and supports newlines. Does NOT support colour codes.

@@ -6,13 +6,16 @@
   "mixins": [
   ],
   "server": [
+    "server.JoinMixin"
   ],
   "client": [
     "client.DrawContextMixin",
     "client.EntryListWidgetAccessor",
+    "client.JoinMixin",
     "client.ModMenuMixin",
     "client.ScreenMixin",
-    "client.TextFieldWidgetMixin"
+    "client.TextFieldWidgetMixin",
+    "client.TranslationMixin"
   ],
   "injectors": {
     "defaultRequire": 1

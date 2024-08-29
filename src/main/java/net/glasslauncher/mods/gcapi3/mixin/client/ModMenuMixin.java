@@ -23,9 +23,10 @@ public class ModMenuMixin {
         Map<String, Function<Screen, ? extends Screen>> map = new HashMap<>();
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
-            if (!map.containsKey(key.namespace.toString())) {
-                map.remove(key.namespace.toString());
-                map.put(key.namespace.toString(), (parent) -> value.configCategoryHandler().getConfigScreen(parent, value.modContainer()));
+            String namespace = key.split(":")[0];
+            if (!map.containsKey(namespace)) {
+                map.remove(namespace);
+                map.put(namespace, (parent) -> value.configCategoryHandler().getConfigScreen(parent, value.modContainer()));
             }
         });
         builder.putAll(map);

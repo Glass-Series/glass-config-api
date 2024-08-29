@@ -116,7 +116,9 @@ public class ScreenBuilder extends Screen {
         //((ButtonWidget) buttons.get(backButtonID)).render(minecraft, mouseX, mouseY);
         screenButtons.forEach(button -> button.render(minecraft, mouseX, mouseY));
         textRenderer.drawWithShadow(baseCategory.name, (width/2) - (textRenderer.getWidth(baseCategory.name)/2), 4, 16777215);
-        textRenderer.drawWithShadow(baseCategory.description, (width/2) - (textRenderer.getWidth(baseCategory.description)/2), 18, 8421504);
+        if (baseCategory.description != null) {
+            textRenderer.drawWithShadow(baseCategory.description, (width / 2) - (textRenderer.getWidth(baseCategory.description) / 2), 18, 8421504);
+        }
         ArrayList<HasDrawable> drawables = new ArrayList<>();
         configHandlerBases.forEach((configHandlerBase -> drawables.addAll(configHandlerBase.getDrawables())));
         if(mouseY > 32 && mouseY < height - 33) {
@@ -238,7 +240,9 @@ public class ScreenBuilder extends Screen {
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.name, x + 2, y + 1, 16777215);
             configHandlerBase.getDrawables().forEach(val -> val.setXYWH(x + 2, y + 12, 212, 20));
             configHandlerBase.getDrawables().forEach(val -> val.draw(mouseX, mouseY));
-            ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.description, x + 2, y + 34, 8421504);
+            if (configHandlerBase.description != null) {
+                ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.description, x + 2, y + 34, 8421504);
+            }
         }
     }
 }

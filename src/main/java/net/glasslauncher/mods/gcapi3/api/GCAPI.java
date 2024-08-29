@@ -6,7 +6,6 @@ import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.glasslauncher.mods.gcapi3.impl.GlassYamlFile;
 import net.glasslauncher.mods.gcapi3.impl.screen.RootScreenBuilder;
 import net.minecraft.client.gui.screen.Screen;
-import net.modificationstation.stationapi.api.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +23,7 @@ public class GCAPI {
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
-    public static void reloadConfig(Identifier configID, @Nullable String overrideConfigJson) throws IOException {
+    public static void reloadConfig(String configID, @Nullable String overrideConfigJson) throws IOException {
         reloadConfig(configID, new GlassYamlFile(overrideConfigJson));
     }
 
@@ -33,7 +32,7 @@ public class GCAPI {
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      * @param overrideConfigJson Optional config override JSON. Leave as null to do a plain config reload. JSON can be partial, and missing values from the JSON will be kept.
      */
-    public static void reloadConfig(Identifier configID, @Nullable GlassYamlFile overrideConfigJson) {
+    public static void reloadConfig(String configID, @Nullable GlassYamlFile overrideConfigJson) {
         ConfigRootEntry category = GCCore.MOD_CONFIGS.get(configID);
         GCCore.loadModConfig(category.configRoot(), category.modContainer(), category.configCategoryHandler().parentField, configID, overrideConfigJson);
         GCCore.saveConfig(category.modContainer(), category.configCategoryHandler(), EventStorage.EventSource.MOD_SAVE);
@@ -43,11 +42,11 @@ public class GCAPI {
      * Force a config reload.
      * @param configID Should be an identifier formatted like mymodid:mygconfigvalue
      */
-    public static void reloadConfig(Identifier configID) {
+    public static void reloadConfig(String configID) {
         reloadConfig(configID, (GlassYamlFile) null);
     }
 
-    public static RootScreenBuilder getRootConfigScreen(@NotNull Identifier identifier, Screen parent) throws AttributeNotFoundException {
+    public static RootScreenBuilder getRootConfigScreen(@NotNull String identifier, Screen parent) throws AttributeNotFoundException {
         ConfigRootEntry configRootEntry = GCCore.MOD_CONFIGS.get(identifier);
         if (configRootEntry != null) {
             return new RootScreenBuilder(parent, configRootEntry.modContainer(), configRootEntry.configCategoryHandler());

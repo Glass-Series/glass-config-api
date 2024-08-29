@@ -22,7 +22,7 @@ public class RootScreenBuilder extends ScreenBuilder {
         super(parent, mod, baseCategory);
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
-            if (key.namespace.toString().equals(mod.getMetadata().getId())) {
+            if (key.split(":")[0].equals(mod.getMetadata().getId())) {
                 allRoots.add(value);
             }
         });
