@@ -16,7 +16,7 @@ public class RootScreenBuilder extends ScreenBuilder {
 
     private final ArrayList<ConfigRootEntry> allRoots = new ArrayList<>();
     private final List<Integer> switchButtons = new ArrayList<>();
-    public int currentIndex = 1; // Arrays start at 1 :fatlaugh:
+    public int currentIndex = 0;
 
     public RootScreenBuilder(Screen parent, ModContainer mod, ConfigCategoryHandler baseCategory) {
         super(parent, mod, baseCategory);
@@ -27,7 +27,6 @@ public class RootScreenBuilder extends ScreenBuilder {
             }
         });
 
-//        allRoots.sort(Collections.reverseOrder(Comparator.comparingInt(entry -> entry.configRoot().index())));
         allRoots.sort(Comparator.comparingInt(entry -> entry.configRoot().index()));
     }
 
