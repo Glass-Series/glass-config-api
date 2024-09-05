@@ -64,17 +64,19 @@ dependencies {
 	// adds some useful annotations for miscellaneous uses. does not add any dependencies, though people without the lib will be missing some useful context hints.
 	implementation("org.jetbrains:annotations:23.0.0")
 
+	implementation("com.google.code.gson:gson:2.9.0")
 	modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
 		isTransitive = false
 	}
 
-	modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}")
-
-	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
 	implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency)
+	modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}")
 
 	// Solely here so I can test that GCAPI plays nice with StAPI easily.
 	modLocalRuntime("net.modificationstation:StationAPI:${project.properties["stapi_version"]}")
+
+	// GCAPI dep
+	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
 }
 configurations.all {
 	exclude(group = "org.ow2.asm", module = "asm-debug-all")
