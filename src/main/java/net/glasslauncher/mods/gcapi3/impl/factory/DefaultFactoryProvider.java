@@ -3,6 +3,7 @@ package net.glasslauncher.mods.gcapi3.impl.factory;
 import com.google.common.collect.ImmutableMap;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.api.ConfigFactoryProvider;
+import net.glasslauncher.mods.gcapi3.impl.SeptFunction;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.entry.BooleanConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.entry.FloatConfigEntryHandler;
@@ -11,7 +12,6 @@ import net.glasslauncher.mods.gcapi3.impl.object.entry.IntegerConfigEntryHandler
 import net.glasslauncher.mods.gcapi3.impl.object.entry.IntegerListConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.entry.StringConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.entry.StringListConfigEntryHandler;
-import uk.co.benjiweber.expressions.function.SeptFunction;
 
 import java.lang.reflect.*;
 import java.util.*;

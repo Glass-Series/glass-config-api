@@ -23,7 +23,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.simpleyaml.configuration.file.YamlFileWrapper;
-import uk.co.benjiweber.expressions.function.SeptFunction;
 
 import java.io.*;
 import java.lang.reflect.*;

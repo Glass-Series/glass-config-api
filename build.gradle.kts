@@ -15,7 +15,7 @@ version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
 
 loom {
-//	accessWidenerPath = file("src/main/resources/gcapi.accesswidener")
+//	accessWidenerPath = file("src/main/resources/gcapi.accesswidener") // Unused.
 
 	runs {
 		register("testClient") {
@@ -68,13 +68,13 @@ dependencies {
 		isTransitive = false
 	}
 
-	modImplementation("net.glasslauncher.mods:glass-networking:1.0.1")
-
-	implementation("com.google.code.gson:gson:2.9.0")
+	modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}")
 
 	implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
 	implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency)
-	implementation(include("com.github.mineLdiver:expressions:f676bbe") as Dependency)
+
+	// Solely here so I can test that GCAPI plays nice with StAPI easily.
+	modLocalRuntime("net.modificationstation:StationAPI:${project.properties["stapi_version"]}")
 }
 configurations.all {
 	exclude(group = "org.ow2.asm", module = "asm-debug-all")

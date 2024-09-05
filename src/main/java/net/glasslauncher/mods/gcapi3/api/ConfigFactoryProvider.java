@@ -1,8 +1,8 @@
 package net.glasslauncher.mods.gcapi3.api;
 
 import com.google.common.collect.ImmutableMap;
+import net.glasslauncher.mods.gcapi3.impl.SeptFunction;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
-import uk.co.benjiweber.expressions.function.SeptFunction;
 
 import java.lang.reflect.*;
 import java.util.function.*;
