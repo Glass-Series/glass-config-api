@@ -25,6 +25,7 @@ public class FloatConfigEntryHandler extends ConfigEntryHandler<Float> {
         super.init(parent, textRenderer);
         textbox = new ExtensibleTextFieldWidget(textRenderer);
         textbox.setValidator(textValidator);
+        textbox.setMaxLength(String.valueOf(Float.MAX_VALUE).length());
         textbox.setText(value.toString());
         textbox.setEnabled(!multiplayerLoaded);
         drawableList.add(textbox);

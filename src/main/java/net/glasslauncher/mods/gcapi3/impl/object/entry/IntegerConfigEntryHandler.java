@@ -25,7 +25,7 @@ public class IntegerConfigEntryHandler extends ConfigEntryHandler<Integer> {
         super.init(parent, textRenderer);
         textbox = new ExtensibleTextFieldWidget(textRenderer);
         textbox.setValidator(textValidator);
-        textbox.setMaxLength(Math.toIntExact(configEntry.maxLength()));
+        textbox.setMaxLength(String.valueOf(Integer.MAX_VALUE).length());
         textbox.setText(value.toString());
         textbox.setEnabled(!multiplayerLoaded);
         drawableList.add(textbox);
