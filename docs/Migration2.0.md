@@ -4,6 +4,7 @@ A LOT of breaking changes happened between v2 and v3, the most important one bei
 
 Most breaking changes are package changes, and annotation changes, with only one major change happening elsewhere for proper validation on load.
 
+- **Entrypoints and the mod id is now** `gcapi3`
 - `@ConfigEntry` and `@ConfigCategory` now house all information about the field is on, removing the need for checking for 6 different annotations on load.
 - `@GConfig` had it's `primary` value removed, and instead replaced with `priority`.
 - All packages have changed to allow for co-existence with GCAPI2.
