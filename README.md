@@ -16,7 +16,7 @@ Optional, though required if you want to edit your configs in-game: [ModMenu](ht
 
 ## Usage Inside a Mod
 
-See the [wiki](https://github.com/calmilamsy/glass-config-api/wiki).
+See the [docs](docs/Home.md).
 
 ## Common Workspace Issues
 
