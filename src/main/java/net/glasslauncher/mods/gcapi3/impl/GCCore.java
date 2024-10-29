@@ -290,7 +290,9 @@ public class GCCore implements PreLaunchEntrypoint {
             saveDeeper(configFile.path(), serverExported.path(), category, category.parentField, readValues, readCategories);
 
             if (EventStorage.PRE_SAVE_LISTENERS.containsKey(mod.getMetadata().getId())) {
-                EventStorage.PRE_SAVE_LISTENERS.get(mod.getMetadata().getId()).getEntrypoint().onPreConfigSaved(source, new GlassYamlFile(configFile.getConfigurationFile()), configFile);
+                GlassYamlFile oldConfigFile = new GlassYamlFile(configFile.getConfigurationFile());
+                oldConfigFile.createOrLoad();
+                EventStorage.PRE_SAVE_LISTENERS.get(mod.getMetadata().getId()).getEntrypoint().onPreConfigSaved(source, oldConfigFile, configFile);
             }
 
             configFile.save();
