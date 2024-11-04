@@ -43,6 +43,7 @@ public class GCCore implements PreLaunchEntrypoint {
     public static final HashMap<String, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     public static boolean isMultiplayer = false;
+    private static boolean joiningServer = false;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI3");
 
     static {
@@ -50,6 +51,7 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static void loadServerConfig(String modID, String string) {
+        joiningServer = true;
         AtomicReference<String> mod = new AtomicReference<>();
         MOD_CONFIGS.keySet().forEach(modId -> {
             if (modId.equals(modID)) {
@@ -65,6 +67,7 @@ public class GCCore implements PreLaunchEntrypoint {
                 e.printStackTrace();
             }
         }
+        joiningServer = false;
     }
 
     public static void exportConfigsForServer(NbtCompound nbtCompound) {
@@ -281,6 +284,9 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static String saveConfig(ModContainer mod, ConfigCategoryHandler category, int source) {
+        if (joiningServer) {
+            throw new RuntimeException("Someone called saveConfig while joining a server, why are you doing this?");
+        }
         try {
             AtomicInteger readValues = new AtomicInteger();
             AtomicInteger readCategories = new AtomicInteger();
