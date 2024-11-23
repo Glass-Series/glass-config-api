@@ -70,22 +70,22 @@ public abstract class ConfigEntryHandler<T> extends ConfigHandlerBase {
                 multiplayerLoaded = true;
                 reset(defaultValue);
             }
-            else if (parentField.getAnnotation(ValueOnVanillaServer.class) != null) {
-                ValueOnVanillaServer valueOnVanillaServer = parentField.getAnnotation(ValueOnVanillaServer.class);
-                multiplayerLoaded = true;
-                if (!valueOnVanillaServer.stringValue().isEmpty()) {
-                    reset(valueOnVanillaServer.stringValue());
-                }
-                else if (valueOnVanillaServer.booleanValue() != TriBoolean.DEFAULT) {
-                    reset(valueOnVanillaServer.booleanValue().value);
-                }
-                else if (valueOnVanillaServer.integerValue() != 0) {
-                    reset(valueOnVanillaServer.integerValue());
-                }
-                else if (valueOnVanillaServer.floatValue() != 0) {
-                    reset(valueOnVanillaServer.floatValue());
-                }
-            }
+//            else if (parentField.getAnnotation(ValueOnVanillaServer.class) != null) {
+//                ValueOnVanillaServer valueOnVanillaServer = parentField.getAnnotation(ValueOnVanillaServer.class);
+//                multiplayerLoaded = true;
+//                if (!valueOnVanillaServer.stringValue().isEmpty()) {
+//                    reset(valueOnVanillaServer.stringValue());
+//                }
+//                else if (valueOnVanillaServer.booleanValue() != TriBoolean.DEFAULT) {
+//                    reset(valueOnVanillaServer.booleanValue().value);
+//                }
+//                else if (valueOnVanillaServer.integerValue() != 0) {
+//                    reset(valueOnVanillaServer.integerValue());
+//                }
+//                else if (valueOnVanillaServer.floatValue() != 0) {
+//                    reset(valueOnVanillaServer.floatValue());
+//                }
+//            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

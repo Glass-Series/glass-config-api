@@ -284,9 +284,9 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static String saveConfig(ModContainer mod, ConfigCategoryHandler category, int source) {
-        if (joiningServer) {
-            throw new RuntimeException("Someone called saveConfig while joining a server, why are you doing this?");
-        }
+//        if (joiningServer) {
+//            throw new RuntimeException("Someone called saveConfig while joining a server, why are you doing this?");
+//        }
         try {
             AtomicInteger readValues = new AtomicInteger();
             AtomicInteger readCategories = new AtomicInteger();
