@@ -37,7 +37,8 @@
   ],
 
   "depends": {
-    "minecraft": "1.0.0-beta.7.3"
+    "minecraft": "1.0.0-beta.7.3",
+    "glassnetworking": "*"
   },
   "suggests": {
     "modmenu": "*"
