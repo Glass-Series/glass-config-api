@@ -60,7 +60,7 @@ public class GCCore implements PreLaunchEntrypoint {
         });
         if (mod.get() != null) {
             ConfigRootEntry rootEntry = MOD_CONFIGS.get(mod.get());
-            saveConfig(rootEntry.modContainer(), rootEntry.configCategoryHandler(), EventStorage.EventSource.SERVER_JOIN | EventStorage.EventSource.MODDED_SERVER_JOIN);
+            saveConfigUnsafe(rootEntry.modContainer(), rootEntry.configCategoryHandler(), EventStorage.EventSource.SERVER_JOIN | EventStorage.EventSource.MODDED_SERVER_JOIN);
             try {
                 loadModConfig(rootEntry.configRoot(), rootEntry.modContainer(), rootEntry.configCategoryHandler().parentField, mod.get(), new GlassYamlFile(string));
             } catch (Exception e) {
@@ -287,6 +287,10 @@ public class GCCore implements PreLaunchEntrypoint {
         if (joiningServer) {
             throw new RuntimeException("Someone called saveConfig while joining a server, why are you doing this?");
         }
+        return saveConfigUnsafe(mod, category, source);
+    }
+
+    private static String saveConfigUnsafe(ModContainer mod, ConfigCategoryHandler category, int source) {
         try {
             AtomicInteger readValues = new AtomicInteger();
             AtomicInteger readCategories = new AtomicInteger();
