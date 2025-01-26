@@ -69,9 +69,11 @@ dependencies {
 
 	transitiveImplementation(include("com.google.guava:guava:33.2.1-jre") as Dependency)
 
-	transitiveImplementation(modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") as Dependency)
+	modImplementation(transitiveImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") as Dependency)
 
-	transitiveImplementation(modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}") as Dependency)
+	modImplementation(transitiveImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}") {
+		isTransitive = false
+	} as Dependency)
 
 	// Solely here so I can test that GCAPI plays nice with StAPI easily.
 	modLocalRuntime("net.modificationstation:StationAPI:${project.properties["stapi_version"]}")
