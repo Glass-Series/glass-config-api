@@ -54,7 +54,7 @@ public class ScreenBuilder extends Screen {
             if (other instanceof ConfigCategoryHandler) {
                 return 1;
             }
-            return self instanceof ConfigCategoryHandler ? -1 : self.name.compareTo(other.name);
+            return self instanceof ConfigCategoryHandler ? -1 : 0;
         });
     }
 

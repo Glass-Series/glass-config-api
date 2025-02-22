@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.ModContainer;
 import net.glasslauncher.mods.gcapi3.api.HasDrawable;
+import net.glasslauncher.mods.gcapi3.impl.TerribleOrderPreservingMultimap;
 import net.glasslauncher.mods.gcapi3.impl.screen.RootScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
@@ -18,11 +19,11 @@ import java.util.concurrent.atomic.*;
 public class ConfigCategoryHandler extends ConfigHandlerBase {
 
     public final boolean isRoot;
-    public Multimap<Class<?>, ConfigHandlerBase> values;
+    public TerribleOrderPreservingMultimap<Class<?>, ConfigHandlerBase> values;
 
     private List<HasDrawable> button;
 
-    public ConfigCategoryHandler(String id, String name, String nameKey, String description, String descriptionKey, Field parentField, Object parentObject, boolean multiplayerSynced, Multimap<Class<?>, ConfigHandlerBase> values, boolean isRoot) {
+    public ConfigCategoryHandler(String id, String name, String nameKey, String description, String descriptionKey, Field parentField, Object parentObject, boolean multiplayerSynced, TerribleOrderPreservingMultimap<Class<?>, ConfigHandlerBase> values, boolean isRoot) {
         super(id, name, nameKey, description, descriptionKey, parentField, parentObject, multiplayerSynced);
         this.values = values;
         this.isRoot = isRoot;

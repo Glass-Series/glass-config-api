@@ -3,6 +3,7 @@ package net.glasslauncher.mods.gcapi3.impl;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.LinkedListMultimap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -22,6 +23,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.message.Message;
 import org.simpleyaml.configuration.file.YamlFileWrapper;
 
 import java.io.*;
@@ -88,6 +90,14 @@ public class GCCore implements PreLaunchEntrypoint {
 
     public static void log(Level level, String message) {
         LOGGER.log(level, message);
+    }
+
+    public static void logError(Message message, Throwable throwable) {
+        LOGGER.error(message, throwable);
+    }
+
+    public static void logError(Throwable throwable) {
+        LOGGER.error(throwable);
     }
 
     private static void loadConfigs() {
@@ -178,7 +188,7 @@ public class GCCore implements PreLaunchEntrypoint {
                 defaultEntry = DEFAULT_MOD_CONFIGS.get(configID);
             }
             ConfigRoot rootConfigAnnotation = configField.getAnnotation(ConfigRoot.class);
-            ConfigCategoryHandler configCategory = new ConfigCategoryHandler(modContainer.getMetadata().getId(), rootConfigAnnotation.visibleName(), rootConfigAnnotation.nameKey(), null, null, configField, objField, rootConfigAnnotation.multiplayerSynced(), HashMultimap.create(), true);
+            ConfigCategoryHandler configCategory = new ConfigCategoryHandler(modContainer.getMetadata().getId(), rootConfigAnnotation.visibleName(), rootConfigAnnotation.nameKey(), null, null, configField, objField, rootConfigAnnotation.multiplayerSynced(), new TerribleOrderPreservingMultimap<>(), true);
             readDeeper(rootConfigObject, configField, modConfigFile.path(), configCategory, totalReadFields, totalReadCategories, isMultiplayer, defaultEntry);
             if (!loaded) {
                 ConfigRootEntry oldEntry = MOD_CONFIGS.remove(configID);
@@ -225,7 +235,7 @@ public class GCCore implements PreLaunchEntrypoint {
                         field,
                         objField,
                         category.multiplayerSynced || configCategoryAnnotation.multiplayerSynced(),
-                        HashMultimap.create(),
+                        new TerribleOrderPreservingMultimap<>(),
                         false
                 );
                 category.values.put(ConfigCategory.class, childCategory);
