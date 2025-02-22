@@ -3,7 +3,7 @@ import java.net.URI
 plugins {
 	id("maven-publish")
 	id("fabric-loom") version "1.9.2"
-	id("babric-loom-extension") version "1.9.3"
+	id("babric-loom-extension") version "1.9.4"
 }
 
 //noinspection GroovyUnusedAssignment
@@ -67,19 +67,16 @@ dependencies {
 	// adds some useful annotations for miscellaneous uses. does not add any dependencies, though people without the lib will be missing some useful context hints.
 	implementation("org.jetbrains:annotations:23.0.0")
 
-	transitiveImplementation(include("com.google.guava:guava:33.2.1-jre") as Dependency)
+	// Optional GCAPI deps
+	transitiveImplementation(modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") as Dependency)
 
-	modImplementation(transitiveImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") as Dependency)
-
-	modImplementation(transitiveImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}") {
+	// GCAPI deps
+	transitiveImplementation(modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}") {
 		isTransitive = false
 	} as Dependency)
 
-	// Solely here so I can test that GCAPI plays nice with StAPI easily.
-	modLocalRuntime("net.modificationstation:StationAPI:${project.properties["stapi_version"]}")
-
-	// GCAPI dep
-	transitiveImplementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency)
+	transitiveImplementation(implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency) as Dependency)
+	transitiveImplementation(implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency) as Dependency)
 }
 
 tasks.withType<ProcessResources> {
