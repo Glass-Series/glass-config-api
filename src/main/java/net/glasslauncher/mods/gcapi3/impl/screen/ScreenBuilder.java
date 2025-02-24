@@ -41,15 +41,19 @@ public class ScreenBuilder extends Screen {
         this.mod = mod;
         this.baseCategory = baseCategory;
         configHandlerBases.addAll(baseCategory.values.values());
-        configHandlerBases = configHandlerBases.stream().filter(value -> {
-            if (value instanceof ConfigCategoryHandler) {
-                return !value.parentField.getAnnotation(ConfigCategory.class).hidden();
-            }
-            if (value instanceof ConfigEntryHandler) {
-                return !value.parentField.getAnnotation(ConfigEntry.class).hidden();
-            }
-            return false;
-        }).collect(Collectors.toCollection(ArrayList::new));
+            configHandlerBases = configHandlerBases.stream().filter(value -> {
+                try {
+                    if (value instanceof ConfigCategoryHandler) {
+                        return !value.parentField.getAnnotation(ConfigCategory.class).hidden();
+                    }
+                    if (value instanceof ConfigEntryHandler) {
+                        return !value.parentField.getAnnotation(ConfigEntry.class).hidden();
+                    }
+                    return false;
+                } catch (Exception e) {
+                    throw new RuntimeException("Error was encountered while trying to parse " + value.parentObject.getClass().getCanonicalName() + "." + value.parentField.getName(), e);
+                }
+            }).collect(Collectors.toCollection(ArrayList::new));
         configHandlerBases.sort((self, other) -> {
             if (other instanceof ConfigCategoryHandler) {
                 return 1;
