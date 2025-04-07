@@ -10,11 +10,10 @@ import net.glasslauncher.mods.gcapi3.api.HasDrawable;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigHandlerBase;
-import net.glasslauncher.mods.gcapi3.mixin.client.EntryListWidgetAccessor;
+import net.glasslauncher.mods.gcapi3.impl.screen.widget.GlassEntryListWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
@@ -207,15 +206,10 @@ public class ScreenBuilder extends Screen {
         });
     }
 
-    class ScreenScrollList extends EntryListWidget {
+    public class ScreenScrollList extends GlassEntryListWidget {
         public ScreenScrollList() {
             super(ScreenBuilder.this.minecraft, ScreenBuilder.this.width, ScreenBuilder.this.height, 32, ScreenBuilder.this.height - 32, 48);
-            this.method_1260(false);
-        }
-
-        public void scroll(float value) {
-            EntryListWidgetAccessor baseAccessor = ((EntryListWidgetAccessor) this);
-            baseAccessor.setScrollAmount(baseAccessor.getScrollAmount() + value);
+            this.setDrawSelectedBox(false);
         }
 
         @Override
@@ -225,7 +219,7 @@ public class ScreenBuilder extends Screen {
 
         @Override
         protected void entryClicked(int entryIndex, boolean doLoad) {
-            ScreenBuilder.this.selectedIndex = entryIndex;
+            selectedIndex = entryIndex;
         }
 
         @Override
@@ -234,15 +228,13 @@ public class ScreenBuilder extends Screen {
         }
 
         @Override
-        protected void renderBackground() {
-            ScreenBuilder.this.renderBackground();
-        }
+        protected void renderBackground() {}
 
         @Override
-        protected void renderEntry(int itemId, int x, int y, int i1, Tessellator arg) {
+        protected void renderEntry(int itemId, int x, int width, int y, int i1, Tessellator arg) {
             ConfigHandlerBase configHandlerBase = configHandlerBases.get(itemId);
             ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.name, x + 2, y + 1, 16777215);
-            configHandlerBase.getDrawables().forEach(val -> val.setXYWH(x + 2, y + 12, 212, 20));
+            configHandlerBase.getDrawables().forEach(val -> val.setXYWH(x + 2, y + 12, width, 20));
             configHandlerBase.getDrawables().forEach(val -> val.draw(mouseX, mouseY));
             if (configHandlerBase.description != null) {
                 ScreenBuilder.this.drawTextWithShadow(ScreenBuilder.this.textRenderer, configHandlerBase.description, x + 2, y + 34, 8421504);

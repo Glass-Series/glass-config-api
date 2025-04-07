@@ -10,7 +10,6 @@
   ],
   "client": [
     "client.DrawContextMixin",
-    "client.EntryListWidgetAccessor",
     "client.JoinMixin",
     "client.ModMenuMixin",
     "client.ScreenMixin",

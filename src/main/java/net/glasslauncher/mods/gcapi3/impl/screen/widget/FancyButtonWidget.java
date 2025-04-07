@@ -33,6 +33,12 @@ public class FancyButtonWidget extends ButtonWidget implements HasDrawable, HasT
         this.y = y;
         this.width = width;
         this.height = height;
+
+        if (width > 396) {
+            int offset = width - 396;
+            this.x = x + (offset / 2) ;
+            this.width -= offset;
+        }
     }
 
     @Override

@@ -4,13 +4,13 @@ import net.glasslauncher.mods.gcapi3.api.CharacterUtils;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.ExtensibleTextFieldWidget;
+import net.glasslauncher.mods.gcapi3.impl.screen.widget.GlassEntryListWidget;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.TexturedButtonWidget;
-import net.glasslauncher.mods.gcapi3.mixin.client.EntryListWidgetAccessor;
 import net.minecraft.class_35;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
@@ -114,8 +114,8 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
         scrollList.render(mouseX, mouseY, delta);
         // Breaks rendering of category buttons.
         //super.render(mouseX, mouseY, delta);
-        ((ButtonWidget) buttons.get(0)).render(minecraft, mouseX, mouseY);
-        ((ButtonWidget) buttons.get(1)).render(minecraft, mouseX, mouseY);
+        //noinspection unchecked This should never be null.
+        buttons.forEach(b -> ((ButtonWidget) b).render(minecraft, mouseX, mouseY));
         textRenderer.drawWithShadow(configEntry.name, (width / 2) - (textRenderer.getWidth(configEntry.name) / 2), 4, 16777215);
         if (configEntry.description != null) {
             textRenderer.drawWithShadow(configEntry.description, (width / 2) - (textRenderer.getWidth(configEntry.description) / 2), 18, 8421504);
@@ -188,15 +188,9 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
         super.removed();
     }
 
-    class ScreenScrollList extends EntryListWidget {
+    public class ScreenScrollList extends GlassEntryListWidget {
         public ScreenScrollList() {
             super(BaseListScreenBuilder.this.minecraft, BaseListScreenBuilder.this.width, BaseListScreenBuilder.this.height, 32, BaseListScreenBuilder.this.height - 64, 24);
-
-        }
-
-        public void scroll(float value) {
-            EntryListWidgetAccessor baseAccessor = ((EntryListWidgetAccessor) this);
-            baseAccessor.setScrollAmount(baseAccessor.getScrollAmount() + value);
         }
 
         @Override
@@ -219,15 +213,15 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
         }
 
         @Override
-        protected void renderEntry(int itemId, int x, int y, int i1, net.minecraft.client.render.Tessellator arg) {
-            if (itemId+2 >= buttons.size()) {
+        protected void renderEntry(int itemId, int x, int width, int y, int i1, Tessellator arg) {
+            if (itemId + 2 >= buttons.size()) {
                 return;
             }
             ExtensibleTextFieldWidget configBase = textFieldWidgets.get(itemId);
             BaseListScreenBuilder.this.drawTextWithShadow(textRenderer, String.valueOf(itemId), x - 2 - textRenderer.getWidth(String.valueOf(itemId)), y + 1, 16777215);
-            ((TexturedButtonWidget) buttons.get(itemId+2)).setPos(x + 214 + 34, y+2);
+            ((TexturedButtonWidget) buttons.get(itemId+2)).setPos(x + width + 4, y + 2);
             ((TexturedButtonWidget) buttons.get(itemId+2)).render(minecraft, mouseX, mouseY);
-            configBase.setXYWH(x + 2, y + 1, 212, 20);
+            configBase.setXYWH(x + 2, y + 1, width, 20);
             configBase.draw(mouseX, mouseY);
         }
     }
