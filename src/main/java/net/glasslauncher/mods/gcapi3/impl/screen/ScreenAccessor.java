@@ -2,7 +2,7 @@ package net.glasslauncher.mods.gcapi3.impl.screen;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
 
-import java.util.*;
+import java.util.List;
 
 public interface ScreenAccessor {
 

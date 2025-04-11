@@ -1,6 +1,5 @@
 package net.glasslauncher.mods.gcapi3.mixin.client;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.prospector.modmenu.ModMenu;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.minecraft.client.gui.screen.Screen;
@@ -9,10 +8,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Mixin(ModMenu.class)
 public class ModMenuMixin {

@@ -5,9 +5,9 @@ import net.glasslauncher.mods.gcapi3.api.HasDrawable;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class ConfigHandlerBase {
 

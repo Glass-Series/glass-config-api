@@ -3,7 +3,7 @@ package net.glasslauncher.mods.gcapi3.api;
 
 import net.glasslauncher.mods.gcapi3.impl.GlassYamlWrapper;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 
 /**
  * Implement in custom types. This listener does not support java builtins because I value what little remains of my sanity.

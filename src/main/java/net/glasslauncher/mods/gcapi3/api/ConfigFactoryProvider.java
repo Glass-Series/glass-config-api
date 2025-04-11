@@ -4,8 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import net.glasslauncher.mods.gcapi3.impl.SeptFunction;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 
-import java.lang.reflect.*;
-import java.util.function.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.function.Function;
 
 public interface ConfigFactoryProvider {
 

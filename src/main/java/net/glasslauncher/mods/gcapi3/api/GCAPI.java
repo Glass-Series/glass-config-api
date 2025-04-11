@@ -9,8 +9,8 @@ import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.management.*;
-import java.io.*;
+import javax.management.AttributeNotFoundException;
+import java.io.IOException;
 
 /**
  * Use this instead of GCCore!

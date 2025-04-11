@@ -3,7 +3,7 @@ package net.glasslauncher.mods.gcapi3.impl;
 import org.simpleyaml.configuration.file.YamlFile;
 import org.simpleyaml.configuration.file.YamlFileWrapper;
 
-import java.util.*;
+import java.util.Objects;
 
 // And so the code crimes continue.
 public class GlassYamlWrapper extends YamlFileWrapper {

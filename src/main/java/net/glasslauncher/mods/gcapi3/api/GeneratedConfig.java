@@ -1,6 +1,6 @@
 package net.glasslauncher.mods.gcapi3.api;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 
 public interface GeneratedConfig {
     /**

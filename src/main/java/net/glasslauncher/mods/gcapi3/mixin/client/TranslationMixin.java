@@ -2,14 +2,13 @@ package net.glasslauncher.mods.gcapi3.mixin.client;
 
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.LWJGLException;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(Minecraft.class)
 public class TranslationMixin {

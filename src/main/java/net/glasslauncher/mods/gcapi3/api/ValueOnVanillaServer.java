@@ -18,4 +18,3 @@ public @interface ValueOnVanillaServer {
     float floatValue() default 0;
     TriBoolean booleanValue() default TriBoolean.DEFAULT;
 }
-

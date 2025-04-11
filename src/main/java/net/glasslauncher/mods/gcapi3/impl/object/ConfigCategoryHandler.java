@@ -1,6 +1,5 @@
 package net.glasslauncher.mods.gcapi3.impl.object;
 
-import com.google.common.collect.Multimap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.ModContainer;
@@ -12,9 +11,10 @@ import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConfigCategoryHandler extends ConfigHandlerBase {
 

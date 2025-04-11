@@ -4,8 +4,11 @@ import org.simpleyaml.configuration.comments.format.YamlCommentFormat;
 import org.simpleyaml.configuration.file.YamlFile;
 import org.simpleyaml.configuration.implementation.api.QuoteStyle;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GlassYamlFile extends YamlFile {
 

@@ -1,6 +1,6 @@
 package net.glasslauncher.mods.gcapi3.api;
 
-import java.util.*;
+import java.util.List;
 
 public interface HasToolTip {
 

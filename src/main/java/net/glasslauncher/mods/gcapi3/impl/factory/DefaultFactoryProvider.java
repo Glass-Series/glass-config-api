@@ -5,17 +5,13 @@ import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.api.ConfigFactoryProvider;
 import net.glasslauncher.mods.gcapi3.impl.SeptFunction;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.BooleanConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.FloatConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.FloatListConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.IntegerConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.IntegerListConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.StringConfigEntryHandler;
-import net.glasslauncher.mods.gcapi3.impl.object.entry.StringListConfigEntryHandler;
+import net.glasslauncher.mods.gcapi3.impl.object.entry.*;
 
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.function.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class DefaultFactoryProvider implements ConfigFactoryProvider {
 

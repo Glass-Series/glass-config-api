@@ -5,7 +5,7 @@ import net.glasslauncher.mods.gcapi3.impl.EventStorage;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.glasslauncher.mods.networking.GlassPacketListener;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class PacketInit implements GlassPacketListener {
 
