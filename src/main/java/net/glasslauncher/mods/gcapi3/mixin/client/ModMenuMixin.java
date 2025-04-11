@@ -16,7 +16,7 @@ import java.util.function.Function;
 @Mixin(ModMenu.class)
 public class ModMenuMixin {
 
-    @Shadow private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
+    @Shadow(remap = false) private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
 
     @Inject(method = "onInitializeClient", at = @At("TAIL"), remap = false)
     private void hijackConfigScreens(CallbackInfo ci) {
