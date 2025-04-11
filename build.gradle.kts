@@ -15,7 +15,7 @@ version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
 
 loom {
-//	accessWidenerPath = file("src/main/resources/gcapi.accesswidener") // Unused.
+//	accessWidenerPath = file("src/main/resources/gcapi3.accesswidener") // Unused.
 
 	@Suppress("UnstableApiUsage")
 	mixin.defaultRefmapName = "${project.properties["archives_base_name"]}3-refmap.json"
