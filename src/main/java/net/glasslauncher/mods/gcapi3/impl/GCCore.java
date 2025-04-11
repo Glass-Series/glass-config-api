@@ -1,22 +1,19 @@
 package net.glasslauncher.mods.gcapi3.impl;
 
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.LinkedListMultimap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
-import net.glasslauncher.mods.gcapi3.api.ConfigCategory;
-import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
-import net.glasslauncher.mods.gcapi3.api.ConfigFactoryProvider;
-import net.glasslauncher.mods.gcapi3.api.ConfigRoot;
-import net.glasslauncher.mods.gcapi3.api.GeneratedConfig;
+import net.glasslauncher.mods.gcapi3.api.*;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigHandlerBase;
+import net.glasslauncher.mods.gcapi3.mixin.client.ClientNetworkHandlerAccessor;
+import net.glasslauncher.mods.gcapi3.mixin.client.ConnectionAccessor;
+import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
 import org.apache.logging.log4j.Level;
@@ -24,13 +21,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.apache.logging.log4j.message.Message;
+import org.jetbrains.annotations.ApiStatus;
 import org.simpleyaml.configuration.file.YamlFileWrapper;
 
-import java.io.*;
-import java.lang.reflect.*;
-import java.util.*;
-import java.util.concurrent.atomic.*;
-import java.util.function.*;
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 /**
  * Do not use this class directly in your code.
@@ -38,6 +41,7 @@ import java.util.function.*;
  */
 @SuppressWarnings("DeprecatedIsStillUsed") // shush, I just don't want others using this class without getting yelled at.
 @Deprecated
+@ApiStatus.Internal
 public class GCCore implements PreLaunchEntrypoint {
     public static final ModContainer NAMESPACE = FabricLoader.getInstance().getModContainer("gcapi3").orElseThrow(RuntimeException::new);
     public static final HashMap<String, ConfigRootEntry> MOD_CONFIGS = new HashMap<>();
@@ -46,8 +50,7 @@ public class GCCore implements PreLaunchEntrypoint {
 
     public static final HashMap<String, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
-    public static boolean isMultiplayer = false;
-    private static boolean joiningServer = false;
+    public static File multiplayerSave = null;
     private static final Logger LOGGER = LogManager.getFormatterLogger("GCAPI3");
 
     static {
@@ -55,7 +58,6 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static void loadServerConfig(String modID, String string) {
-        joiningServer = true;
         AtomicReference<String> mod = new AtomicReference<>();
         MOD_CONFIGS.keySet().forEach(modId -> {
             if (modId.equals(modID)) {
@@ -71,7 +73,6 @@ public class GCCore implements PreLaunchEntrypoint {
                 e.printStackTrace();
             }
         }
-        joiningServer = false;
     }
 
     public static void exportConfigsForServer(NbtCompound nbtCompound) {
@@ -163,18 +164,22 @@ public class GCCore implements PreLaunchEntrypoint {
                     return;
                 }
             }
-            GlassYamlFile modConfigFile = new GlassYamlFile(new File(FabricLoader.getInstance().getConfigDir().toFile(), modContainer.getMetadata().getId() + "/" + configField.getAnnotation(ConfigRoot.class).value() + ".yml"));
+            GlassYamlFile modConfigFile;
             if (jsonOverride == null) {
+                multiplayerSave = null;
+                modConfigFile = new GlassYamlFile(new File(getSaveFolder(), modContainer.getMetadata().getId() + "/" + configField.getAnnotation(ConfigRoot.class).value() + ".yml"));
                 modConfigFile.createOrLoad();
             }
             else {
+                modConfigFile = new GlassYamlFile(new File(getSaveFolder(), modContainer.getMetadata().getId() + "/" + configField.getAnnotation(ConfigRoot.class).value() + ".yml"));
                 modConfigFile.merge(jsonOverride);
-                isMultiplayer = modConfigFile.getBoolean("multiplayer", false);
+                multiplayerSave = modConfigFile.getBoolean("multiplayer", false) ? getServerConfigFolder() : null;
                 // Try to catch mods reloading configs while on a server.
-                if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && !isMultiplayer) {
-                    isMultiplayer = ((Minecraft) FabricLoader.getInstance().getGameInstance()).world.isRemote;
+                if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && multiplayerSave == null) {
+                    multiplayerSave = ((Minecraft) FabricLoader.getInstance().getGameInstance()).world.isRemote ? getServerConfigFolder() : null;
                 }
-                if (isMultiplayer) {
+
+                if (multiplayerSave != null) {
                     log("Loading server config for " + modContainer.getMetadata().getId() + "!");
                 }
                 else {
@@ -191,7 +196,7 @@ public class GCCore implements PreLaunchEntrypoint {
             }
             ConfigRoot rootConfigAnnotation = configField.getAnnotation(ConfigRoot.class);
             ConfigCategoryHandler configCategory = new ConfigCategoryHandler(modContainer.getMetadata().getId(), rootConfigAnnotation.visibleName(), rootConfigAnnotation.nameKey(), null, null, configField, objField, rootConfigAnnotation.multiplayerSynced(), new TerribleOrderPreservingMultimap<>(), true);
-            readDeeper(rootConfigObject, configField, modConfigFile.path(), configCategory, totalReadFields, totalReadCategories, isMultiplayer, defaultEntry);
+            readDeeper(rootConfigObject, configField, modConfigFile.path(), configCategory, totalReadFields, totalReadCategories, multiplayerSave != null, defaultEntry);
             if (!loaded) {
                 ConfigRootEntry oldEntry = MOD_CONFIGS.remove(configID);
                 MOD_CONFIGS.put(configID, new ConfigRootEntry(oldEntry.modContainer(), oldEntry.configRoot(), oldEntry.configObject(), configCategory));
@@ -296,9 +301,6 @@ public class GCCore implements PreLaunchEntrypoint {
     }
 
     public static String saveConfig(ModContainer mod, ConfigCategoryHandler category, int source) {
-        if (joiningServer) {
-            throw new RuntimeException("Someone called saveConfig while joining a server, why are you doing this?");
-        }
         return saveConfigUnsafe(mod, category, source);
     }
 
@@ -306,7 +308,7 @@ public class GCCore implements PreLaunchEntrypoint {
         try {
             AtomicInteger readValues = new AtomicInteger();
             AtomicInteger readCategories = new AtomicInteger();
-            GlassYamlFile configFile = new GlassYamlFile(new File(FabricLoader.getInstance().getConfigDir().toFile(), mod.getMetadata().getId() + "/" + category.parentField.getAnnotation(ConfigRoot.class).value() + ".yml"));
+            GlassYamlFile configFile = new GlassYamlFile(new File(getSaveFolder(), mod.getMetadata().getId() + "/" + category.parentField.getAnnotation(ConfigRoot.class).value() + ".yml"));
             configFile.createNewFile();
             GlassYamlFile serverExported = new GlassYamlFile();
             saveDeeper(configFile.path(), serverExported.path(), category, category.parentField, readValues, readCategories);
@@ -363,5 +365,18 @@ public class GCCore implements PreLaunchEntrypoint {
                 throw new RuntimeException("What?! Config contains a non-serializable entry!");
             }
         }
+    }
+
+    public static File getSaveFolder() {
+        return multiplayerSave == null ? FabricLoader.getInstance().getConfigDir().toFile() : multiplayerSave;
+    }
+
+    public static File getServerConfigFolder() {
+        InetSocketAddress address =  (InetSocketAddress) ((ConnectionAccessor) ((ClientNetworkHandlerAccessor) MinecraftAccessor.getInstance().getNetworkHandler()).getConnection()).getAddress();
+        String serverAddress = address.getHostName() + ":" + address.getPort();
+
+        File file = new File(FabricLoader.getInstance().getConfigDir().toFile(), GCCore.NAMESPACE.getMetadata().getId() + "/server_configs" + serverAddress.hashCode());
+        file.mkdirs();
+        return file;
     }
 }

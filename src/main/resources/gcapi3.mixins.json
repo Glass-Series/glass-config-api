@@ -9,8 +9,12 @@
     "server.JoinMixin"
   ],
   "client": [
+    "client.ClientNetworkHandlerAccessor",
+    "client.ConnectionAccessor",
     "client.DrawContextMixin",
     "client.JoinMixin",
+    "client.MinecraftAccessor",
+    "client.MinecraftMixin",
     "client.ModMenuMixin",
     "client.ScreenMixin",
     "client.TextFieldWidgetMixin",

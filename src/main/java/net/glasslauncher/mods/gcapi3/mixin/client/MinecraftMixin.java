@@ -1,0 +1,37 @@
+package net.glasslauncher.mods.gcapi3.mixin.client;
+
+import net.glasslauncher.mods.gcapi3.impl.GCCore;
+import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
+import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
+import net.glasslauncher.mods.networking.GlassNetworking;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(Minecraft.class)
+public class MinecraftMixin {
+    @Inject(method = "method_2115", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ClientPlayerEntity;method_1315()V"))
+    private void checkVanillaJoined(World string, String playerEntity, PlayerEntity par3, CallbackInfo ci) {
+        if(!GlassNetworking.serverHasNetworking()) {
+            //noinspection deprecation
+            GCCore.MOD_CONFIGS.forEach((identifier, configRootEntry) -> recursiveTriggerVanillaBehavior(configRootEntry.configCategoryHandler()));
+        }
+    }
+
+    @Unique
+    private void recursiveTriggerVanillaBehavior(ConfigCategoryHandler configCategory) {
+        configCategory.values.forEach((aClass, configBase) -> {
+            if(configBase.getClass().isAssignableFrom(ConfigCategoryHandler.class)) {
+                recursiveTriggerVanillaBehavior((ConfigCategoryHandler) configBase);
+            }
+            else {
+                ((ConfigEntryHandler<?>) configBase).vanillaServerBehavior();
+            }
+        });
+    }
+}
