@@ -42,6 +42,8 @@ public class GCCore implements PreLaunchEntrypoint {
     public static final ModContainer NAMESPACE = FabricLoader.getInstance().getModContainer("gcapi3").orElseThrow(RuntimeException::new);
     public static final HashMap<String, ConfigRootEntry> MOD_CONFIGS = new HashMap<>();
 
+    public static boolean RELOAD_WANTED = false;
+
     public static final HashMap<String, HashMap<String, Object>> DEFAULT_MOD_CONFIGS = new HashMap<>();
     private static boolean loaded = false;
     public static boolean isMultiplayer = false;

@@ -21,14 +21,14 @@ public class ExampleConfigClass {
     @ConfigEntry(name = "ASD 2")
     public String asd2 = "hmmm";
 
-    @ConfigEntry(name = "ASD 3")
+    @ConfigEntry(name = "ASD 3", requiresRestart = true)
     public String asd3 = "hmmm";
 
     @ConfigEntry(name = "MP Synced Boolean", multiplayerSynced = true)
     @ValueOnVanillaServer(booleanValue = TriBoolean.TRUE)
     public Boolean mpBool = false;
 
-    @ConfigEntry(name = "Test Enum")
+    @ConfigEntry(name = "Test Enum", requiresRestart = true)
     public ExampleConfigEnum enumTest = ExampleConfigEnum.YAY;
 
     /**

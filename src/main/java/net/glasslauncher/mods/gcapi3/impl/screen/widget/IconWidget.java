@@ -7,9 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.Tessellator;
 import org.lwjgl.opengl.GL11;
 
-import java.util.*;
-
-public class IconWidget implements HasDrawable, HasToolTip {
+public abstract class IconWidget implements HasDrawable, HasToolTip {
 
     public int x;
     public int y;
@@ -43,36 +41,11 @@ public class IconWidget implements HasDrawable, HasToolTip {
     }
 
     @Override
-    public void mouseClicked(int mouseX, int mouseY, int button) {
-
-    }
-
-    @Override
     public void setXYWH(int x, int y, int width, int height) {
         this.x = x + width + 2;
         this.y = y + height/2+1;
         this.width = 8;
         this.height = 8;
-    }
-
-    @Override
-    public void tick() {
-
-    }
-
-    @Override
-    public void keyPressed(char character, int key) {
-
-    }
-
-    @Override
-    public void setID(int id) {
-
-    }
-
-    @Override
-    public List<String> getTooltip() {
-        return Collections.singletonList("This value is synced to the server in multiplayer");
     }
 
     @Override

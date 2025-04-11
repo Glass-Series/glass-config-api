@@ -8,19 +8,27 @@ import net.glasslauncher.mods.gcapi3.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.gcapi3.api.HasDrawable;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.screen.BaseListScreenBuilder;
+import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class BaseListConfigEntryHandler<T> extends ConfigEntryHandler<T[]> implements ConfigEntryWithButton {
     @Environment(EnvType.CLIENT)
     private BaseListScreenBuilder<T> listScreen;
     @Environment(EnvType.CLIENT)
     private FancyButtonWidget button;
+    protected Runnable textUpdatedListener = () -> {
+        if (configEntry.requiresRestart() && parent instanceof ScreenBuilder screenBuilder) {
+            screenBuilder.setRequiresRestart();
+        }
+    };
 
     public BaseListConfigEntryHandler(String id, ConfigEntry configEntry, Field parentField, Object parentObject, boolean multiplayerSynced, T[] value, T[] defaultValue) {
         super(id, configEntry, parentField, parentObject, multiplayerSynced, value, defaultValue);

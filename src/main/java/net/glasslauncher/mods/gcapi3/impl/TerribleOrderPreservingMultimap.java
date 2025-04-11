@@ -3,13 +3,8 @@ package net.glasslauncher.mods.gcapi3.impl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TerribleOrderPreservingMultimap<A, B> implements Map<A, B> {
     private final Map<A, List<B>> entries = new HashMap<>();
@@ -95,6 +90,38 @@ public class TerribleOrderPreservingMultimap<A, B> implements Map<A, B> {
     @NotNull
     @Override
     public Set<Entry<A, B>> entrySet() {
-        return new HashSet<>(); // Nope, no, no, dear god please don't make me
+        return entries.entrySet().stream().flatMap(aListEntry -> {
+            Set<Entry<A, B>> set = new HashSet<>();
+            for (B entry : aListEntry.getValue()) {
+                set.add(new TerribleEntry(aListEntry.getKey(), entry));
+            }
+            return set.stream();
+        }).collect(Collectors.toSet());
+    }
+
+    private class TerribleEntry implements Entry<A, B> {
+        A key;
+        B value;
+
+        public TerribleEntry(A key, B value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public A getKey() {
+            return key;
+        }
+
+        @Override
+        public B getValue() {
+            return value;
+        }
+
+        @Override
+        public B setValue(B value) {
+            this.value = value;
+            return value;
+        }
     }
 }

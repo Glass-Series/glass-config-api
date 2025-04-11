@@ -8,6 +8,7 @@ import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.gcapi3.api.HasDrawable;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
+import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,9 +16,9 @@ import net.minecraft.client.resource.language.TranslationStorage;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.*;
 
 /**
  * This class is a bit of a crapshoot cause java's generic type handling is pitifully bad.
@@ -72,6 +73,11 @@ public class EnumConfigEntryHandler<T extends Enum<?>> extends ConfigEntryHandle
             value = 0;
         }
         button.text = getButtonText();
+        if (configEntry.requiresRestart()) {
+            if (parent instanceof ScreenBuilder screenBuilder) {
+                screenBuilder.setRequiresRestart();
+            }
+        }
     }
 
     @Override

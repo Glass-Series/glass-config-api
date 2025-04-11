@@ -77,5 +77,8 @@ public @interface ConfigEntry {
      */
     boolean hidden() default false;
 
-
+    /**
+     * If true, displays a warning to the user advising them to reboot their game after changing this.
+     */
+    boolean requiresRestart() default false;
 }

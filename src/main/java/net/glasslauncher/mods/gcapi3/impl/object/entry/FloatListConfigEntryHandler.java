@@ -7,8 +7,8 @@ import net.glasslauncher.mods.gcapi3.impl.screen.BaseListScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.FloatListScreenBuilder;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class FloatListConfigEntryHandler extends BaseListConfigEntryHandler<Float> {
 
@@ -23,7 +23,8 @@ public class FloatListConfigEntryHandler extends BaseListConfigEntryHandler<Floa
         BaseListScreenBuilder<Float> listScreen = new FloatListScreenBuilder(parent,
                 configEntry,
                 this,
-                textValidator
+                textValidator,
+                textUpdatedListener
         );
 
         listScreen.setValues(value);

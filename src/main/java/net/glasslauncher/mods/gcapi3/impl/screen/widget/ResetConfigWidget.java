@@ -2,13 +2,15 @@ package net.glasslauncher.mods.gcapi3.impl.screen.widget;
 
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ResetConfigWidget extends IconWidget {
     private final ConfigEntryHandler<?> configEntry;
 
-    public ResetConfigWidget(int x, int y, int width, int height, ConfigEntryHandler<?> configEntry) {
-        super(x, y, width, height, "/assets/gcapi3/reset.png");
+    public ResetConfigWidget(ConfigEntryHandler<?> configEntry) {
+        super(0, 0, 0, 0, "/assets/gcapi3/reset.png");
         this.configEntry = configEntry;
     }
 
@@ -27,8 +29,7 @@ public class ResetConfigWidget extends IconWidget {
 
     @Override
     public void setXYWH(int x, int y, int width, int height) {
-        super.setXYWH(x, y, width, height);
-        this.y -= 10;
+        super.setXYWH(x, y - 10, width, height);
     }
 
     @Override
@@ -44,5 +45,20 @@ public class ResetConfigWidget extends IconWidget {
         if(!configEntry.multiplayerLoaded) {
             super.draw(mouseX, mouseY);
         }
+    }
+
+    @Override
+    public void tick() {
+
+    }
+
+    @Override
+    public void keyPressed(char character, int key) {
+
+    }
+
+    @Override
+    public void setID(int id) {
+
     }
 }

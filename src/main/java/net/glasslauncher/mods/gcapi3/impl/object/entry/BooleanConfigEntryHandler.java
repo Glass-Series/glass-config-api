@@ -7,13 +7,14 @@ import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.gcapi3.api.HasDrawable;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
+import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 import java.util.List;
 
 public class BooleanConfigEntryHandler extends ConfigEntryHandler<Boolean> implements ConfigEntryWithButton {
@@ -60,6 +61,11 @@ public class BooleanConfigEntryHandler extends ConfigEntryHandler<Boolean> imple
     public void onClick() {
         value = !value;
         button.text = value.toString();
+        if (configEntry.requiresRestart()) {
+            if (parent instanceof ScreenBuilder screenBuilder) {
+                screenBuilder.setRequiresRestart();
+            }
+        }
     }
 
     @Override

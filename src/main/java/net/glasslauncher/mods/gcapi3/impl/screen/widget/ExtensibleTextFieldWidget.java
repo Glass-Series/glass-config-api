@@ -12,9 +12,9 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
-import java.util.function.*;
+import java.util.function.Function;
 
 /**
  * Basically a modified Textbox from r1.2.5, but modified for gcapi's use case.
@@ -45,6 +45,7 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
 
     private boolean doRenderUpdate = true;
     private Function<String, List<String>> contentsValidator;
+    @Setter private Runnable textUpdatedListener;
 
     public ExtensibleTextFieldWidget(TextRenderer textRenderer) {
         this.textRenderer = textRenderer;
@@ -82,6 +83,9 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
         return this.text.substring(var1, var2);
     }
 
+    /**
+     * Replaces highlighted text.
+     */
     public void addText(String string) {
         String var2 = "";
         String var3 = CharacterUtils.stripInvalidChars(string);
@@ -107,76 +111,79 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
 
         this.text = var2;
         this.updateOffsetCursorMax(var4 - this.cursorMin + var8);
+        if (textUpdatedListener != null) {
+            textUpdatedListener.run();
+        }
     }
 
-    public void method_729(int i) {
+    public void removeWord(int countAndDirection) {
         if (!this.text.isEmpty()) {
             if (this.cursorMin != this.cursorMax) {
                 this.addText("");
             } else {
-                this.method_735(this.method_739(i) - this.cursorMax);
+                this.removeRelativeToCursor(this.getWords(countAndDirection) - this.cursorMax);
             }
         }
     }
 
-    public void method_735(int i) {
+    public void removeRelativeToCursor(int countAndDirection) {
         if (!this.text.isEmpty()) {
             if (this.cursorMin != this.cursorMax) {
                 this.addText("");
             } else {
-                boolean var2 = i < 0;
-                int var3 = var2 ? this.cursorMax + i : this.cursorMax;
-                int var4 = var2 ? this.cursorMax : this.cursorMax + i;
-                String var5 = "";
-                if (var3 >= 0) {
-                    var5 = this.text.substring(0, var3);
+                boolean backwards = countAndDirection < 0;
+                int amountToTryForwards = backwards ? this.cursorMax + countAndDirection : this.cursorMax;
+                int amountToTryBackwards = backwards ? this.cursorMax : this.cursorMax + countAndDirection;
+                String foundCharacters = "";
+                if (amountToTryForwards >= 0) {
+                    foundCharacters = this.text.substring(0, amountToTryForwards);
                 }
 
-                if (var4 < this.text.length()) {
-                    var5 = var5 + this.text.substring(var4);
+                if (amountToTryBackwards < this.text.length()) {
+                    foundCharacters = foundCharacters + this.text.substring(amountToTryBackwards);
                 }
 
-                this.text = var5;
-                if (var2) {
-                    this.updateOffsetCursorMax(i);
+                this.text = foundCharacters;
+                if (backwards) {
+                    this.updateOffsetCursorMax(countAndDirection);
                 }
 
             }
         }
     }
 
-    public int method_739(int i) {
-        return this.method_730(i, this.getCursorMax());
+    public int getWords(int directionAndCount) {
+        return this.getWords(directionAndCount, this.getCursorMax());
     }
 
-    public int method_730(int i, int j) {
-        int var3 = j;
-        boolean var4 = i < 0;
-        int var5 = Math.abs(i);
+    public int getWords(int directionAndCount, int maximumSize) {
+        int endOfWordsIndex = maximumSize;
+        boolean backwards = directionAndCount < 0;
+        int maximumWords = Math.abs(directionAndCount);
 
-        for(int var6 = 0; var6 < var5; ++var6) {
-            if (!var4) {
+        for(int i = 0; i < maximumWords; ++i) {
+            if (!backwards) {
                 int var7 = this.text.length();
-                var3 = this.text.indexOf(32, var3);
-                if (var3 == -1) {
-                    var3 = var7;
+                endOfWordsIndex = this.text.indexOf(32, endOfWordsIndex);
+                if (endOfWordsIndex == -1) {
+                    endOfWordsIndex = var7;
                 } else {
-                    while(var3 < var7 && this.text.charAt(var3) == ' ') {
-                        ++var3;
+                    while(endOfWordsIndex < var7 && this.text.charAt(endOfWordsIndex) == ' ') {
+                        ++endOfWordsIndex;
                     }
                 }
             } else {
-                while(var3 > 0 && this.text.charAt(var3 - 1) == ' ') {
-                    --var3;
+                while(endOfWordsIndex > 0 && this.text.charAt(endOfWordsIndex - 1) == ' ') {
+                    --endOfWordsIndex;
                 }
 
-                while(var3 > 0 && this.text.charAt(var3 - 1) != ' ') {
-                    --var3;
+                while(endOfWordsIndex > 0 && this.text.charAt(endOfWordsIndex - 1) != ' ') {
+                    --endOfWordsIndex;
                 }
             }
         }
 
-        return var3;
+        return endOfWordsIndex;
     }
 
     public void updateOffsetCursorMax(int cursorMax) {
@@ -225,15 +232,15 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
                     return;
                 default:
                     switch(i) {
-                        case 14:
+                        case Keyboard.KEY_BACK:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                                this.method_729(-1);
+                                this.removeWord(-1);
                             } else {
-                                this.method_735(-1);
+                                this.removeRelativeToCursor(-1);
                             }
 
                             return;
-                        case 199:
+                        case Keyboard.KEY_HOME:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                                 this.updateCursorPosition(0);
                             } else {
@@ -241,35 +248,35 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
                             }
 
                             return;
-                        case 203:
+                        case Keyboard.KEY_LEFT:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                                 if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                    this.updateCursorPosition(this.method_730(-1, this.getCursorMin()));
+                                    this.updateCursorPosition(this.getWords(-1, this.getCursorMin()));
                                 } else {
                                     this.updateCursorPosition(this.getCursorMin() - 1);
                                 }
                             } else if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                this.updateCursorMax(this.method_739(-1));
+                                this.updateCursorMax(this.getWords(-1));
                             } else {
                                 this.updateOffsetCursorMax(-1);
                             }
 
                             return;
-                        case 205:
+                        case Keyboard.KEY_RIGHT:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                                 if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                    this.updateCursorPosition(this.method_730(1, this.getCursorMin()));
+                                    this.updateCursorPosition(this.getWords(1, this.getCursorMin()));
                                 } else {
                                     this.updateCursorPosition(this.getCursorMin() + 1);
                                 }
                             } else if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                this.updateCursorMax(this.method_739(1));
+                                this.updateCursorMax(this.getWords(1));
                             } else {
                                 this.updateOffsetCursorMax(1);
                             }
 
                             return;
-                        case 207:
+                        case Keyboard.KEY_END:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                                 this.updateCursorPosition(this.text.length());
                             } else {
@@ -277,11 +284,11 @@ public class ExtensibleTextFieldWidget extends DrawContext implements HasDrawabl
                             }
 
                             return;
-                        case 211:
+                        case Keyboard.KEY_DELETE:
                             if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                                this.method_729(1);
+                                this.removeWord(1);
                             } else {
-                                this.method_735(1);
+                                this.removeRelativeToCursor(1);
                             }
 
                             return;

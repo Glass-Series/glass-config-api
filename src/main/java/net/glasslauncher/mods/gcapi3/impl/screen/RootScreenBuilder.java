@@ -6,11 +6,14 @@ import net.glasslauncher.mods.gcapi3.impl.ConfigRootEntry;
 import net.glasslauncher.mods.gcapi3.impl.EventStorage;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
+import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
@@ -58,11 +61,22 @@ public class RootScreenBuilder extends ScreenBuilder {
     }
 
     @Override
+    public void setRequiresRestart() {
+        super.setRequiresRestart();
+        //noinspection deprecation
+        GCCore.RELOAD_WANTED = true;
+    }
+
+    @Override
     protected void buttonClicked(ButtonWidget button) {
         super.buttonClicked(button);
         if (button.id == backButtonID) {
             //noinspection deprecation Intentional use of GCCore internals.
             GCCore.saveConfig(mod, baseCategory, EventStorage.EventSource.USER_SAVE);
+            //noinspection deprecation
+            if (GCCore.RELOAD_WANTED) {
+                MinecraftAccessor.getInstance().setScreen(new RestartWantedScreen(this));
+            }
         }
         if (switchButtons.contains(button.id)) {
             int index = switchButtons.get(0) == button.id? -1 : 1;

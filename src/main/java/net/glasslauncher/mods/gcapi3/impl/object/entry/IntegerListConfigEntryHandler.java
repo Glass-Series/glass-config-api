@@ -7,7 +7,7 @@ import net.glasslauncher.mods.gcapi3.impl.screen.BaseListScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.IntegerListScreenBuilder;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 
 public class IntegerListConfigEntryHandler extends BaseListConfigEntryHandler<Integer> {
 
@@ -22,7 +22,8 @@ public class IntegerListConfigEntryHandler extends BaseListConfigEntryHandler<In
         BaseListScreenBuilder<Integer> listScreen = new IntegerListScreenBuilder(parent,
                 configEntry,
                 this,
-                textValidator
+                textValidator,
+                textUpdatedListener
         );
         listScreen.setValues(value);
         return listScreen;

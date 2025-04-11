@@ -15,10 +15,11 @@ import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.*;
-import java.util.concurrent.atomic.*;
-import java.util.function.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public abstract class BaseListScreenBuilder<T> extends Screen {
 
@@ -29,14 +30,27 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
     protected ConfigEntryHandler<T[]> configEntry;
     public final List<ExtensibleTextFieldWidget> textFieldWidgets = new ArrayList<>();
     protected Function<String, List<String>> validator;
+    protected Runnable textUpdatedListener;
     protected final ConfigEntry configAnnotation;
     private boolean isInUse = false;
 
+    /**
+     * This constructor is slated for removal in 4.0.
+     */
+    @Deprecated(forRemoval = true)
     protected BaseListScreenBuilder(Screen parent, ConfigEntry configAnnotation, ConfigEntryHandler<T[]> configEntry, Function<String, List<String>> validator) {
         this.parent = parent;
         this.configAnnotation = configAnnotation;
         this.configEntry = configEntry;
         this.validator = validator;
+    }
+
+    protected BaseListScreenBuilder(Screen parent, ConfigEntry configAnnotation, ConfigEntryHandler<T[]> configEntry, Function<String, List<String>> validator, Runnable textUpdatedListener) {
+        this.parent = parent;
+        this.configAnnotation = configAnnotation;
+        this.configEntry = configEntry;
+        this.validator = validator;
+        this.textUpdatedListener = textUpdatedListener;
     }
 
     public void setValues(List<T> list) {
@@ -46,6 +60,7 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
             textbox.setValidator(validator);
             textbox.setMaxLength(Math.toIntExact(configAnnotation.maxLength())); // This helper throws an exception if the number is too high for an int. Handy!
             textbox.setText(String.valueOf(value));
+            textbox.setTextUpdatedListener(textUpdatedListener);
             textFieldWidgets.add(textbox);
         });
     }

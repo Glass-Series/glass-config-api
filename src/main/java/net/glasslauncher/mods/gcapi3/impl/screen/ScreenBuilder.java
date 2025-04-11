@@ -2,11 +2,7 @@ package net.glasslauncher.mods.gcapi3.impl.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.glasslauncher.mods.gcapi3.api.CharacterUtils;
-import net.glasslauncher.mods.gcapi3.api.ConfigCategory;
-import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
-import net.glasslauncher.mods.gcapi3.api.ConfigEntryWithButton;
-import net.glasslauncher.mods.gcapi3.api.HasDrawable;
+import net.glasslauncher.mods.gcapi3.api.*;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigHandlerBase;
@@ -18,10 +14,14 @@ import net.minecraft.client.render.Tessellator;
 import net.minecraft.client.resource.language.TranslationStorage;
 import org.lwjgl.input.Mouse;
 
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScreenBuilder extends Screen {
+    private static final String REQUIRES_RESTART = "Requires Restart";
+    private static final String DONE = TranslationStorage.getInstance().get("gui.done");
 
     protected ScreenScrollList scrollList;
     protected HashMap<Integer, ConfigHandlerBase> buttonToEntry;
@@ -73,7 +73,7 @@ public class ScreenBuilder extends Screen {
         screenButtons.clear();
         this.scrollList = new ScreenScrollList();
         this.buttonToEntry = new HashMap<>();
-        ButtonWidget button = new ButtonWidget(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, TranslationStorage.getInstance().get("gui.done"));
+        ButtonWidget button = new ButtonWidget(backButtonID = buttons.size(),width/2-75, height-26, 150, 20, DONE);
         //noinspection unchecked
         buttons.add(button);
         screenButtons.add(button);
@@ -206,7 +206,15 @@ public class ScreenBuilder extends Screen {
         });
     }
 
+    public void setRequiresRestart() {
+        ((ButtonWidget) buttons.get(backButtonID)).text = REQUIRES_RESTART;
+        if (parent instanceof ScreenBuilder screenBuilder) {
+            screenBuilder.setRequiresRestart();
+        }
+    }
+
     public class ScreenScrollList extends GlassEntryListWidget {
+
         public ScreenScrollList() {
             super(ScreenBuilder.this.minecraft, ScreenBuilder.this.width, ScreenBuilder.this.height, 32, ScreenBuilder.this.height - 32, 48);
             this.setDrawSelectedBox(false);

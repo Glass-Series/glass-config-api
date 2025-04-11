@@ -3,13 +3,15 @@ package net.glasslauncher.mods.gcapi3.impl.object.entry;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.api.HasDrawable;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
+import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.ExtensibleTextFieldWidget;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.List;
 
 public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
     private ExtensibleTextFieldWidget textbox;
@@ -27,6 +29,11 @@ public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
         textbox.setMaxLength(Math.toIntExact(configEntry.maxLength()));
         textbox.setText(value);
         textbox.setEnabled(!multiplayerLoaded);
+        textbox.setTextUpdatedListener(() -> {
+            if (configEntry.requiresRestart() && parent instanceof ScreenBuilder screenBuilder) {
+                screenBuilder.setRequiresRestart();
+            }
+        });
         drawableList.add(textbox);
     }
 
