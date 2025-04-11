@@ -45,6 +45,9 @@ public class IntegerConfigEntryHandler extends ConfigEntryHandler<Integer> {
 
     @Override
     public void setDrawableValue(Integer value) {
+        if (textbox == null) {
+            return;
+        }
         textbox.setText(value.toString());
     }
 

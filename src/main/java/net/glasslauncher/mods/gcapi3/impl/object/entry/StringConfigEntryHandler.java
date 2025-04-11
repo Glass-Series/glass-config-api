@@ -44,6 +44,9 @@ public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
 
     @Override
     public void setDrawableValue(String value) {
+        if (textbox == null) {
+            return;
+        }
         textbox.setText(value);
     }
 

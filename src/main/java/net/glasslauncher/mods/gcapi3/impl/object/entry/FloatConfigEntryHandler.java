@@ -45,6 +45,9 @@ public class FloatConfigEntryHandler extends ConfigEntryHandler<Float> {
 
     @Override
     public void setDrawableValue(Float value) {
+        if (textbox == null) {
+            return;
+        }
         textbox.setText(value.toString());
     }
 
