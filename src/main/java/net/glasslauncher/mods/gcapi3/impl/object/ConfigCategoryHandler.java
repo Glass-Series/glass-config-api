@@ -8,11 +8,12 @@ import net.glasslauncher.mods.gcapi3.impl.TerribleOrderPreservingMultimap;
 import net.glasslauncher.mods.gcapi3.impl.screen.RootScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
+import net.glasslauncher.mods.gcapi3.impl.screen.widget.ResetConfigWidget;
 import net.minecraft.client.gui.screen.Screen;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -41,7 +42,9 @@ public class ConfigCategoryHandler extends ConfigHandlerBase {
     @Override
     public @NotNull List<HasDrawable> getDrawables() {
         if (button == null) {
-            button = Collections.singletonList(new FancyButtonWidget(0, 0, 0, "Open"));
+            button = new ArrayList<>();
+            button.add(new FancyButtonWidget(0, 0, 0, "Open"));
+            button.add(new ResetConfigWidget(this));
         }
         return button;
     }
@@ -50,5 +53,11 @@ public class ConfigCategoryHandler extends ConfigHandlerBase {
     public void applyTranslations(AtomicInteger count) {
         super.applyTranslations(count);
         values.forEach((aClass, configHandlerBase) -> configHandlerBase.applyTranslations(count));
+    }
+
+    public void resetMultiplayerSafeRecursive() throws IllegalAccessException {
+        for (ConfigHandlerBase configHandlerBase : values.values()) {
+            configHandlerBase.resetMultiplayerSafeRecursive();
+        }
     }
 }

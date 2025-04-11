@@ -70,4 +70,6 @@ public abstract class ConfigHandlerBase {
 
     @NotNull
     public abstract List<HasDrawable> getDrawables();
+
+    abstract void resetMultiplayerSafeRecursive() throws IllegalAccessException;
 }

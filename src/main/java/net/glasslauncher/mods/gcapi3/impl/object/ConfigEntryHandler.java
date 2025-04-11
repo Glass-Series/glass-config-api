@@ -66,6 +66,13 @@ public abstract class ConfigEntryHandler<T> extends ConfigHandlerBase {
      */
     abstract public void reset(Object defaultValue) throws IllegalAccessException;
 
+    public void resetMultiplayerSafeRecursive() throws IllegalAccessException {
+        if (multiplayerLoaded) {
+            return;
+        }
+        reset(defaultValue);
+    }
+
     /**
      * This is called on all ConfigEntry objects when joining a vanilla server.
      * Things done in here probably shouldn't be saved, so make sure you set multiplayerLoaded to true if you do anything.

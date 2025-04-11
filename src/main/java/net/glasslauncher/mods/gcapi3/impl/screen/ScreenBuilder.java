@@ -7,6 +7,7 @@ import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigHandlerBase;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.GlassEntryListWidget;
+import net.glasslauncher.mods.gcapi3.impl.screen.widget.ResetConfigWidget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -34,6 +35,8 @@ public class ScreenBuilder extends Screen {
     protected List<ConfigHandlerBase> configHandlerBases = new ArrayList<>();
     protected int backButtonID;
     protected List<ButtonWidget> screenButtons = new ArrayList<>();
+
+    protected ResetConfigWidget resetConfigWidget;
 
     public ScreenBuilder(Screen parent, ModContainer mod, ConfigCategoryHandler baseCategory) {
         this.parent = parent;
@@ -91,6 +94,8 @@ public class ScreenBuilder extends Screen {
                 }
             });
         });
+
+        resetConfigWidget = new ResetConfigWidget(baseCategory);
     }
 
     @Override
@@ -130,6 +135,12 @@ public class ScreenBuilder extends Screen {
                 CharacterUtils.renderTooltip(textRenderer, tooltip, mouseX, mouseY, this);
             }
         }
+
+        resetConfigWidget.setXYWH(width - 25, height - 10, 10, 10);
+        resetConfigWidget.draw(mouseX, mouseY);
+        if (((ScreenAccessor) this).glass_config_api$isMouseInBounds(resetConfigWidget.getXYWH(), mouseX, mouseY)) {
+            CharacterUtils.renderTooltip(textRenderer, List.of("Reset all displayed configs to default."), mouseX, mouseY, this);
+        }
     }
 
     @Override
@@ -143,6 +154,7 @@ public class ScreenBuilder extends Screen {
                 }
             }
 
+            resetConfigWidget.mouseClicked(mouseX, mouseY, buttonID);
             return;
         }
         if (buttonID != 0) { // We only want left click

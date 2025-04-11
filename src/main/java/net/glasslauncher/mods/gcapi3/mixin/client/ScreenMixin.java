@@ -9,7 +9,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -43,7 +42,7 @@ public class ScreenMixin extends DrawContext implements ScreenAccessor {
         AtomicReference<List<String>> tooltip = new AtomicReference<>(null);
         //noinspection unchecked
         Stream.of(buttons, extraObjectsToCheck).flatMap(Collection::stream).forEach((widget) -> {
-            if (widget instanceof HasToolTip && isMouseInBounds(((HasToolTip) widget).getXYWH(), mouseX, mouseY)) {
+            if (widget instanceof HasToolTip && glass_config_api$isMouseInBounds(((HasToolTip) widget).getXYWH(), mouseX, mouseY)) {
                 tooltip.set(((HasToolTip) widget).getTooltip());
             }
         });
@@ -55,8 +54,8 @@ public class ScreenMixin extends DrawContext implements ScreenAccessor {
         selectedButton = value;
     }
 
-    @Unique
-    public boolean isMouseInBounds(int[] xywh, int mouseX, int mouseY) {
+    @Override
+    public boolean glass_config_api$isMouseInBounds(int[] xywh, int mouseX, int mouseY) {
         return mouseX >= xywh[0] && mouseX <= xywh[0] + xywh[2] && mouseY >= xywh[1] && mouseY <= xywh[1] + xywh[3];
     }
 
