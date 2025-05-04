@@ -51,13 +51,13 @@ public @interface ConfigEntry {
     boolean multiplayerSynced() default false;
 
     /**
-     * Use maxValue instead.
+     * Use maxValue instead. Will be removed in 4.0.
      */
     @Deprecated(forRemoval = true)
     long maxLength() default 32;
 
     /**
-     * Use minValue instead.
+     * Use minValue instead. Will be removed in 4.0.
      */
     @Deprecated(forRemoval = true)
     long minLength() default 0;
