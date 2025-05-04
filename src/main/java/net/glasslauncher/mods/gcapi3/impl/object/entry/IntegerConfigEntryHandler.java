@@ -75,7 +75,7 @@ public class IntegerConfigEntryHandler extends ConfigEntryHandler<Integer> {
         if (Integer.parseInt(str) > Math.round(configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxValue())) {
             return Collections.singletonList("Value is too high");
         }
-        if (Integer.parseInt(str) < (configEntry.minValue() == 32d ? configEntry.minLength() : configEntry.minValue())) {
+        if (Integer.parseInt(str) < (configEntry.minValue() == 0d ? configEntry.minLength() : configEntry.minValue())) {
             return Collections.singletonList("Value is too low");
         }
         return null;

@@ -75,7 +75,7 @@ public class FloatConfigEntryHandler extends ConfigEntryHandler<Float> {
         if (Float.parseFloat(str) > (configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxValue())) {
             return Collections.singletonList("Value is too high");
         }
-        if (Float.parseFloat(str) < (configEntry.minValue() == 32d ? configEntry.minLength() : configEntry.minValue())) {
+        if (Float.parseFloat(str) < (configEntry.minValue() == 0d ? configEntry.minLength() : configEntry.minValue())) {
             return Collections.singletonList("Value is too low");
         }
         return null;

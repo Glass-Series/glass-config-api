@@ -75,7 +75,7 @@ public class DoubleConfigEntryHandler extends ConfigEntryHandler<Double> {
         if (Double.parseDouble(str) > Math.round(configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxValue())) {
             return Collections.singletonList("Value is too high");
         }
-        if (Double.parseDouble(str) < (configEntry.minValue() == 32d ? configEntry.minLength() : configEntry.minValue())) {
+        if (Double.parseDouble(str) < (configEntry.minValue() == 0d ? configEntry.minLength() : configEntry.minValue())) {
             return Collections.singletonList("Value is too low");
         }
         return null;

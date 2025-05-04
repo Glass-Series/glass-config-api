@@ -71,7 +71,7 @@ public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
         if (str.length() > Math.round(configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxValue())) {
             return Collections.singletonList("Value is too long");
         }
-        if (str.length() < (configEntry.minValue() == 32d ? configEntry.minLength() : configEntry.minValue())) {
+        if (str.length() < (configEntry.minValue() == 0d ? configEntry.minLength() : configEntry.minValue())) {
             return Collections.singletonList("Value is too short");
         }
         return null;
