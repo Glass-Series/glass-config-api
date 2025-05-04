@@ -33,6 +33,7 @@ public class DefaultFactoryProvider implements ConfigFactoryProvider {
         immutableBuilder.put(String.class, DefaultFactoryProvider::justPass);
         immutableBuilder.put(Integer.class, DefaultFactoryProvider::justPass);
         immutableBuilder.put(Float.class, DefaultFactoryProvider::justPass);
+        immutableBuilder.put(Double.class, DefaultFactoryProvider::justPass);
         immutableBuilder.put(Boolean.class, DefaultFactoryProvider::justPass);
         immutableBuilder.put(String[].class, DefaultFactoryProvider::justPass);
         immutableBuilder.put(Integer[].class, DefaultFactoryProvider::justPass);

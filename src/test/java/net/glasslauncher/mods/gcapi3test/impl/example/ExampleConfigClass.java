@@ -24,6 +24,9 @@ public class ExampleConfigClass {
     @ConfigEntry(name = "ASD 3", requiresRestart = true)
     public String asd3 = "hmmm";
 
+    @ConfigEntry(name = "DoubleTest")
+    public Double doubl = 12d;
+
     @ConfigEntry(name = "MP Synced Boolean", multiplayerSynced = true)
     @ValueOnVanillaServer(booleanValue = TriBoolean.TRUE)
     public Boolean mpBool = false;
