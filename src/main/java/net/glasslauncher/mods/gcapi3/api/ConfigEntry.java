@@ -51,13 +51,25 @@ public @interface ConfigEntry {
     boolean multiplayerSynced() default false;
 
     /**
+     * Use maxValue instead.
+     */
+    @Deprecated(forRemoval = true)
+    long maxLength() default 32;
+
+    /**
+     * Use minValue instead.
+     */
+    @Deprecated(forRemoval = true)
+    long minLength() default 0;
+
+    /**
      * The maximum length of this value.
      * Default 32.
      * Numeric values: the actual number value.
      * Strings: how many characters.
      * Applies to the contents of arrays, not the arrays themselves. See max and minArrayLength.
      */
-    long maxLength() default 32;
+    double maxValue() default 32;
 
     /**
      * The minimum length of this value.
@@ -66,7 +78,7 @@ public @interface ConfigEntry {
      * Strings: how many characters.
      * Applies to the contents of arrays, not the arrays themselves. See max and minArrayLength.
      */
-    long minLength() default 0;
+    double minValue() default 0;
 
     long maxArrayLength() default Byte.MAX_VALUE;
     long minArrayLength() default 0;

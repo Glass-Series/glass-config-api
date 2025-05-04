@@ -58,7 +58,7 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
         list.forEach((value) -> {
             ExtensibleTextFieldWidget textbox = new ExtensibleTextFieldWidget(textRenderer);
             textbox.setValidator(validator);
-            textbox.setMaxLength(Math.toIntExact(configAnnotation.maxLength())); // This helper throws an exception if the number is too high for an int. Handy!
+            textbox.setMaxLength(Math.toIntExact(Math.round(configAnnotation.maxValue() == 32d ? configAnnotation.maxLength() : configAnnotation.maxValue()))); // This helper throws an exception if the number is too high for an int. Handy!
             textbox.setText(String.valueOf(value));
             textbox.setTextUpdatedListener(textUpdatedListener);
             textFieldWidgets.add(textbox);

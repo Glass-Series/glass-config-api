@@ -26,7 +26,7 @@ public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
         super.init(parent, textRenderer);
         textbox = new ExtensibleTextFieldWidget(textRenderer);
         textbox.setValidator(textValidator);
-        textbox.setMaxLength(Math.toIntExact(configEntry.maxLength()));
+        textbox.setMaxLength(Math.toIntExact(configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxLength()));
         textbox.setText(value);
         textbox.setEnabled(!multiplayerLoaded);
         textbox.setTextUpdatedListener(() -> {
@@ -68,10 +68,10 @@ public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
     }
 
     public static List<String> stringValidator(ConfigEntry configEntry, String str) {
-        if (str.length() > configEntry.maxLength()) {
+        if (str.length() > Math.round(configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxValue())) {
             return Collections.singletonList("Value is too long");
         }
-        if (str.length() < configEntry.minLength()) {
+        if (str.length() < (configEntry.minValue() == 32d ? configEntry.minLength() : configEntry.minValue())) {
             return Collections.singletonList("Value is too short");
         }
         return null;

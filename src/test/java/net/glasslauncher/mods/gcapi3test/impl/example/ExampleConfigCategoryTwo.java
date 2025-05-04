@@ -19,6 +19,6 @@ public class ExampleConfigCategoryTwo {
     @ConfigEntry(name = "A FLOAT LIST??!!")
     public Float[] aFList = new Float[0];
 
-    @ConfigEntry(name = "A FIXED LIST?!", maxLength = 10, maxArrayLength = 3, minArrayLength = 3)
+    @ConfigEntry(name = "A FIXED LIST?!", maxValue = 10, maxArrayLength = 3, minArrayLength = 3)
     public Integer[] aFIList = new Integer[] { 1, 3, 4 };
 }

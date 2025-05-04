@@ -72,10 +72,10 @@ public class FloatConfigEntryHandler extends ConfigEntryHandler<Float> {
         if (!CharacterUtils.isFloat(str)) {
             return Collections.singletonList("Value is not a floating point number");
         }
-        if (Float.parseFloat(str) > configEntry.maxLength()) {
+        if (Float.parseFloat(str) > (configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxValue())) {
             return Collections.singletonList("Value is too high");
         }
-        if (Float.parseFloat(str) < configEntry.minLength()) {
+        if (Float.parseFloat(str) < (configEntry.minValue() == 32d ? configEntry.minLength() : configEntry.minValue())) {
             return Collections.singletonList("Value is too low");
         }
         return null;
