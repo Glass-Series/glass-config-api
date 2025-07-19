@@ -18,6 +18,8 @@ public class ModMenuMixin {
 
     @Shadow(remap = false) private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
 
+    HashMap<String, Integer> lowestIndexes = new HashMap<>();
+    
     @Inject(method = "onInitializeClient", at = @At("TAIL"), remap = false)
     private void hijackConfigScreens(CallbackInfo ci) {
         //noinspection deprecation
@@ -26,8 +28,12 @@ public class ModMenuMixin {
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
             String namespace = key.split(":")[0];
+
             if (!map.containsKey(namespace)) {
-                map.remove(namespace);
+                lowestIndexes.put(namespace, value.configRoot().index());
+                map.put(namespace, (parent) -> value.configCategoryHandler().getConfigScreen(parent, value.modContainer()));
+            } else if (value.configRoot().index() < lowestIndexes.getOrDefault(namespace, Integer.MAX_VALUE)) {
+                lowestIndexes.put(namespace, value.configRoot().index());
                 map.put(namespace, (parent) -> value.configCategoryHandler().getConfigScreen(parent, value.modContainer()));
             }
         });
