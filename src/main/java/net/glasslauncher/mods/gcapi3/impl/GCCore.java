@@ -16,6 +16,7 @@ import net.glasslauncher.mods.gcapi3.mixin.client.ConnectionAccessor;
 import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -176,7 +177,12 @@ public class GCCore implements PreLaunchEntrypoint {
                 multiplayerSave = modConfigFile.getBoolean("multiplayer", false) ? getServerConfigFolder() : null;
                 // Try to catch mods reloading configs while on a server.
                 if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && multiplayerSave == null) {
-                    multiplayerSave = ((Minecraft) FabricLoader.getInstance().getGameInstance()).world.isRemote ? getServerConfigFolder() : null;
+                    World world = ((Minecraft) FabricLoader.getInstance().getGameInstance()).world;
+                    if (world != null) {
+                        multiplayerSave = world.isRemote ? getServerConfigFolder() : null;
+                    } else {
+                        multiplayerSave = null;
+                    }
                 }
 
                 if (multiplayerSave != null) {
