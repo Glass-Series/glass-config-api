@@ -1,8 +1,9 @@
 package net.glasslauncher.mods.gcapi3.mixin.client;
 
-import io.github.prospector.modmenu.ModMenu;
+import net.danygames2014.modmenu.ModMenu;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.minecraft.client.gui.screen.Screen;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -15,9 +16,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Mixin(ModMenu.class)
-public class ModMenuMixin {
+public class ModMenuBabricMixin {
 
-    @Shadow(remap = false) private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
+    @Final @Shadow(remap = false) private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
 
     @Unique private final HashMap<String, Integer> lowestIndexes = new HashMap<>();
     

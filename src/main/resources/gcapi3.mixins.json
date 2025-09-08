@@ -15,6 +15,7 @@
     "client.JoinMixin",
     "client.MinecraftAccessor",
     "client.MinecraftMixin",
+    "client.ModMenuBabricMixin",
     "client.ModMenuMixin",
     "client.ScreenMixin",
     "client.TextFieldWidgetMixin",

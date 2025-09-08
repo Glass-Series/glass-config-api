@@ -2,8 +2,8 @@ import java.net.URI
 
 plugins {
 	id("maven-publish")
-	id("fabric-loom") version "1.9.2"
-	id("babric-loom-extension") version "1.9.4"
+	id("fabric-loom") version "1.11.7"
+	id("babric-loom-extension") version "1.10.2"
 }
 
 //noinspection GroovyUnusedAssignment
@@ -62,13 +62,19 @@ dependencies {
 	// convenience stuff
 	// adds some useful annotations for data classes. does not add any dependencies
 	compileOnly("org.projectlombok:lombok:1.18.24")
-	annotationProcessor("org.projectlombok:lombok:1.18.24")
+	annotationProcessor("org.projectlombok:lombok:1.18.38")
 
 	// adds some useful annotations for miscellaneous uses. does not add any dependencies, though people without the lib will be missing some useful context hints.
 	implementation("org.jetbrains:annotations:23.0.0")
 
 	// Optional GCAPI deps
-	transitiveImplementation(modImplementation("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") as Dependency)
+	modCompileOnly("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
+		isTransitive = false
+	}
+	implementation("com.google.code.gson:gson:2.13.1")
+	modImplementation("net.danygames2014:modmenu:${project.properties["modmenubabric_version"]}") {
+		isTransitive = false
+	}
 
 	// GCAPI deps
 	transitiveImplementation(modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}") {
@@ -85,6 +91,11 @@ tasks.withType<ProcessResources> {
 	filesMatching("fabric.mod.json") {
 		expand(mapOf("version" to project.properties["version"]))
 	}
+}
+
+// Tell gradle to stop trying to be smart.
+tasks.withType<GenerateModuleMetadata> {
+	enabled = false
 }
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
