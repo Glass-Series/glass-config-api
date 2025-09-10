@@ -1,6 +1,7 @@
 package net.glasslauncher.mods.gcapi3.mixin.client;
 
 import net.danygames2014.modmenu.ModMenu;
+import net.danygames2014.modmenu.api.ConfigScreenFactory;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Final;
@@ -18,15 +19,14 @@ import java.util.function.Function;
 @Mixin(ModMenu.class)
 public class ModMenuBabricMixin {
 
-    @Final @Shadow(remap = false) private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
-
+    @Shadow @Final private static Map<String, ConfigScreenFactory<?>> configScreenFactories;
     @Unique private final HashMap<String, Integer> lowestIndexes = new HashMap<>();
     
     @Inject(method = "onInitializeClient", at = @At("TAIL"), remap = false)
     private void hijackConfigScreens(CallbackInfo ci) {
         //noinspection deprecation
         GCCore.log("Adding config screens to ModMenu...");
-        Map<String, Function<Screen, ? extends Screen>> map = new HashMap<>();
+        Map<String, ConfigScreenFactory<?>> map = new HashMap<>();
         //noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
             String namespace = key.split(":")[0];
