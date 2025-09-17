@@ -176,7 +176,8 @@ public class GCCore implements PreLaunchEntrypoint {
                 multiplayerSave = modConfigFile.getBoolean("multiplayer", false) ? getServerConfigFolder() : null;
                 // Try to catch mods reloading configs while on a server.
                 if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT && multiplayerSave == null) {
-                    multiplayerSave = ((Minecraft) FabricLoader.getInstance().getGameInstance()).world.isRemote ? getServerConfigFolder() : null;
+                    Minecraft minecraft = (Minecraft) FabricLoader.getInstance().getGameInstance();
+                    multiplayerSave = minecraft != null && minecraft.world != null && minecraft.world.isRemote ? getServerConfigFolder() : null;
                 }
 
                 if (multiplayerSave != null) {
