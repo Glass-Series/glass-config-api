@@ -12,7 +12,7 @@
 3. Fill out the required `value` and `visibleName` parameters on the [annotation](#Annotations). Value is the name of your config file. (e.g. `@ConfigRoot(value = "config", visibleName = "My Config GUI")`)
 4. Go into your `fabric.mod.json` and add the snippet below inside your `entrypoints` section:
 ```json
-"gcapi": [
+"gcapi3": [
   "<path.to.the.class.containing.the.field.here>"
 ]
 ```
