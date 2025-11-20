@@ -17,7 +17,7 @@
 ]
 ```
 5. Now let's go back to the empty class you made earlier.
-6. Create some fields with the type you want ([Valid Types](Types)) and annotate them with `@ConfigEntry`, filling out the value parameter with what you'd like the user to see your option called in the config GUI. (e.g. `@ConfigEntry(name = "My Config Field") public String myField = ""`)
+6. Create some fields with the type you want ([Valid Types](Types.md)) and annotate them with `@ConfigEntry`, filling out the value parameter with what you'd like the user to see your option called in the config GUI. (e.g. `@ConfigEntry(name = "My Config Field") public String myField = ""`)
 7. Done! You can use the field in your code, GCAPI will handle loading and syncing logic for you.
 
 # Categories
