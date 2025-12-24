@@ -27,6 +27,9 @@ public class ExampleConfigClass {
     @ConfigEntry(name = "DoubleTest")
     public Double doubl = 12d;
 
+    @ConfigEntry(name = "FloatText", maxValue = 64)
+    public Float shor = 12f;
+
     @ConfigEntry(name = "MP Synced Boolean", multiplayerSynced = true)
     @ValueOnVanillaServer(booleanValue = TriBoolean.TRUE)
     public Boolean mpBool = false;

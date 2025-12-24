@@ -68,7 +68,7 @@ public class ScreenBuilder extends Screen {
     public void init() {
         configHandlerBases.forEach((value) -> {
             //noinspection rawtypes
-            if (value instanceof ConfigEntryHandler configEntry && configEntry.getDrawableValue() != null) {
+            if (value instanceof ConfigEntryHandler configEntry && configEntry.isValueValid() && configEntry.getDrawableValue() != null) {
                 configEntry.value = configEntry.getDrawableValue();
             }
         });
@@ -207,12 +207,13 @@ public class ScreenBuilder extends Screen {
             if (value instanceof ConfigEntryHandler<?>) {
                 //noinspection rawtypes
                 ConfigEntryHandler configEntry = (ConfigEntryHandler<?>) value;
-                if (configEntry.isValueValid()) {
-                    configEntry.value = configEntry.getDrawableValue();
-                }
-                else {
-                    //noinspection unchecked
-                    configEntry.setDrawableValue(configEntry.value);
+                configEntry.value = configEntry.getDrawableValue();
+                if (!configEntry.isValueValid()) {
+                    try {
+                        configEntry.reset(configEntry.defaultValue);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });
