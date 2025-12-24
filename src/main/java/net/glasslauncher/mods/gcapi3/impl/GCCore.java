@@ -291,8 +291,20 @@ public class GCCore implements PreLaunchEntrypoint {
                         rootJsonObject.getChild(field.getName(), fieldType) != null? rootJsonObject.getChild(field.getName(), fieldType) : childObjField,
                         defaultConfig.get(field.getName())
                 );
+                if (!loaded) { // Holy fuck I can't wait until I get the 4.0 code out the door
+                    Object value = configEntry.value;
+                    //noinspection unchecked,RedundantCast
+                    ((ConfigEntryHandler<Object>) configEntry).value = configEntry.defaultValue;
+                    if (!configEntry.isValueValid()) {
+                        throw new RuntimeException("Default config value for \"" + field.getName() + "\" inside of \"" + configField.getName() + " is invalid! This is a problem with the mod!");
+                    }
+                    //noinspection unchecked,RedundantCast
+                    ((ConfigEntryHandler<Object>) configEntry).value = value;
+                }
+                configEntry.isValueValid();
                 if(!configEntry.isValueValid()) {
-                    throw new RuntimeException("Config value for \"" + field.getName() + "\" inside of \"" + configField.getName() + " is invalid!");
+                    logError(new RuntimeException("Config value for \"" + field.getName() + "\" inside of \"" + configField.getName() + " is invalid!"));
+                    configEntry.reset(configEntry.defaultValue);
                 }
                 configEntry.multiplayerLoaded = isMultiplayer && configEntry.multiplayerSynced;
                 category.values.put(field.getType(), configEntry);
