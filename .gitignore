@@ -26,4 +26,5 @@ bin/
 
 # fabric
 
-run/
+run/*
+!run/server.properties

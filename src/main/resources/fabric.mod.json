@@ -19,6 +19,9 @@
 
   "environment": "*",
   "entrypoints": {
+    "main": [
+      "net.glasslauncher.mods.networking.GlassNetworking"
+    ],
     "preLaunch": [
       "net.glasslauncher.mods.gcapi3.impl.GCCore"
     ],
@@ -41,5 +44,8 @@
   },
   "suggests": {
     "modmenu": "*"
+  },
+  "breaks": {
+    "glassnetworking": "*"
   }
 }

@@ -4,8 +4,13 @@
   "package": "net.glasslauncher.mods.gcapi3.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "networking.HandshakePacketMixin",
+    "networking.PacketHandlerMixin",
+    "networking.PacketMixin",
+    "networking.accessor.NbtCompoundAccessor"
   ],
   "server": [
+    "networking.server.ServerLoginNetworkHandlerMixin",
     "server.JoinMixin"
   ],
   "client": [

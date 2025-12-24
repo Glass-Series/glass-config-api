@@ -1,0 +1,4 @@
+accessWidener v2 named
+
+accessible field net/minecraft/client/Minecraft INSTANCE Lnet/minecraft/client/Minecraft;
+accessible method net/minecraft/nbt/NbtElement write (Ljava/io/DataOutput;)V

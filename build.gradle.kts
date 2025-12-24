@@ -15,7 +15,7 @@ version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
 
 loom {
-//	accessWidenerPath = file("src/main/resources/gcapi3.accesswidener") // Unused.
+	accessWidenerPath = file("src/main/resources/gcapi3.accesswidener")
 
 	@Suppress("UnstableApiUsage")
 	mixin.defaultRefmapName = "${project.properties["archives_base_name"]}3-refmap.json"
@@ -77,10 +77,6 @@ dependencies {
 	}
 
 	// GCAPI deps
-	transitiveImplementation(modImplementation("net.glasslauncher.mods:glass-networking:${project.properties["glass_networking_version"]}") {
-		isTransitive = false
-	} as Dependency)
-
 	transitiveImplementation(implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency) as Dependency)
 	transitiveImplementation(implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency) as Dependency)
 }
