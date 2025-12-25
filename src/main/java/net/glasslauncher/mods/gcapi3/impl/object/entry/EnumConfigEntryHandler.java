@@ -7,6 +7,7 @@ import net.glasslauncher.mods.gcapi3.api.CharacterUtils;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
 import net.glasslauncher.mods.gcapi3.api.ConfigEntryWithButton;
 import net.glasslauncher.mods.gcapi3.api.HasDrawable;
+import net.glasslauncher.mods.gcapi3.impl.SeptFunction;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.screen.ScreenBuilder;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.FancyButtonWidget;
@@ -94,5 +95,19 @@ public class EnumConfigEntryHandler<T extends Enum<?>> extends ConfigEntryHandle
 
     public String getButtonText() {
         return TranslationStorage.getInstance().get(parentEnumArray[value].toString()) + " (" + (value + 1) + "/" + parentEnumArray.length + ")";
+    }
+
+    @SuppressWarnings("unchecked") // cry more
+    public static <T extends Enum<?>> SeptFunction<String, ConfigEntry, Field, Object, Boolean, Object, Object, ConfigEntryHandler<?>> getEnumBuilder(Class<T> enu) {
+        return (id, configEntry, parentField, parentObject, isMultiplayerSynced, enumOrOrdinal, defaultEnum) -> {
+            int enumOrdinal;
+            if(enumOrOrdinal instanceof Integer ordinal) {
+                enumOrdinal = ordinal;
+            }
+            else {
+                enumOrdinal = ((T) enumOrOrdinal).ordinal();
+            }
+            return new EnumConfigEntryHandler<T>(id, configEntry, parentField, parentObject, isMultiplayerSynced, enumOrdinal, ((T) defaultEnum).ordinal(), enu);
+        };
     }
 }
