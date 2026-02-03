@@ -41,7 +41,7 @@ public class GlassNetworking implements ModInitializer {
     static final ArrayList<String> CLIENT_BOUND_PACKETS = new ArrayList<>();
     static final HashMap<String, BiConsumer<GlassPacket, NetworkHandler>> PACKET_HANDLERS = new HashMap<>();
 
-    public static int writeAndGetNbtLength(NbtElement element, OutputStream dataOutput) {
+    public static int writeAndGetNbtLength(NbtElement element, OutputStream dataOutput) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(dataOutput);
         element.write(outputStream);
         try {

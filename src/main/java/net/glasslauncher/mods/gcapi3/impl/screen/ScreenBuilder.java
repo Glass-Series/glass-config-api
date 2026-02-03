@@ -86,11 +86,11 @@ public class ScreenBuilder extends Screen {
                 entryHandler.init(this, textRenderer);
             }
             value.getDrawables().forEach(val -> {
-                if (val instanceof ButtonWidget) {
+                if (val instanceof ButtonWidget buttonWidget) {
                     val.setID(buttons.size());
                     buttonToEntry.put(buttons.size(), value);
                     //noinspection unchecked
-                    buttons.add(val);
+                    buttons.add(buttonWidget);
                 }
             });
         });

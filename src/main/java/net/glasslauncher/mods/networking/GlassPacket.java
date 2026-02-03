@@ -9,6 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiConsumer;
@@ -73,7 +74,7 @@ public class GlassPacket extends Packet {
     }
 
     @Override
-    public void write(DataOutputStream stream) {
+    public void write(DataOutputStream stream) throws IOException {
         nbt.putString("glassnetworking:packetId", packetId);
         nbt.putString("glassnetworking:modId", modId);
         length = GlassNetworking.writeAndGetNbtLength(nbt, stream);
