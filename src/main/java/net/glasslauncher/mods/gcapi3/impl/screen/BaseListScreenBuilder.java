@@ -6,8 +6,8 @@ import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.ExtensibleTextFieldWidget;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.GlassEntryListWidget;
 import net.glasslauncher.mods.gcapi3.impl.screen.widget.TexturedButtonWidget;
-import net.minecraft.class_35;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ParticlesGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.Tessellator;
@@ -71,7 +71,7 @@ public abstract class BaseListScreenBuilder<T> extends Screen {
 
     @Override
     public void init(Minecraft minecraft, int width, int height) {
-        this.field_157 = new class_35(minecraft);
+        this.particlesGui = new ParticlesGui(minecraft);
         this.minecraft = minecraft;
         this.textRenderer = minecraft.textRenderer;
         this.width = width;

@@ -57,7 +57,7 @@ public class JoinMixin {
     }
 
     @Inject(
-            method = "method_1646",
+            method = "sendPacketAndDisconnect",
             at = @At("HEAD")
     )
     private void onDisconnect(Packet par1, CallbackInfo ci) {

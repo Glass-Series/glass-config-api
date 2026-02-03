@@ -64,10 +64,10 @@ public class FancyButtonWidget extends ButtonWidget implements HasDrawable, HasT
             GL11.glBindTexture(3553, minecraft.textureManager.getTextureId("/gui/gui.png"));
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             boolean var5 = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-            int var6 = this.method_1187(var5);
+            int var6 = this.getYImage(var5);
             this.drawTexture(this.x, this.y, 0, 46 + var6 * 20, this.width / 2, this.height);
             this.drawTexture(this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + var6 * 20, this.width / 2, this.height);
-            this.method_1188(minecraft, mouseX, mouseY);
+            this.renderBackground(minecraft, mouseX, mouseY);
             if (!this.active) {
                 this.drawCenteredTextWithShadow(var4, this.text, this.x + this.width / 2, this.y + (this.height - 8) / 2, disabledColour);
             } else if (var5) {

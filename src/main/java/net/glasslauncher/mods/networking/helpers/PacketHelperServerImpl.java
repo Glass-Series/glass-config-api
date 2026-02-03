@@ -13,6 +13,6 @@ public class PacketHelperServerImpl extends PacketHelperImpl {
 
     @Override
     public void sendTo(PlayerEntity player, GlassPacket packet) {
-        ((ServerPlayerEntity) player).field_255.method_835(packet);
+        ((ServerPlayerEntity) player).networkHandler.sendPacket(packet);
     }
 }

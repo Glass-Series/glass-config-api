@@ -76,12 +76,12 @@ public class GlassPacket extends Packet {
     public void write(DataOutputStream stream) {
         nbt.putString("glassnetworking:packetId", packetId);
         nbt.putString("glassnetworking:modId", modId);
-        length = net.glasslauncher.mods.networking.GlassNetworking.writeAndGetNbtLength(nbt, stream);
+        length = GlassNetworking.writeAndGetNbtLength(nbt, stream);
     }
 
     @Override
     public void apply(NetworkHandler networkHandler) {
-        BiConsumer<GlassPacket, NetworkHandler> packetHandler = net.glasslauncher.mods.networking.GlassNetworking.PACKET_HANDLERS.get(getFullId());
+        BiConsumer<GlassPacket, NetworkHandler> packetHandler = GlassNetworking.PACKET_HANDLERS.get(getFullId());
         if (packetHandler != null) {
             packetHandler.accept(this, networkHandler);
         }

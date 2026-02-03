@@ -68,13 +68,13 @@ dependencies {
 	implementation("org.jetbrains:annotations:23.0.0")
 
 	// Optional GCAPI deps
-	modCompileOnly("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
-		isTransitive = false
-	}
-	implementation("com.google.code.gson:gson:2.13.1")
-	modImplementation("net.danygames2014:modmenu:${project.properties["modmenubabric_version"]}") {
-		isTransitive = false
-	}
+//	modCompileOnly("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
+//		isTransitive = false
+//	}
+//	implementation("com.google.code.gson:gson:2.13.1")
+//	modImplementation("net.danygames2014:modmenu:${project.properties["modmenubabric_version"]}") {
+//		isTransitive = false
+//	}
 
 	// GCAPI deps
 	transitiveImplementation(implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency) as Dependency)

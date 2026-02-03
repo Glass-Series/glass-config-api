@@ -106,6 +106,6 @@ public class GlassNetworking implements ModInitializer {
      */
     @Environment(EnvType.SERVER)
     public static boolean clientHasNetworking(ServerPlayerEntity entity) {
-        return ((GlassNetworkHandler) entity.field_255).glass_Networking$hasGlassNetworking();
+        return ((GlassNetworkHandler) entity.networkHandler).glass_Networking$hasGlassNetworking();
     }
 }

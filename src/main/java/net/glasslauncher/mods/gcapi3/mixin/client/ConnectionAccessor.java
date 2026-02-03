@@ -8,6 +8,6 @@ import java.net.SocketAddress;
 
 @Mixin(Connection.class)
 public interface ConnectionAccessor {
-    @Accessor("field_1282")
+    @Accessor("address")
     SocketAddress getAddress();
 }

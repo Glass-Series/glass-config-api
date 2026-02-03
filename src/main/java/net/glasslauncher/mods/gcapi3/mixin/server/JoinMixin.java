@@ -28,7 +28,7 @@ public class JoinMixin {
             locals = LocalCapture.CAPTURE_FAILHARD
     )
     private void gcapi_afterLogin(LoginHelloPacket arg, CallbackInfo ci, ServerPlayerEntity player) {
-        if (((GlassNetworkHandler) player.field_255).glass_Networking$hasGlassNetworking()) {
+        if (((GlassNetworkHandler) player.networkHandler).glass_Networking$hasGlassNetworking()) {
             GCCore.log("Ping successful! Sending config to " + player.name);
 //            GCAPI_PLAYERS.put(player, true); // There's no real need for this, I think?
             NbtCompound nbtCompound = new NbtCompound();

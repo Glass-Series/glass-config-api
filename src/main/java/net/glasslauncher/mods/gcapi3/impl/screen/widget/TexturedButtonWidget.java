@@ -65,7 +65,7 @@ public class TexturedButtonWidget extends ButtonWidget implements HasToolTip {
 			tess.vertex(x, y, this.zOffset, (float) u * uScale, (float) adjustedV * vScale);
 			tess.draw();
 
-			this.method_1188(mc, mouseX, mouseY);
+			this.renderBackground(mc, mouseX, mouseY);
 		}
 	}
 
