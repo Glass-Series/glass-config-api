@@ -7,7 +7,8 @@
     "networking.HandshakePacketMixin",
     "networking.PacketHandlerMixin",
     "networking.PacketMixin",
-    "networking.accessor.NbtCompoundAccessor"
+    "networking.accessor.NbtCompoundAccessor",
+    "networking.accessor.NbtElementAccessor"
   ],
   "server": [
     "networking.server.ServerLoginNetworkHandlerMixin",

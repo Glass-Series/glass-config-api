@@ -5,6 +5,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
+import net.glasslauncher.mods.gcapi3.mixin.networking.accessor.NbtElementAccessor;
 import net.glasslauncher.mods.networking.GlassNetworkHandler;
 import net.glasslauncher.mods.networking.GlassPacket;
 import net.glasslauncher.mods.networking.GlassPacketListener;
@@ -43,7 +45,7 @@ public class GlassNetworking implements ModInitializer {
 
     public static int writeAndGetNbtLength(NbtElement element, OutputStream dataOutput) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(dataOutput);
-        element.write(outputStream);
+        ((NbtElementAccessor)element).invokeWrite(outputStream);
         try {
             outputStream.flush();
         } catch (IOException e) {
@@ -86,7 +88,7 @@ public class GlassNetworking implements ModInitializer {
      */
     @Environment(EnvType.CLIENT)
     public static boolean serverHasNetworking() {
-        ClientNetworkHandler handler = Minecraft.INSTANCE.getNetworkHandler();
+        ClientNetworkHandler handler = MinecraftAccessor.getInstance().getNetworkHandler();
         if (handler == null) {
             return false;
         }
