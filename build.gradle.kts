@@ -6,8 +6,8 @@ plugins {
 	id("ploceus") version "1.15-SNAPSHOT"
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
+java.targetCompatibility = JavaVersion.VERSION_21
 
 base.archivesName = project.properties["archives_base_name"] as String
 version = project.properties["mod_version"] as String
@@ -43,6 +43,7 @@ repositories {
 	maven("https://maven.glass-launcher.net/snapshots/")
 	maven("https://maven.minecraftforge.net/")
 	maven("https://jitpack.io/")
+    maven("https://maven.ornithemc.net/releases")
 	mavenCentral()
 	exclusiveContent {
 		forRepository {
@@ -62,8 +63,8 @@ dependencies {
 	"serverExceptions"(ploceus.raven(project.properties["server_raven_build"] as String, "server"))
 	"clientSignatures"(ploceus.sparrow(project.properties["client_sparrow_build"] as String, "client"))
 	"serverSignatures"(ploceus.sparrow(project.properties["server_sparrow_build"] as String, "server"))
-	"clientNests"(ploceus.nests(project.properties["client_nests_build"] as String, "client"))
-	"serverNests"(ploceus.nests(project.properties["server_nests_build"] as String, "server"))
+    "clientNests"("net.glasslauncher:biny-nests:b1.7.3-client+build.2")
+    "serverNests"("net.glasslauncher:biny-nests:b1.7.3-server+build.2")
 
 	modImplementation("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
 
@@ -82,13 +83,7 @@ dependencies {
 
 	// Optional GCAPI deps
 	// TODO: add back when modmenu is on ornithe
-//	modCompileOnly("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
-//		isTransitive = false
-//	}
-//	implementation("com.google.code.gson:gson:2.13.1")
-//	modImplementation("net.danygames2014:modmenu:${project.properties["modmenubabric_version"]}") {
-//		isTransitive = false
-//	}
+    modCompileOnly("com.terraformersmc:modmenu:${project.properties["modmenu_version"]}")
 
 	// GCAPI deps
 	implementation(include("com.google.guava:guava:33.2.1-jre")!!)
@@ -101,6 +96,11 @@ tasks.withType<ProcessResources> {
 	filesMatching("fabric.mod.json") {
 		expand(mapOf("version" to project.properties["version"]))
 	}
+}
+
+// Don't fail test task when no tests are discovered (these are mod test classes, not unit tests)
+tasks.withType<Test> {
+    failOnNoDiscoveredTests = false
 }
 
 // Tell gradle to stop trying to be smart.
