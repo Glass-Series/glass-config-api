@@ -5,6 +5,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
+import net.glasslauncher.mods.gcapi3.mixin.networking.accessor.NbtElementAccessor;
 import net.glasslauncher.mods.networking.GlassNetworkHandler;
 import net.glasslauncher.mods.networking.GlassPacket;
 import net.glasslauncher.mods.networking.GlassPacketListener;
@@ -41,9 +43,9 @@ public class GlassNetworking implements ModInitializer {
     static final ArrayList<String> CLIENT_BOUND_PACKETS = new ArrayList<>();
     static final HashMap<String, BiConsumer<GlassPacket, NetworkHandler>> PACKET_HANDLERS = new HashMap<>();
 
-    public static int writeAndGetNbtLength(NbtElement element, OutputStream dataOutput) {
+    public static int writeAndGetNbtLength(NbtElement element, OutputStream dataOutput) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(dataOutput);
-        element.write(outputStream);
+        ((NbtElementAccessor)element).invokeWrite(outputStream);
         try {
             outputStream.flush();
         } catch (IOException e) {
@@ -86,7 +88,7 @@ public class GlassNetworking implements ModInitializer {
      */
     @Environment(EnvType.CLIENT)
     public static boolean serverHasNetworking() {
-        ClientNetworkHandler handler = Minecraft.INSTANCE.getNetworkHandler();
+        ClientNetworkHandler handler = MinecraftAccessor.getInstance().getNetworkHandler();
         if (handler == null) {
             return false;
         }
@@ -106,6 +108,6 @@ public class GlassNetworking implements ModInitializer {
      */
     @Environment(EnvType.SERVER)
     public static boolean clientHasNetworking(ServerPlayerEntity entity) {
-        return ((GlassNetworkHandler) entity.field_255).glass_Networking$hasGlassNetworking();
+        return ((GlassNetworkHandler) entity.networkHandler).glass_Networking$hasGlassNetworking();
     }
 }

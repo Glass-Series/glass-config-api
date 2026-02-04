@@ -46,9 +46,9 @@ public class RestartWantedScreen extends Screen {
     protected void buttonClicked(ButtonWidget button) {
         if (button.id == 0) {
             if (minecraft.world != null) {
-                minecraft.field_2773.method_1990(Stats.LEAVE_GAME, 1);
+                minecraft.stats.increment(Stats.LEAVE_GAME, 1);
                 if (minecraft.isWorldRemote()) {
-                    minecraft.world.method_293();
+                    minecraft.world.disconnect();
                 }
 
                 minecraft.setWorld(null);

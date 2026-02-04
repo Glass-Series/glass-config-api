@@ -86,11 +86,11 @@ public class ScreenBuilder extends Screen {
                 entryHandler.init(this, textRenderer);
             }
             value.getDrawables().forEach(val -> {
-                if (val instanceof ButtonWidget) {
+                if (val instanceof ButtonWidget buttonWidget) {
                     val.setID(buttons.size());
                     buttonToEntry.put(buttons.size(), value);
                     //noinspection unchecked
-                    buttons.add(val);
+                    buttons.add(buttonWidget);
                 }
             });
         });
@@ -149,7 +149,7 @@ public class ScreenBuilder extends Screen {
             for (ButtonWidget button : screenButtons) {
                 if (button.isMouseOver(minecraft, mouseX, mouseY)) {
                     ((ScreenAccessor) this).glass_config_api$setSelectedButton(button);
-                    minecraft.soundManager.method_2009("random.click", 1.0F, 1.0F);
+                    minecraft.soundManager.playSound("random.click", 1.0F, 1.0F);
                     buttonClicked(button);
                 }
             }
@@ -165,7 +165,7 @@ public class ScreenBuilder extends Screen {
             ButtonWidget button = (ButtonWidget) buttonObj;
             if (button.isMouseOver(minecraft, mouseX, mouseY)) {
                 ((ScreenAccessor) this).glass_config_api$setSelectedButton(button);
-                minecraft.soundManager.method_2009("random.click", 1.0F, 1.0F);
+                minecraft.soundManager.playSound("random.click", 1.0F, 1.0F);
                 buttonClicked(button);
             }
         }

@@ -40,7 +40,8 @@
   ],
 
   "depends": {
-    "minecraft": "1.0.0-beta.7.3"
+    "minecraft": "1.0.0-beta.7.3",
+    "java": ">=21"
   },
   "suggests": {
     "modmenu": "*"

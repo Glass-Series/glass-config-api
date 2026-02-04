@@ -2,17 +2,20 @@ import java.net.URI
 
 plugins {
 	id("maven-publish")
-	id("fabric-loom") version "1.11.7"
-	id("babric-loom-extension") version "1.10.2"
+	id("net.fabricmc.fabric-loom-remap") version "1.15.+"
+	id("ploceus") version "1.15-SNAPSHOT"
 }
 
-//noinspection GroovyUnusedAssignment
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
+java.targetCompatibility = JavaVersion.VERSION_21
 
 base.archivesName = project.properties["archives_base_name"] as String
 version = project.properties["mod_version"] as String
 group = project.properties["maven_group"] as String
+
+ploceus {
+	setIntermediaryGeneration(2)
+}
 
 loom {
 	accessWidenerPath = file("src/main/resources/gcapi3.accesswidener")
@@ -33,11 +36,14 @@ loom {
 }
 
 repositories {
+	mavenLocal()
+	maven("https://maven.glass-launcher.net/releases")
+	maven("https://mvn.devos.one/releases")
+	maven("https://maven.wispforest.io")
 	maven("https://maven.glass-launcher.net/snapshots/")
-	maven("https://maven.glass-launcher.net/releases/")
-	maven("https://maven.glass-launcher.net/babric")
 	maven("https://maven.minecraftforge.net/")
 	maven("https://jitpack.io/")
+    maven("https://maven.ornithemc.net/releases")
 	mavenCentral()
 	exclusiveContent {
 		forRepository {
@@ -51,8 +57,16 @@ repositories {
 
 dependencies {
 	minecraft("com.mojang:minecraft:${project.properties["minecraft_version"]}")
-	mappings("net.glasslauncher:biny:${project.properties["yarn_mappings"]}:v2")
-	modImplementation("babric:fabric-loader:${project.properties["loader_version"]}")
+	mappings(ploceus.mappings("net.glasslauncher:biny-ornithe:b1.7.3+build.${project.properties["biny_mappings"]}:mergedv2"))
+
+	"clientExceptions"(ploceus.raven(project.properties["client_raven_build"] as String, "client"))
+	"serverExceptions"(ploceus.raven(project.properties["server_raven_build"] as String, "server"))
+	"clientSignatures"(ploceus.sparrow(project.properties["client_sparrow_build"] as String, "client"))
+	"serverSignatures"(ploceus.sparrow(project.properties["server_sparrow_build"] as String, "server"))
+    "clientNests"("net.glasslauncher:biny-nests:b1.7.3-client+build.2")
+    "serverNests"("net.glasslauncher:biny-nests:b1.7.3-server+build.2")
+
+	modImplementation("net.fabricmc:fabric-loader:${project.properties["loader_version"]}")
 
 	implementation("org.apache.logging.log4j:log4j-core:2.17.2")
 
@@ -68,17 +82,12 @@ dependencies {
 	implementation("org.jetbrains:annotations:23.0.0")
 
 	// Optional GCAPI deps
-	modCompileOnly("net.glasslauncher.mods:ModMenu:${project.properties["modmenu_version"]}") {
-		isTransitive = false
-	}
-	implementation("com.google.code.gson:gson:2.13.1")
-	modImplementation("net.danygames2014:modmenu:${project.properties["modmenubabric_version"]}") {
-		isTransitive = false
-	}
+	// TODO: add back when modmenu is on ornithe
+    modCompileOnly("com.terraformersmc:modmenu:${project.properties["modmenu_version"]}")
 
 	// GCAPI deps
-	transitiveImplementation(implementation(include("com.google.guava:guava:33.2.1-jre") as Dependency) as Dependency)
-	transitiveImplementation(implementation(include("me.carleslc:Simple-Yaml:1.8.4") as Dependency) as Dependency)
+	implementation(include("com.google.guava:guava:33.2.1-jre")!!)
+	implementation(include("me.carleslc:Simple-Yaml:1.8.4")!!)
 }
 
 tasks.withType<ProcessResources> {
@@ -87,6 +96,11 @@ tasks.withType<ProcessResources> {
 	filesMatching("fabric.mod.json") {
 		expand(mapOf("version" to project.properties["version"]))
 	}
+}
+
+// Don't fail test task when no tests are discovered (these are mod test classes, not unit tests)
+tasks.withType<Test> {
+    failOnNoDiscoveredTests = false
 }
 
 // Tell gradle to stop trying to be smart.
@@ -99,6 +113,7 @@ tasks.withType<GenerateModuleMetadata> {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
+	options.release = 21
 }
 
 java {

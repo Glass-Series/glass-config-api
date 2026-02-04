@@ -1,6 +1,6 @@
 package net.glasslauncher.mods.gcapi3.mixin.client;
-
-import io.github.prospector.modmenu.ModMenu;
+//    "client.ModMenuMixin",
+import com.terraformersmc.modmenu.ModMenu;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public class ModMenuMixin {
     @Shadow(remap = false) private static Map<String, Function<Screen, ? extends Screen>> configScreenFactories;
 
     @Unique private final HashMap<String, Integer> lowestIndexes = new HashMap<>();
-    
+
     @Inject(method = "onInitializeClient", at = @At("TAIL"), remap = false)
     private void hijackConfigScreens(CallbackInfo ci) {
         //noinspection deprecation

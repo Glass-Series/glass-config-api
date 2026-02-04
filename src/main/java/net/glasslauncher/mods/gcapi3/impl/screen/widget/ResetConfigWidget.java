@@ -36,7 +36,7 @@ public class ResetConfigWidget extends IconWidget {
                 else if (configCategory != null) {
                     configCategory.resetMultiplayerSafeRecursive();
                 }
-                MinecraftAccessor.getInstance().soundManager.method_2009("random.click", 1.0F, 1.0F);
+                MinecraftAccessor.getInstance().soundManager.playSound("random.click", 1.0F, 1.0F);
             } catch (IllegalAccessException e) {
                 //noinspection deprecation
                 GCCore.logError(e);
