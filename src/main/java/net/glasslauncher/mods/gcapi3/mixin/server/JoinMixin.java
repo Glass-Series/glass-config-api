@@ -22,7 +22,7 @@ public class JoinMixin {
             method = "accept",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/ServerPlayerEntity;method_317()V",
+                    target = "Lnet/minecraft/entity/player/ServerPlayerEntity;initScreenHandler()V",
                     shift = At.Shift.AFTER
             ),
             locals = LocalCapture.CAPTURE_FAILHARD
