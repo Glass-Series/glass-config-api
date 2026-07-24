@@ -48,6 +48,7 @@ public class GlassPacket extends Packet {
     };
 
     private int length;
+    public boolean blocking = false;
 
     /***
      * Use this when sending the packet.
@@ -70,13 +71,15 @@ public class GlassPacket extends Packet {
         ((NbtCompoundAccessor)nbt).invokeRead(stream);
         packetId = nbt.getString("glassnetworking:packetId");
         modId = nbt.getString("glassnetworking:modId");
+        blocking = nbt.getBoolean("glassnetworking:blocking");
     }
 
     @Override
     public void write(DataOutputStream stream) {
         nbt.putString("glassnetworking:packetId", packetId);
         nbt.putString("glassnetworking:modId", modId);
-        length = net.glasslauncher.mods.networking.GlassNetworking.writeAndGetNbtLength(nbt, stream);
+        nbt.putBoolean("glassnetworking:blocking", blocking);
+        length = GlassNetworking.writeAndGetNbtLength(nbt, stream);
     }
 
     @Override
