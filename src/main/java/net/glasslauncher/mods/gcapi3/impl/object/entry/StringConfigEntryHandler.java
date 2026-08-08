@@ -26,7 +26,7 @@ public class StringConfigEntryHandler extends ConfigEntryHandler<String> {
         super.init(parent, textRenderer);
         textbox = new ExtensibleTextFieldWidget(textRenderer);
         textbox.setValidator(textValidator);
-        textbox.setMaxLength(Math.toIntExact(configEntry.maxValue() == 32d ? configEntry.maxLength() : configEntry.maxLength()));
+        textbox.setMaxLength(Math.toIntExact(configEntry.maxValue() == 32d ? configEntry.maxLength() : (long) configEntry.maxValue()));
         textbox.setText(value);
         textbox.setEnabled(!multiplayerLoaded);
         textbox.setTextUpdatedListener(() -> {
