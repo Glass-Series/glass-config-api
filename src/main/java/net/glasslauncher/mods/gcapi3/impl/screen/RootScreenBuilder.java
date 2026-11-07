@@ -2,10 +2,14 @@ package net.glasslauncher.mods.gcapi3.impl.screen;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.glasslauncher.mods.gcapi3.api.ConfigCategory;
+import net.glasslauncher.mods.gcapi3.api.ConfigEntry;
+import net.glasslauncher.mods.gcapi3.api.ConfigRoot;
 import net.glasslauncher.mods.gcapi3.impl.ConfigRootEntry;
 import net.glasslauncher.mods.gcapi3.impl.EventStorage;
 import net.glasslauncher.mods.gcapi3.impl.GCCore;
 import net.glasslauncher.mods.gcapi3.impl.object.ConfigCategoryHandler;
+import net.glasslauncher.mods.gcapi3.impl.object.ConfigEntryHandler;
 import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,16 +18,18 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RootScreenBuilder extends ScreenBuilder {
 
     private final ArrayList<ConfigRootEntry> allRoots = new ArrayList<>();
     private final List<Integer> switchButtons = new ArrayList<>();
     public int currentIndex = 0;
+    private boolean reloadOnInit = true;
 
     public RootScreenBuilder(Screen parent, ModContainer mod, ConfigCategoryHandler baseCategory) {
         super(parent, mod, baseCategory);
-        //noinspection deprecation
+        // noinspection deprecation
         GCCore.MOD_CONFIGS.forEach((key, value) -> {
             if (key.split(":")[0].equals(mod.getMetadata().getId())) {
                 allRoots.add(value);
@@ -33,27 +39,62 @@ public class RootScreenBuilder extends ScreenBuilder {
         allRoots.sort(Comparator.comparingInt(entry -> entry.configRoot().index()));
     }
 
+    public RootScreenBuilder setReloadOnInit(boolean reload) {
+        this.reloadOnInit = reload;
+        return this;
+    }
+
     @Override
     public void init() {
+        if (reloadOnInit) {
+            reloadConfig();
+
+            // Rebuild list from the refreshed category
+            configHandlerBases.clear();
+            configHandlerBases.addAll(baseCategory.values.values());
+            configHandlerBases = configHandlerBases.stream().filter(value -> {
+                try {
+                    if (value instanceof ConfigCategoryHandler) {
+                        return !value.parentField.getAnnotation(ConfigCategory.class).hidden();
+                    }
+                    if (value instanceof ConfigEntryHandler) {
+                        return !value.parentField.getAnnotation(ConfigEntry.class).hidden();
+                    }
+                    return false;
+                } catch (Exception e) {
+                    throw new RuntimeException("Error was encountered while trying to parse "
+                            + value.parentObject.getClass().getCanonicalName() + "." + value.parentField.getName(), e);
+                }
+            }).collect(Collectors.toCollection(ArrayList::new));
+            configHandlerBases.sort((self, other) -> {
+                if (other instanceof ConfigCategoryHandler) {
+                    return 1;
+                }
+                return self instanceof ConfigCategoryHandler ? -1 : 0;
+            });
+        }
+
         super.init();
         switchButtons.clear();
-        if(allRoots.size() > 1) {
+        if (allRoots.size() > 1) {
             int prevRoot = currentIndex - 1;
             if (prevRoot < 0) {
-                prevRoot = allRoots.size()-1;
+                prevRoot = allRoots.size() - 1;
             }
-            ButtonWidget button = new ButtonWidget(buttons.size(), 2, 0, 160, 20, "< " + allRoots.get(prevRoot).configRoot().visibleName());
-            //noinspection unchecked
+            ButtonWidget button = new ButtonWidget(buttons.size(), 2, 0, 160, 20,
+                    "< " + allRoots.get(prevRoot).configRoot().visibleName());
+            // noinspection unchecked
             buttons.add(button);
             screenButtons.add(button);
             switchButtons.add(button.id);
 
             int nextRoot = currentIndex + 1;
-            if (nextRoot > allRoots.size()-1) {
+            if (nextRoot > allRoots.size() - 1) {
                 nextRoot = 0;
             }
-            button = new ButtonWidget(buttons.size(), width - 162, 0, 160, 20,  allRoots.get(nextRoot).configRoot().visibleName() + " >");
-            //noinspection unchecked
+            button = new ButtonWidget(buttons.size(), width - 162, 0, 160, 20,
+                    allRoots.get(nextRoot).configRoot().visibleName() + " >");
+            // noinspection unchecked
             buttons.add(button);
             screenButtons.add(button);
             switchButtons.add(button.id);
@@ -63,7 +104,7 @@ public class RootScreenBuilder extends ScreenBuilder {
     @Override
     public void setRequiresRestart() {
         super.setRequiresRestart();
-        //noinspection deprecation
+        // noinspection deprecation
         GCCore.RELOAD_WANTED = true;
     }
 
@@ -71,25 +112,31 @@ public class RootScreenBuilder extends ScreenBuilder {
     protected void buttonClicked(ButtonWidget button) {
         super.buttonClicked(button);
         if (button.id == backButtonID) {
-            //noinspection deprecation Intentional use of GCCore internals.
-            GCCore.saveConfig(mod, baseCategory, EventStorage.EventSource.USER_SAVE);
-            //noinspection deprecation
+            // noinspection deprecation Intentional use of GCCore internals.
+            for (ConfigRootEntry root : allRoots) {
+                GCCore.saveConfig(mod, root.configCategoryHandler(), EventStorage.EventSource.USER_SAVE);
+            }
+            // noinspection deprecation
             if (GCCore.RELOAD_WANTED) {
                 MinecraftAccessor.getInstance().setScreen(new RestartWantedScreen(this));
             }
         }
         if (switchButtons.contains(button.id)) {
-            int index = switchButtons.get(0) == button.id? -1 : 1;
+            // Save text box inputs to memory.
+            saveToEntries();
+
+            int index = switchButtons.get(0) == button.id ? -1 : 1;
             index += currentIndex;
-            if (index > allRoots.size()-1) {
+            if (index > allRoots.size() - 1) {
                 index = 0;
+            } else if (index < 0) {
+                index = allRoots.size() - 1;
             }
-            else if (index < 0) {
-                index = allRoots.size()-1;
-            }
-            RootScreenBuilder builder = (RootScreenBuilder) allRoots.get(index).configCategoryHandler().getConfigScreen(parent, mod);
+            RootScreenBuilder builder = (RootScreenBuilder) allRoots.get(index).configCategoryHandler()
+                    .getConfigScreen(parent, mod);
             builder.currentIndex = index;
-            //noinspection deprecation
+            builder.setReloadOnInit(false);
+            // noinspection deprecation
             ((Minecraft) FabricLoader.getInstance().getGameInstance()).setScreen(builder);
         }
     }
