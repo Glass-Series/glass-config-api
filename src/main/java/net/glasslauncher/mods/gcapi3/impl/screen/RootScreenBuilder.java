@@ -68,17 +68,6 @@ public class RootScreenBuilder extends ScreenBuilder {
     }
 
     @Override
-    protected void keyPressed(char character, int key) {
-        super.keyPressed(character, key);
-        //noinspection deprecation Intentional use of GCCore internals.
-        GCCore.saveConfig(mod, baseCategory, EventStorage.EventSource.USER_SAVE);
-        //noinspection deprecation
-        if (GCCore.RELOAD_WANTED) {
-            MinecraftAccessor.getInstance().setScreen(new RestartWantedScreen(this));
-        }
-    }
-
-    @Override
     protected void buttonClicked(ButtonWidget button) {
         super.buttonClicked(button);
         if (button.id == backButtonID) {
